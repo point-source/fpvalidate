@@ -42,12 +42,12 @@ class ValidationBuilder<T> {
   /// For strings, checks if the string is not empty.
   /// For other types, checks if the value is not null and converts to string.
   ValidationBuilder<T> notEmpty() {
-    _validators.add((value) {
-      final stringValue = value.toString();
+    _validators.add((val) {
+      final stringValue = val.toString();
 
       return stringValue.isEmpty
           ? ValidationFailure('$fieldName not provided')
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -57,14 +57,14 @@ class ValidationBuilder<T> {
   ///
   /// Converts the value to string and checks if its length is at least [minLength].
   ValidationBuilder<T> minLength(int minLength) {
-    _validators.add((value) {
-      final stringValue = value.toString();
+    _validators.add((val) {
+      final stringValue = val.toString();
 
       return stringValue.length < minLength
           ? ValidationFailure(
               '$fieldName must be at least $minLength characters',
             )
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -74,14 +74,14 @@ class ValidationBuilder<T> {
   ///
   /// Converts the value to string and checks if its length is no more than [maxLength].
   ValidationBuilder<T> maxLength(int maxLength) {
-    _validators.add((value) {
-      final stringValue = value.toString();
+    _validators.add((val) {
+      final stringValue = val.toString();
 
       return stringValue.length > maxLength
           ? ValidationFailure(
               '$fieldName must be no more than $maxLength characters',
             )
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -92,12 +92,12 @@ class ValidationBuilder<T> {
   /// Converts the value to string and checks if it matches the given [pattern].
   /// [description] is used in the error message to describe what the pattern represents.
   ValidationBuilder<T> pattern(RegExp pattern, String description) {
-    _validators.add((value) {
-      final stringValue = value.toString();
+    _validators.add((val) {
+      final stringValue = val.toString();
 
       return !pattern.hasMatch(stringValue)
           ? ValidationFailure('$fieldName must match pattern: $description')
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -131,15 +131,15 @@ class ValidationBuilder<T> {
   ///
   /// Attempts to parse the value as a number and checks if it's greater than [min].
   ValidationBuilder<T> min(num min) {
-    _validators.add((value) {
-      final numValue = num.tryParse(value.toString());
+    _validators.add((val) {
+      final numValue = num.tryParse(val.toString());
       if (numValue == null) {
         return ValidationFailure('$fieldName must be a number');
       }
 
       return numValue < min
           ? ValidationFailure('$fieldName must be at least $min')
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -149,15 +149,15 @@ class ValidationBuilder<T> {
   ///
   /// Attempts to parse the value as a number and checks if it's less than [max].
   ValidationBuilder<T> max(num max) {
-    _validators.add((value) {
-      final numValue = num.tryParse(value.toString());
+    _validators.add((val) {
+      final numValue = num.tryParse(val.toString());
       if (numValue == null) {
         return ValidationFailure('$fieldName must be a number');
       }
 
       return numValue > max
           ? ValidationFailure('$fieldName must be no more than $max')
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -167,15 +167,15 @@ class ValidationBuilder<T> {
   ///
   /// Attempts to parse the value as a number and checks if it's between [min] and [max] (inclusive).
   ValidationBuilder<T> inRange(num min, num max) {
-    _validators.add((value) {
-      final numValue = num.tryParse(value.toString());
+    _validators.add((val) {
+      final numValue = num.tryParse(val.toString());
       if (numValue == null) {
         return ValidationFailure('$fieldName must be a number');
       }
 
       return numValue < min || numValue > max
           ? ValidationFailure('$fieldName must be between $min and $max')
-          : ValidationSuccess(value);
+          : ValidationSuccess(val);
     });
 
     return this;
@@ -195,9 +195,9 @@ class ValidationBuilder<T> {
   /// This method is only available for nullable types.
   ValidationBuilder<T?> nonNull() {
     _validators.add(
-      (value) => value == null
+      (val) => val == null
           ? ValidationFailure('$fieldName cannot be null')
-          : ValidationSuccess(value),
+          : ValidationSuccess(val),
     );
 
     return this as ValidationBuilder<T?>;
@@ -207,13 +207,13 @@ class ValidationBuilder<T> {
   ///
   /// This method is only available for nullable types.
   ValidationBuilder<T?> nonNullOrEmpty() {
-    _validators.add((value) {
-      if (value == null) return ValidationFailure('$fieldName cannot be null');
-      if (value is String && value.isEmpty) {
+    _validators.add((val) {
+      if (val == null) return ValidationFailure('$fieldName cannot be null');
+      if (val is String && val.isEmpty) {
         return ValidationFailure('$fieldName cannot be empty');
       }
 
-      return ValidationSuccess(value);
+      return ValidationSuccess(val);
     });
 
     return this as ValidationBuilder<T?>;
