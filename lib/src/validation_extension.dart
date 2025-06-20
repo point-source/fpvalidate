@@ -97,13 +97,22 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
   /// or returns a list of all validated values if all validations pass.
   ///
   /// This method stops at the first validation failure and throws that error.
+  ///
+  /// Note: This method will throw an error if any builder is not an AsyncValidationBuilder.
+  /// Use [validateMixed] if you have a mix of sync and async builders.
   Future<List<T>> validateAsync() async {
     final results = <T>[];
 
     for (final builder in this) {
       try {
-        final result = await builder.validateAsync();
-        results.add(result);
+        if (builder is AsyncValidationBuilder<T>) {
+          final result = await builder.validateAsync();
+          results.add(result);
+        } else {
+          // For sync builders, use the sync validate method
+          final result = builder.validate();
+          results.add(result);
+        }
       } catch (e, stackTrace) {
         if (e is ValidationError) {
           rethrow;
@@ -140,6 +149,9 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
   /// or [TaskEither.right] with a list of all validated values if all validations pass.
   ///
   /// This method stops at the first validation failure and returns that error.
+  ///
+  /// This method automatically detects whether each builder is sync or async and
+  /// validates accordingly.
   TaskEither<ValidationError, List<T>> validateTaskEither() =>
       TaskEither.tryCatch(
         () async => await validateAsync(),

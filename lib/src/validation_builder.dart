@@ -34,9 +34,6 @@ class ValidationBuilder<T> {
   /// The list of validators to apply to the value.
   final List<Validator<T>> _validators = [];
 
-  /// The list of async validators to apply to the value.
-  final List<AsyncValidator<T>> _asyncValidators = [];
-
   /// Validates that the field is not empty.
   ///
   /// For strings, checks if the string is not empty and not just whitespace.
@@ -236,7 +233,8 @@ class ValidationBuilder<T> {
   /// Adds a custom async validator function.
   ///
   /// [validator] is a function that takes a value and returns a [Future<ValidationResult>].
-  /// This allows you to create custom async validation logic that integrates with the fluent API.
+  /// This method converts the current builder to an [AsyncValidationBuilder] to ensure
+  /// proper async validation handling.
   ///
   /// Example:
   /// ```dart
@@ -253,10 +251,8 @@ class ValidationBuilder<T> {
   ///     })
   ///     .validateAsync();
   /// ```
-  ValidationBuilder<T> customAsync(AsyncValidator<T> validator) {
-    _asyncValidators.add(validator);
-
-    return this;
+  AsyncValidationBuilder<T> customAsync(AsyncValidator<T> validator) {
+    return AsyncValidationBuilder._fromSync(this, validator);
   }
 
   /// Executes all validators and throws a [ValidationError] if validation fails.
@@ -265,9 +261,6 @@ class ValidationBuilder<T> {
   /// or returns the original value if all validations pass.
   ///
   /// This method is useful for users who prefer traditional exception handling.
-  ///
-  /// Note: This method only executes synchronous validators. Use [validateAsync]
-  /// if you have async validators.
   T validate() {
     for (final validator in _validators) {
       final result = validator(value);
@@ -280,6 +273,87 @@ class ValidationBuilder<T> {
     }
 
     return value;
+  }
+
+  /// Executes all validators and returns the result as an [Either].
+  ///
+  /// Returns [Either.left] with a [ValidationError] if any validation fails,
+  /// or [Either.right] with the original value if all validations pass.
+  ///
+  /// This is useful for synchronous validation scenarios with fpdart.
+  Either<ValidationError, T> validateEither() => Either.tryCatch(
+    () => validate(),
+    (e, stackTrace) => e is ValidationError
+        ? e
+        : ValidationError(
+            fieldName,
+            'Validation failed: ${e.toString()}',
+            stackTrace,
+          ),
+  );
+
+  /// Executes all validators and returns the result as a [TaskEither].
+  ///
+  /// Returns [TaskEither.left] with a [ValidationError] if any validation fails,
+  /// or [TaskEither.right] with the original value if all validations pass.
+  ///
+  /// This is useful for synchronous validation scenarios with fpdart that need
+  /// to be wrapped in a TaskEither for consistency with async validation.
+  TaskEither<ValidationError, T> validateTaskEither() => TaskEither.tryCatch(
+    () async => validate(),
+    (e, stackTrace) => e is ValidationError
+        ? e
+        : ValidationError(
+            fieldName,
+            'Validation failed: ${e.toString()}',
+            stackTrace,
+          ),
+  );
+}
+
+/// An async version of [ValidationBuilder] that handles asynchronous validation.
+///
+/// This class is automatically created when you add an async validator to a regular
+/// [ValidationBuilder]. It provides the same fluent API but with async validation methods.
+///
+/// Example:
+/// ```dart
+/// final result = await email
+///     .field('Email')
+///     .notEmpty()
+///     .email()
+///     .customAsync((email) async {
+///       // Check if email exists in database
+///       final exists = await userService.emailExists(email);
+///       return exists
+///           ? ValidationFailure('Email already registered')
+///           : ValidationSuccess(email);
+///     })
+///     .validateAsync();
+/// ```
+class AsyncValidationBuilder<T> extends ValidationBuilder<T> {
+  /// Creates a new async validation builder from a sync builder and an async validator.
+  AsyncValidationBuilder._fromSync(
+    ValidationBuilder<T> syncBuilder,
+    AsyncValidator<T> validator,
+  ) : super(syncBuilder.value, syncBuilder.fieldName) {
+    // Copy all validators from the sync builder
+    _validators.addAll(syncBuilder._validators);
+    _asyncValidators.add(validator);
+  }
+
+  /// The list of async validators to apply to the value.
+  final List<AsyncValidator<T>> _asyncValidators = [];
+
+  /// Adds a custom async validator function.
+  ///
+  /// [validator] is a function that takes a value and returns a [Future<ValidationResult>].
+  /// This allows you to create custom async validation logic that integrates with the fluent API.
+  @override
+  AsyncValidationBuilder<T> customAsync(AsyncValidator<T> validator) {
+    _asyncValidators.add(validator);
+
+    return this;
   }
 
   /// Executes all validators (including async ones) and throws a [ValidationError] if validation fails.
@@ -313,26 +387,6 @@ class ValidationBuilder<T> {
 
     return value;
   }
-
-  /// Executes all validators and returns the result as an [Either].
-  ///
-  /// Returns [Either.left] with a [ValidationError] if any validation fails,
-  /// or [Either.right] with the original value if all validations pass.
-  ///
-  /// This is useful for synchronous validation scenarios with fpdart.
-  ///
-  /// Note: This method only executes synchronous validators. Use [validateTaskEither]
-  /// if you have async validators.
-  Either<ValidationError, T> validateEither() => Either.tryCatch(
-    () => validate(),
-    (e, stackTrace) => e is ValidationError
-        ? e
-        : ValidationError(
-            fieldName,
-            'Validation failed: ${e.toString()}',
-            stackTrace,
-          ),
-  );
 
   /// Executes all validators and returns the result as a [TaskEither].
   ///
