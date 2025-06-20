@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:fpvalidate/src/validation_result.dart';
+
 import 'validation_builder.dart';
 
 /// Common numeric validation functions that can be used with the [custom] method.
@@ -21,6 +23,7 @@ class NumericValidators {
     if (value != value.toInt()) {
       return ValidationFailure('must be an integer');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -31,6 +34,7 @@ class NumericValidators {
     if (value % 2 != 0) {
       return ValidationFailure('must be even');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -41,6 +45,7 @@ class NumericValidators {
     if (value % 2 == 0) {
       return ValidationFailure('must be odd');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -55,6 +60,7 @@ class NumericValidators {
     if (sqrtValue != sqrtValue.toInt()) {
       return ValidationFailure('must be a perfect square');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -75,6 +81,7 @@ class NumericValidators {
         return ValidationFailure('must be prime');
       }
     }
+
     return ValidationSuccess(value);
   };
 
@@ -93,6 +100,7 @@ class NumericValidators {
     if ((intValue & (intValue - 1)) != 0) {
       return ValidationFailure('must be a power of 2');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -111,6 +119,7 @@ class NumericValidators {
         if (difference > percentage) {
           return ValidationFailure('must be within $percentage% of $target');
         }
+
         return ValidationSuccess(value);
       };
 
@@ -124,6 +133,7 @@ class NumericValidators {
     if (value < 1 || value > 65535) {
       return ValidationFailure('must be between 1 and 65535');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -137,6 +147,7 @@ class NumericValidators {
     if (value < 1900 || value > 2100) {
       return ValidationFailure('must be between 1900 and 2100');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -150,6 +161,7 @@ class NumericValidators {
     if (value < 1 || value > 12) {
       return ValidationFailure('must be between 1 and 12');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -163,6 +175,7 @@ class NumericValidators {
     if (value < 1 || value > 31) {
       return ValidationFailure('must be between 1 and 31');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -176,6 +189,7 @@ class NumericValidators {
     if (value < 0 || value > 23) {
       return ValidationFailure('must be between 0 and 23');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -189,6 +203,7 @@ class NumericValidators {
     if (value < 0 || value > 59) {
       return ValidationFailure('must be between 0 and 59');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -202,6 +217,7 @@ class NumericValidators {
     if (value < 0 || value > 59) {
       return ValidationFailure('must be between 0 and 59');
     }
+
     return ValidationSuccess(value);
   };
 }

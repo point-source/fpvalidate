@@ -1,3 +1,5 @@
+import 'package:fpvalidate/src/validation_result.dart';
+
 import 'validation_builder.dart';
 
 /// Common nullable validation functions that can be used with the [custom] method.
@@ -24,6 +26,7 @@ class NullableValidators {
     if (value == null) {
       return ValidationSuccess(value);
     }
+
     return validator(value);
   };
 
@@ -47,6 +50,7 @@ class NullableValidators {
     if (value == null) {
       return ValidationFailure('cannot be null');
     }
+
     return validator(value);
   };
 
@@ -62,6 +66,7 @@ class NullableValidators {
     if (value.isEmpty) {
       return ValidationFailure('cannot be empty if provided');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -77,6 +82,7 @@ class NullableValidators {
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
       return ValidationFailure('must be a valid email format if provided');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -92,6 +98,7 @@ class NullableValidators {
     if (!RegExp(r'^https?://.*').hasMatch(value)) {
       return ValidationFailure('must be a valid URL format if provided');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -109,6 +116,7 @@ class NullableValidators {
         'must be a valid phone number format if provided',
       );
     }
+
     return ValidationSuccess(value);
   };
 
@@ -126,6 +134,7 @@ class NullableValidators {
     if (value < min || value > max) {
       return ValidationFailure('must be between $min and $max if provided');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -144,6 +153,7 @@ class NullableValidators {
         'must be at least $minLength characters if provided',
       );
     }
+
     return ValidationSuccess(value);
   };
 
@@ -162,6 +172,7 @@ class NullableValidators {
         'must be no more than $maxLength characters if provided',
       );
     }
+
     return ValidationSuccess(value);
   };
 }

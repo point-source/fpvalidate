@@ -1,25 +1,12 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:fpvalidate/src/validation_result.dart';
 import 'validation_error.dart';
 
 /// A function type that validates a value and returns a validation result.
 typedef Validator<T> = ValidationResult<T> Function(T value);
 
-/// Represents the result of a validation operation.
-sealed class ValidationResult<T> {
-  const ValidationResult();
-}
-
-/// Indicates that validation was successful.
-class ValidationSuccess<T> extends ValidationResult<T> {
-  const ValidationSuccess(this.value);
-  final T value;
-}
-
-/// Indicates that validation failed.
-class ValidationFailure<T> extends ValidationResult<T> {
-  const ValidationFailure(this.message);
-  final String message;
-}
+/// A function type that validates a value asynchronously and returns a validation result.
+typedef AsyncValidator<T> = Future<ValidationResult<T>> Function(T value);
 
 /// A builder class that provides a fluent API for creating validation chains.
 ///
@@ -46,6 +33,9 @@ class ValidationBuilder<T> {
 
   /// The list of validators to apply to the value.
   final List<Validator<T>> _validators = [];
+
+  /// The list of async validators to apply to the value.
+  final List<AsyncValidator<T>> _asyncValidators = [];
 
   /// Validates that the field is not empty.
   ///
@@ -239,22 +229,85 @@ class ValidationBuilder<T> {
     return this;
   }
 
-  /// Executes all validators and returns the result as a [TaskEither].
+  /// Adds a custom async validator function.
   ///
-  /// Returns [TaskEither.left] with a [ValidationError] if any validation fails,
-  /// or [TaskEither.right] with the original value if all validations pass.
-  TaskEither<ValidationError, T> validate() {
+  /// [validator] is a function that takes a value and returns a [Future<ValidationResult>].
+  /// This allows you to create custom async validation logic that integrates with the fluent API.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await email
+  ///     .field('Email')
+  ///     .notEmpty()
+  ///     .email()
+  ///     .customAsync((email) async {
+  ///       // Check if email exists in database
+  ///       final exists = await userService.emailExists(email);
+  ///       return exists
+  ///           ? ValidationFailure('Email already registered')
+  ///           : ValidationSuccess(email);
+  ///     })
+  ///     .validateAsync();
+  /// ```
+  ValidationBuilder<T> customAsync(AsyncValidator<T> validator) {
+    _asyncValidators.add(validator);
+
+    return this;
+  }
+
+  /// Executes all validators and throws a [ValidationError] if validation fails.
+  ///
+  /// Throws a [ValidationError] if any validation fails,
+  /// or returns the original value if all validations pass.
+  ///
+  /// This method is useful for users who prefer traditional exception handling.
+  ///
+  /// Note: This method only executes synchronous validators. Use [validateAsync]
+  /// if you have async validators.
+  T validate() {
     for (final validator in _validators) {
       final result = validator(value);
       switch (result) {
         case ValidationFailure(message: final msg):
-          return TaskEither.left(ValidationError(fieldName, msg));
+          throw ValidationError(fieldName, msg);
         case ValidationSuccess():
           continue;
       }
     }
 
-    return TaskEither.right(value);
+    return value;
+  }
+
+  /// Executes all validators (including async ones) and throws a [ValidationError] if validation fails.
+  ///
+  /// Throws a [ValidationError] if any validation fails,
+  /// or returns the original value if all validations pass.
+  ///
+  /// This method is useful for users who prefer traditional exception handling.
+  Future<T> validateAsync() async {
+    // Execute sync validators first
+    for (final validator in _validators) {
+      final result = validator(value);
+      switch (result) {
+        case ValidationFailure(message: final msg):
+          throw ValidationError(fieldName, msg);
+        case ValidationSuccess():
+          continue;
+      }
+    }
+
+    // Execute async validators
+    for (final validator in _asyncValidators) {
+      final result = await validator(value);
+      switch (result) {
+        case ValidationFailure(message: final msg):
+          throw ValidationError(fieldName, msg);
+        case ValidationSuccess():
+          continue;
+      }
+    }
+
+    return value;
   }
 
   /// Executes all validators and returns the result as an [Either].
@@ -262,18 +315,35 @@ class ValidationBuilder<T> {
   /// Returns [Either.left] with a [ValidationError] if any validation fails,
   /// or [Either.right] with the original value if all validations pass.
   ///
-  /// This is useful for synchronous validation scenarios.
-  Either<ValidationError, T> validateSync() {
-    for (final validator in _validators) {
-      final result = validator(value);
-      switch (result) {
-        case ValidationFailure(message: final msg):
-          return Either.left(ValidationError(fieldName, msg));
-        case ValidationSuccess():
-          continue;
-      }
-    }
+  /// This is useful for synchronous validation scenarios with fpdart.
+  ///
+  /// Note: This method only executes synchronous validators. Use [validateTask]
+  /// if you have async validators.
+  Either<ValidationError, T> validateEither() => Either.tryCatch(
+    () => validate(),
+    (e, stackTrace) => e is ValidationError
+        ? e
+        : ValidationError(
+            fieldName,
+            'Validation failed: ${e.toString()}',
+            stackTrace,
+          ),
+  );
 
-    return Either.right(value);
-  }
+  /// Executes all validators and returns the result as a [TaskEither].
+  ///
+  /// Returns [TaskEither.left] with a [ValidationError] if any validation fails,
+  /// or [TaskEither.right] with the original value if all validations pass.
+  ///
+  /// This is useful for asynchronous validation scenarios with fpdart.
+  TaskEither<ValidationError, T> validateTask() => TaskEither.tryCatch(
+    () async => await validateAsync(),
+    (e, stackTrace) => e is ValidationError
+        ? e
+        : ValidationError(
+            fieldName,
+            'Validation failed: ${e.toString()}',
+            stackTrace,
+          ),
+  );
 }

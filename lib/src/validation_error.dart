@@ -13,13 +13,17 @@ class ValidationError {
   ///
   /// [fieldName] is the name of the field that failed validation.
   /// [message] is the error message describing the validation failure.
-  const ValidationError(this.fieldName, this.message);
+  /// [stackTrace] is an optional stack trace for debugging purposes.
+  const ValidationError(this.fieldName, this.message, [this.stackTrace]);
 
   /// The name of the field that failed validation.
   final String fieldName;
 
   /// The error message describing the validation failure.
   final String message;
+
+  /// Optional stack trace for debugging purposes.
+  final StackTrace? stackTrace;
 
   @override
   String toString() => '$fieldName: $message';
@@ -30,8 +34,10 @@ class ValidationError {
       other is ValidationError &&
           runtimeType == other.runtimeType &&
           fieldName == other.fieldName &&
-          message == other.message;
+          message == other.message &&
+          stackTrace == other.stackTrace;
 
   @override
-  int get hashCode => fieldName.hashCode ^ message.hashCode;
+  int get hashCode =>
+      fieldName.hashCode ^ message.hashCode ^ stackTrace.hashCode;
 }

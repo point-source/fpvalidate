@@ -1,3 +1,5 @@
+import 'package:fpvalidate/src/validation_result.dart';
+
 import 'validation_builder.dart';
 
 /// Common string validation functions that can be used with the [custom] method.
@@ -21,6 +23,7 @@ class StringValidators {
     if (!value.contains(substring)) {
       return ValidationFailure('must contain "$substring"');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -32,6 +35,7 @@ class StringValidators {
     if (!value.startsWith(prefix)) {
       return ValidationFailure('must start with "$prefix"');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -43,6 +47,7 @@ class StringValidators {
     if (!value.endsWith(suffix)) {
       return ValidationFailure('must end with "$suffix"');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -53,6 +58,7 @@ class StringValidators {
     if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
       return ValidationFailure('must contain only alphanumeric characters');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -63,6 +69,7 @@ class StringValidators {
     if (!RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
       return ValidationFailure('must contain only letters');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -73,6 +80,7 @@ class StringValidators {
     if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
       return ValidationFailure('must contain only digits');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -86,6 +94,7 @@ class StringValidators {
     ).hasMatch(value)) {
       return ValidationFailure('must be a valid UUID');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -98,6 +107,7 @@ class StringValidators {
     if (!RegExp(r'^[0-9]{13,19}$').hasMatch(cleanValue)) {
       return ValidationFailure('must be a valid credit card number');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -108,6 +118,7 @@ class StringValidators {
     if (!RegExp(r'^[0-9]{5}(-[0-9]{4})?$').hasMatch(value)) {
       return ValidationFailure('must be a valid postal code');
     }
+
     return ValidationSuccess(value);
   };
 
@@ -120,6 +131,7 @@ class StringValidators {
     }
     try {
       DateTime.parse(value);
+
       return ValidationSuccess(value);
     } catch (e) {
       return ValidationFailure('must be a valid date');
@@ -133,6 +145,7 @@ class StringValidators {
     if (!RegExp(r'^([01]?[0-9]|2[0-3]):[0-5][0-9]$').hasMatch(value)) {
       return ValidationFailure('must be a valid time in HH:MM format');
     }
+
     return ValidationSuccess(value);
   };
 }
