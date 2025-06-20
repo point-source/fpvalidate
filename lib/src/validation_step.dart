@@ -1,3 +1,4 @@
+import 'package:fpvalidate/src/extensions/async_validation_step.dart';
 import 'package:fpvalidate/src/validation_error.dart';
 
 part 'extensions/field_extension.dart';
@@ -14,6 +15,8 @@ sealed class ValidationStep<T> {
 
   ValidationStep<R> next<R>(Validator<T, R> onValidate);
 
+  AsyncValidationStep<R> nextAsync<R>(AsyncValidator<T, R> onValidate);
+
   Success<R> _success<R>(R value) => Success(fieldName, value);
 
   Failure<R> _fail<R>(String message, [StackTrace? stackTrace]) =>
@@ -29,6 +32,23 @@ sealed class ValidationStep<T> {
   }
 }
 
+class Success<T> extends ValidationStep<T> {
+  @override
+  final T validated;
+
+  const Success(super.fieldName, this.validated);
+
+  @override
+  ValidationStep<R> next<R>(Validator<T, R> onValidate) {
+    return onValidate(validated);
+  }
+
+  @override
+  AsyncValidationStep<R> nextAsync<R>(AsyncValidator<T, R> onValidate) {
+    return AsyncValidationStep(onValidate(validated));
+  }
+}
+
 class Failure<T> extends ValidationStep<T> {
   final ValidationError error;
 
@@ -40,17 +60,10 @@ class Failure<T> extends ValidationStep<T> {
   }
 
   @override
-  T get validated => throw error;
-}
-
-class Success<T> extends ValidationStep<T> {
-  @override
-  final T validated;
-
-  const Success(super.fieldName, this.validated);
-
-  @override
-  ValidationStep<R> next<R>(Validator<T, R> onValidate) {
-    return onValidate(validated);
+  AsyncValidationStep<R> nextAsync<R>(AsyncValidator<T, R> onValidate) {
+    return AsyncValidationStep(Future.value(Failure<R>(fieldName, error)));
   }
+
+  @override
+  T get validated => throw error;
 }
