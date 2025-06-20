@@ -23,11 +23,11 @@
 /// ].validate()
 /// .mapLeft((error) => CustomError(error.message));
 /// ```
-library fpvalidate;
+library;
 
 export 'src/validation_error.dart';
 export 'src/validation_builder.dart';
-export 'src/validation_extensions.dart';
+export 'src/validation_extension.dart';
 export 'src/string_validators.dart';
 export 'src/numeric_validators.dart';
 export 'src/nullable_validators.dart';
