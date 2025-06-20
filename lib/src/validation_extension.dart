@@ -81,9 +81,8 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
         if (e is ValidationError) {
           rethrow;
         }
-        throw ValidationError(
-          'Unknown validation error',
-          e.toString(),
+        Error.throwWithStackTrace(
+          ValidationError('Unknown validation error', e.toString()),
           stackTrace,
         );
       }
@@ -109,9 +108,8 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
         if (e is ValidationError) {
           rethrow;
         }
-        throw ValidationError(
-          'Unknown validation error',
-          e.toString(),
+        Error.throwWithStackTrace(
+          ValidationError('Unknown validation error', e.toString()),
           stackTrace,
         );
       }
