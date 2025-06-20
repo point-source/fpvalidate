@@ -39,13 +39,17 @@ class ValidationBuilder<T> {
 
   /// Validates that the field is not empty.
   ///
-  /// For strings, checks if the string is not empty.
+  /// For strings, checks if the string is not empty and not just whitespace.
   /// For other types, checks if the value is not null and converts to string.
-  ValidationBuilder<T> notEmpty() {
+  ///
+  /// [trim] is a boolean flag that determines if the string should be trimmed
+  /// of whitespace before checking if it's empty.
+  /// Defaults to true.
+  ValidationBuilder<T> notEmpty({bool trim = true}) {
     _validators.add((val) {
       final stringValue = val.toString();
 
-      return stringValue.isEmpty
+      return (trim ? stringValue.trim().isEmpty : stringValue.isEmpty)
           ? ValidationFailure('$fieldName not provided')
           : ValidationSuccess(val);
     });
