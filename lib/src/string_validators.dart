@@ -126,11 +126,18 @@ class StringValidators {
   ///
   /// Returns a validator function that can be used with the [custom] method.
   static Validator<String> isoDate() => (value) {
-    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+    final match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(value);
+    if (match == null) {
       return ValidationFailure('must be a valid date in YYYY-MM-DD format');
     }
     try {
-      DateTime.parse(value);
+      final year = int.parse(match.group(1)!);
+      final month = int.parse(match.group(2)!);
+      final day = int.parse(match.group(3)!);
+      final parsed = DateTime.parse(value);
+      if (parsed.year != year || parsed.month != month || parsed.day != day) {
+        return ValidationFailure('must be a valid date');
+      }
 
       return ValidationSuccess(value);
     } catch (e) {
