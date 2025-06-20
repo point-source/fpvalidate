@@ -32,7 +32,7 @@ Add fpvalidate to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fpvalidate: ^1.0.0
+  fpvalidate: ^0.1.0
   fpdart: ^1.1.1
 ```
 
@@ -96,7 +96,7 @@ final result = await email
           ? ValidationFailure('Email already registered')
           : ValidationSuccess(email);
     })
-    .validateTask()
+    .validateTaskEither()
     .run();
 ```
 
@@ -133,6 +133,28 @@ email.field('Email')
     .validate();
 ```
 
+#### String Validators
+
+For even more convenient string validation, you can use the extension methods directly on `ValidationBuilder<String>`:
+
+```dart
+someString.field('Some String')
+    .contains('required')     // Must contain substring
+    .startsWith('https')      // Must start with prefix
+    .endsWith('.com')         // Must end with suffix
+    .alphanumeric()           // Only alphanumeric characters
+    .lettersOnly()            // Only letters
+    .digitsOnly()             // Only digits
+    .uuid()                   // Valid UUID format
+    .creditCard()             // Valid credit card number
+    .postalCode()             // Valid postal code format
+    .isoDate()                // Valid ISO date (YYYY-MM-DD)
+    .time24Hour()             // Valid 24-hour time (HH:MM)
+    .validate();
+```
+
+These extension methods provide the same functionality as the `StringValidators` class but with a more fluent, chainable API. They automatically use the field name in error messages for better user experience.
+
 ### Numeric Validators
 
 ```dart
@@ -142,6 +164,20 @@ age.field('Age')
     .inRange(13, 65)      // Value within range
     .positive()           // Must be positive
     .nonNegative()        // Must be non-negative
+    .isInteger()          // Must be an integer
+    .isEven()             // Must be even
+    .isOdd()              // Must be odd
+    .isPrime()            // Must be prime
+    .isPowerOfTwo()       // Must be a power of 2
+    .isPerfectSquare()    // Must be a perfect square
+    .isPortNumber()       // Must be a valid port number (1-65535)
+    .isYear()             // Must be a valid year (1900-2100)
+    .isMonth()            // Must be a valid month (1-12)
+    .isDayOfMonth()       // Must be a valid day (1-31)
+    .isHour()             // Must be a valid hour (0-23)
+    .isMinute()           // Must be a valid minute (0-59)
+    .isSecond()           // Must be a valid second (0-59)
+    .withinPercentage(target, 5.0) // Within 5% of target value
     .validate();
 ```
 
@@ -154,6 +190,19 @@ optionalField.field('Optional Field')
     .custom(NullableValidators.optionalInRange(0, 100))
     .validate();
 ```
+
+Available nullable validators:
+
+- `ifPresent()` - Apply validator only if value is not null
+- `optional()` - Alias for ifPresent
+- `required()` - Ensure value is not null and apply validator
+- `optionalNotEmpty()` - Ensure string is not empty if provided
+- `optionalEmail()` - Ensure valid email format if provided
+- `optionalUrl()` - Ensure valid URL format if provided
+- `optionalPhone()` - Ensure valid phone format if provided
+- `optionalInRange(min, max)` - Ensure value is in range if provided
+- `optionalMinLength(length)` - Ensure minimum length if provided
+- `optionalMaxLength(length)` - Ensure maximum length if provided
 
 ## Custom Validators
 
@@ -249,7 +298,7 @@ Future<Either<String, UserRegistration>> validateRegistration({
     phone?.field('Phone').custom(NullableValidators.optionalPhone()) ??
         ValidationBuilder(null, 'Phone').custom((_) => ValidationSuccess(null)),
     age.field('Age').min(13).max(120),
-  ].validateTask()
+  ].validateTaskEither()
   .map((values) => UserRegistration(
     email: values[0],
     password: values[1],
@@ -315,11 +364,62 @@ final result = email
     );
 ```
 
-## Available Validator Classes
+## Validation Methods
 
-- **StringValidators**: Contains, startsWith, endsWith, alphanumeric, lettersOnly, digitsOnly, uuid, creditCard, postalCode, isoDate, time24Hour
-- **NumericValidators**: isInteger, isEven, isOdd, isPerfectSquare, isPrime, isPowerOfTwo, withinPercentage, isPortNumber, isYear, isMonth, isDayOfMonth, isHour, isMinute
-- **NullableValidators**: ifPresent, optional, required, optionalNotEmpty, optionalEmail, optionalUrl, optionalPhone, optionalInRange, optionalMinLength, optionalMaxLength
+The library provides several validation methods to suit different use cases:
+
+### Synchronous Validation
+
+- `validate()` - Throws ValidationError on failure, returns value on success
+- `validateEither()` - Returns Either<ValidationError, T>
+- `validateTaskEither()` - Returns TaskEither<ValidationError, T>
+
+### Asynchronous Validation
+
+- `validateAsync()` - Throws ValidationError on failure, returns Future<T> on success
+- `validateTaskEither()` - Returns TaskEither<ValidationError, T>
+
+### Batch Validation
+
+- `validate()` - Throws ValidationError on first failure, returns List<T> on success
+- `validateAsync()` - Throws ValidationError on first failure, returns Future<List<T>> on success
+- `validateEither()` - Returns Either<ValidationError, List<T>>
+- `validateTaskEither()` - Returns TaskEither<ValidationError, List<T>>
+
+## Examples
+
+Check out the [example/example.dart](example/example.dart) file for more usage examples:
+
+```dart
+// Basic string validation
+final result = 'https://example.com/api'
+    .field('URL')
+    .startsWith('https')
+    .contains('api')
+    .validate();
+
+// Complex string validation
+final result = 'user123'
+    .field('Username')
+    .alphanumeric()
+    .minLength(4)
+    .maxLength(20)
+    .validate();
+
+// Date and time validation
+final dateResult = '2023-12-25'.field('Date').isoDate().validate();
+final timeResult = '14:30'.field('Time').time24Hour().validate();
+
+// Functional validation with Either
+final functionalResult = '550e8400-e29b-41d4-a716-446655440000'
+    .field('UUID')
+    .uuid()
+    .validateEither()
+    .fold(
+      (error) => '❌ UUID validation failed: ${error.message}',
+      (value) => '✅ Valid UUID: $value',
+    );
+```
 
 ## Additional Information
 
