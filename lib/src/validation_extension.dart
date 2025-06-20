@@ -37,7 +37,7 @@ extension ValidationExtension<T> on T {
 ///     .notEmpty()
 ///     .validate();
 /// ```
-extension NullableValidationExtension<T> on T? {
+extension NullableValidationBuilderExtension<T> on T? {
   /// Starts a validation chain for this nullable value.
   ///
   /// [fieldName] is the name of the field that will be used in error messages.

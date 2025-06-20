@@ -1,7 +1,9 @@
 import 'package:test/test.dart';
 import 'package:fpvalidate/src/validation_extension.dart';
+import 'package:fpvalidate/src/string_validation_extension.dart';
 import 'package:fpvalidate/src/validation_error.dart';
 import 'package:fpvalidate/src/validation_result.dart';
+import 'package:fpvalidate/src/numeric_validation_extension.dart';
 
 void main() {
   group('ValidationExtension', () {
@@ -26,13 +28,17 @@ void main() {
 
   group('NullableValidationExtension', () {
     test('should create ValidationBuilder with nullable value', () {
-      final builder = NullableValidationExtension('test').field('Test Field');
+      final builder = NullableValidationBuilderExtension(
+        'test',
+      ).field('Test Field');
       expect(builder.value, equals('test'));
       expect(builder.fieldName, equals('Test Field'));
     });
 
     test('should work with null value', () {
-      final builder = NullableValidationExtension(null).field('Test Field');
+      final builder = NullableValidationBuilderExtension(
+        null,
+      ).field('Test Field');
       expect(builder.value, isNull);
       expect(builder.fieldName, equals('Test Field'));
     });
@@ -43,12 +49,12 @@ void main() {
       test('should validate all builders successfully', () {
         final builders = [
           'test'.field('Field1').notEmpty(),
-          '42'.field('Field2').min(10),
+          42.field('Field2').min(10),
           'valid@email.com'.field('Field3').email(),
         ];
 
         final results = builders.validate();
-        expect(results, equals(['test', '42', 'valid@email.com']));
+        expect(results, equals(['test', 42, 'valid@email.com']));
       });
 
       test('should throw ValidationError on first failure', () {
@@ -81,12 +87,12 @@ void main() {
       test('should validate all builders asynchronously', () async {
         final builders = [
           'test'.field('Field1').notEmpty(),
-          '42'.field('Field2').min(10),
+          42.field('Field2').min(10),
           'valid@email.com'.field('Field3').email(),
         ];
 
         final results = await builders.validateAsync();
-        expect(results, equals(['test', '42', 'valid@email.com']));
+        expect(results, equals(['test', 42, 'valid@email.com']));
       });
 
       test('should throw ValidationError on first async failure', () {
@@ -108,14 +114,14 @@ void main() {
       test('should return right for successful validation', () {
         final builders = [
           'test'.field('Field1').notEmpty(),
-          '42'.field('Field2').min(10),
+          42.field('Field2').min(10),
         ];
 
         final result = builders.validateEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (left) => fail('Should not be left'),
-          (right) => expect(right, equals(['test', '42'])),
+          (right) => expect(right, equals(['test', 42])),
         );
       });
 
@@ -138,7 +144,7 @@ void main() {
       test('should return right for successful validation', () async {
         final builders = [
           'test'.field('Field1').notEmpty(),
-          '42'.field('Field2').min(10),
+          42.field('Field2').min(10),
         ];
 
         final result = builders.validateTaskEither();
@@ -146,7 +152,7 @@ void main() {
         expect(either.isRight(), isTrue);
         either.fold(
           (left) => fail('Should not be left'),
-          (right) => expect(right, equals(['test', '42'])),
+          (right) => expect(right, equals(['test', 42])),
         );
       });
 
@@ -195,6 +201,169 @@ void main() {
             throwsA(isA<ValidationError>()),
           );
         },
+      );
+    });
+  });
+
+  group('StringValidationExtension', () {
+    test('contains should validate substring presence', () {
+      expect(
+        () => 'hello world'.field('Test').contains('world').validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'hello world'.field('Test').contains('missing').validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('startsWith should validate prefix', () {
+      expect(
+        () =>
+            'https://example.com'.field('Test').startsWith('https').validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'http://example.com'.field('Test').startsWith('https').validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('endsWith should validate suffix', () {
+      expect(
+        () => 'file.txt'.field('Test').endsWith('.txt').validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'file.doc'.field('Test').endsWith('.txt').validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('alphanumeric should validate alphanumeric characters only', () {
+      expect(
+        () => 'abc123'.field('Test').alphanumeric().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'abc-123'.field('Test').alphanumeric().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('lettersOnly should validate letters only', () {
+      expect(
+        () => 'abcdef'.field('Test').lettersOnly().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'abc123'.field('Test').lettersOnly().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('digitsOnly should validate digits only', () {
+      expect(
+        () => '123456'.field('Test').digitsOnly().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => '123abc'.field('Test').digitsOnly().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('uuid should validate UUID format', () {
+      expect(
+        () => '550e8400-e29b-41d4-a716-446655440000'
+            .field('Test')
+            .uuid()
+            .validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'invalid-uuid'.field('Test').uuid().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('creditCard should validate credit card format', () {
+      expect(
+        () => '4111111111111111'.field('Test').creditCard().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => '1234'.field('Test').creditCard().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('postalCode should validate postal code format', () {
+      expect(
+        () => '12345'.field('Test').postalCode().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => '12345-6789'.field('Test').postalCode().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => '1234'.field('Test').postalCode().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('isoDate should validate ISO date format', () {
+      expect(
+        () => '2023-12-25'.field('Test').isoDate().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => '2023-13-01'.field('Test').isoDate().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('time24Hour should validate 24-hour time format', () {
+      expect(
+        () => '14:30'.field('Test').time24Hour().validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => '25:00'.field('Test').time24Hour().validate(),
+        throwsA(isA<ValidationError>()),
+      );
+    });
+
+    test('should chain multiple string validators', () {
+      expect(
+        () => 'https://example.com/api'
+            .field('URL')
+            .startsWith('https')
+            .contains('api')
+            .validate(),
+        returnsNormally,
+      );
+
+      expect(
+        () => 'http://example.com/api'
+            .field('URL')
+            .startsWith('https')
+            .contains('api')
+            .validate(),
+        throwsA(isA<ValidationError>()),
       );
     });
   });

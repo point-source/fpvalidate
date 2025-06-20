@@ -3,6 +3,8 @@ import 'package:fpvalidate/src/validation_builder.dart';
 import 'package:fpvalidate/src/validation_error.dart';
 import 'package:fpvalidate/src/validation_result.dart';
 import 'package:fpvalidate/src/validation_extension.dart';
+import 'package:fpvalidate/src/string_validation_extension.dart';
+import 'package:fpvalidate/src/numeric_validation_extension.dart';
 
 void main() {
   group('ValidationBuilder', () {
@@ -33,11 +35,6 @@ void main() {
           throwsA(isA<ValidationError>()),
         );
       });
-
-      test('should work with non-string types', () {
-        final result = 42.field('Number').notEmpty().validate();
-        expect(result, equals(42));
-      });
     });
 
     group('minLength', () {
@@ -51,11 +48,6 @@ void main() {
           () => 'test'.field('Test').minLength(5).validate(),
           throwsA(isA<ValidationError>()),
         );
-      });
-
-      test('should work with non-string types', () {
-        final result = 12345.field('Number').minLength(3).validate();
-        expect(result, equals(12345));
       });
     });
 
@@ -161,25 +153,18 @@ void main() {
 
     group('min', () {
       test('should pass for number greater than minimum', () {
-        final result = '10'.field('Number').min(5).validate();
-        expect(result, equals('10'));
+        final result = 10.field('Number').min(5).validate();
+        expect(result, equals(10));
       });
 
       test('should pass for number equal to minimum', () {
-        final result = '5'.field('Number').min(5).validate();
-        expect(result, equals('5'));
+        final result = 5.field('Number').min(5).validate();
+        expect(result, equals(5));
       });
 
       test('should fail for number less than minimum', () {
         expect(
-          () => '3'.field('Number').min(5).validate(),
-          throwsA(isA<ValidationError>()),
-        );
-      });
-
-      test('should fail for non-numeric string', () {
-        expect(
-          () => 'abc'.field('Number').min(5).validate(),
+          () => 3.field('Number').min(5).validate(),
           throwsA(isA<ValidationError>()),
         );
       });
@@ -187,18 +172,18 @@ void main() {
 
     group('max', () {
       test('should pass for number less than maximum', () {
-        final result = '5'.field('Number').max(10).validate();
-        expect(result, equals('5'));
+        final result = 5.field('Number').max(10).validate();
+        expect(result, equals(5));
       });
 
       test('should pass for number equal to maximum', () {
-        final result = '10'.field('Number').max(10).validate();
-        expect(result, equals('10'));
+        final result = 10.field('Number').max(10).validate();
+        expect(result, equals(10));
       });
 
       test('should fail for number greater than maximum', () {
         expect(
-          () => '15'.field('Number').max(10).validate(),
+          () => 15.field('Number').max(10).validate(),
           throwsA(isA<ValidationError>()),
         );
       });
@@ -206,27 +191,27 @@ void main() {
 
     group('inRange', () {
       test('should pass for number within range', () {
-        final result = '5'.field('Number').inRange(1, 10).validate();
-        expect(result, equals('5'));
+        final result = 5.field('Number').inRange(1, 10).validate();
+        expect(result, equals(5));
       });
 
       test('should pass for number at range boundaries', () {
-        final result1 = '1'.field('Number').inRange(1, 10).validate();
-        final result2 = '10'.field('Number').inRange(1, 10).validate();
-        expect(result1, equals('1'));
-        expect(result2, equals('10'));
+        final result1 = 1.field('Number').inRange(1, 10).validate();
+        final result2 = 10.field('Number').inRange(1, 10).validate();
+        expect(result1, equals(1));
+        expect(result2, equals(10));
       });
 
       test('should fail for number below range', () {
         expect(
-          () => '0'.field('Number').inRange(1, 10).validate(),
+          () => 0.field('Number').inRange(1, 10).validate(),
           throwsA(isA<ValidationError>()),
         );
       });
 
       test('should fail for number above range', () {
         expect(
-          () => '11'.field('Number').inRange(1, 10).validate(),
+          () => 11.field('Number').inRange(1, 10).validate(),
           throwsA(isA<ValidationError>()),
         );
       });
@@ -234,20 +219,20 @@ void main() {
 
     group('positive', () {
       test('should pass for positive number', () {
-        final result = '5'.field('Number').positive().validate();
-        expect(result, equals('5'));
+        final result = 5.field('Number').positive().validate();
+        expect(result, equals(5));
       });
 
       test('should fail for zero', () {
         expect(
-          () => '0'.field('Number').positive().validate(),
+          () => 0.field('Number').positive().validate(),
           throwsA(isA<ValidationError>()),
         );
       });
 
       test('should fail for negative number', () {
         expect(
-          () => '-5'.field('Number').positive().validate(),
+          () => (-5).field('Number').positive().validate(),
           throwsA(isA<ValidationError>()),
         );
       });
@@ -255,20 +240,20 @@ void main() {
 
     group('negative', () {
       test('should pass for negative number', () {
-        final result = '-5'.field('Number').negative().validate();
-        expect(result, equals('-5'));
+        final result = (-5).field('Number').negative().validate();
+        expect(result, equals(-5));
       });
 
       test('should fail for zero', () {
         expect(
-          () => '0'.field('Number').negative().validate(),
+          () => 0.field('Number').negative().validate(),
           throwsA(isA<ValidationError>()),
         );
       });
 
       test('should fail for positive number', () {
         expect(
-          () => '5'.field('Number').negative().validate(),
+          () => 5.field('Number').negative().validate(),
           throwsA(isA<ValidationError>()),
         );
       });
@@ -276,18 +261,18 @@ void main() {
 
     group('nonNegative', () {
       test('should pass for positive number', () {
-        final result = '5'.field('Number').nonNegative().validate();
-        expect(result, equals('5'));
+        final result = 5.field('Number').nonNegative().validate();
+        expect(result, equals(5));
       });
 
       test('should pass for zero', () {
-        final result = '0'.field('Number').nonNegative().validate();
-        expect(result, equals('0'));
+        final result = 0.field('Number').nonNegative().validate();
+        expect(result, equals(0));
       });
 
       test('should fail for negative number', () {
         expect(
-          () => '-5'.field('Number').nonNegative().validate(),
+          () => (-5).field('Number').nonNegative().validate(),
           throwsA(isA<ValidationError>()),
         );
       });
@@ -301,7 +286,7 @@ void main() {
 
       test('should fail for null value', () {
         expect(
-          () => NullableValidationExtension(
+          () => NullableValidationBuilderExtension(
             null,
           ).field('Test').nonNull().validate(),
           throwsA(isA<ValidationError>()),
@@ -317,7 +302,7 @@ void main() {
 
       test('should fail for null value', () {
         expect(
-          () => NullableValidationExtension(
+          () => NullableValidationBuilderExtension(
             null,
           ).field('Test').nonNullOrEmpty().validate(),
           throwsA(isA<ValidationError>()),
