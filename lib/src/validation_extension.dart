@@ -126,7 +126,7 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
   /// This method stops at the first validation failure and returns that error.
   ///
   /// Note: This method only works with synchronous validators. If any builder
-  /// contains async validators, use [validateTask] instead.
+  /// contains async validators, use [validateTaskEither] instead.
   Either<ValidationError, List<T>> validateEither() => Either.tryCatch(
     () => validate(),
     (e, stackTrace) => e is ValidationError
@@ -140,10 +140,15 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
   /// or [TaskEither.right] with a list of all validated values if all validations pass.
   ///
   /// This method stops at the first validation failure and returns that error.
-  TaskEither<ValidationError, List<T>> validateTask() => TaskEither.tryCatch(
-    () async => await validateAsync(),
-    (e, stackTrace) => e is ValidationError
-        ? e
-        : ValidationError('Unknown validation error', e.toString(), stackTrace),
-  );
+  TaskEither<ValidationError, List<T>> validateTaskEither() =>
+      TaskEither.tryCatch(
+        () async => await validateAsync(),
+        (e, stackTrace) => e is ValidationError
+            ? e
+            : ValidationError(
+                'Unknown validation error',
+                e.toString(),
+                stackTrace,
+              ),
+      );
 }

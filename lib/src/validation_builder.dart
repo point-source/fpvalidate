@@ -317,7 +317,7 @@ class ValidationBuilder<T> {
   ///
   /// This is useful for synchronous validation scenarios with fpdart.
   ///
-  /// Note: This method only executes synchronous validators. Use [validateTask]
+  /// Note: This method only executes synchronous validators. Use [validateTaskEither]
   /// if you have async validators.
   Either<ValidationError, T> validateEither() => Either.tryCatch(
     () => validate(),
@@ -336,7 +336,7 @@ class ValidationBuilder<T> {
   /// or [TaskEither.right] with the original value if all validations pass.
   ///
   /// This is useful for asynchronous validation scenarios with fpdart.
-  TaskEither<ValidationError, T> validateTask() => TaskEither.tryCatch(
+  TaskEither<ValidationError, T> validateTaskEither() => TaskEither.tryCatch(
     () async => await validateAsync(),
     (e, stackTrace) => e is ValidationError
         ? e
