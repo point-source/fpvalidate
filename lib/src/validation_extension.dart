@@ -71,6 +71,14 @@ extension ValidationBuilderListExtension<T> on List<ValidationBuilder<T>> {
   /// Note: This method only works with synchronous validators. If any builder
   /// contains async validators, use [validateAsync] instead.
   List<T> validate() {
+    // Assert that no builders contain async validators
+    for (int i = 0; i < length; i++) {
+      assert(
+        elementAtOrNull(i) is! AsyncValidationBuilder<T>,
+        'Builder at index $i contains async validators. Use validateAsync() instead.',
+      );
+    }
+
     final results = <T>[];
 
     for (final builder in this) {
