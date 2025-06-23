@@ -1,4 +1,4 @@
-import 'package:fpvalidate/src/extensions/async_validation_step.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:fpvalidate/src/validation_error.dart';
 
 part 'extensions/field_extension.dart';
@@ -6,64 +6,76 @@ part 'extensions/nullable_extension.dart';
 part 'extensions/num_extension.dart';
 part 'extensions/string_extension.dart';
 
-/// A function type that validates a value and returns a validation result.
-typedef Validator<T, R> = ValidationStep<R> Function(T value);
-
 sealed class ValidationStep<T> {
   final String fieldName;
-  const ValidationStep(this.fieldName);
 
-  ValidationStep<R> next<R>(Validator<T, R> onValidate);
+  const ValidationStep({required this.fieldName});
 
-  AsyncValidationStep<R> nextAsync<R>(AsyncValidator<T, R> onValidate);
+  ValidationStep<R> bind<R>(Either<ValidationError, R> Function(T) f);
 
-  Success<R> _success<R>(R value) => Success(fieldName, value);
+  AsyncValidationStep<R> bindAsync<R>(
+    TaskEither<ValidationError, R> Function(T) f,
+  );
 
-  Failure<R> _fail<R>(String message, [StackTrace? stackTrace]) =>
-      Failure(fieldName, ValidationError(fieldName, message, stackTrace));
+  Either<ValidationError, R> _success<R>(R value) => Right(value);
 
-  T get validated;
-
-  R match<R>(R Function(T) onSuccess, R Function(ValidationError) onFailure) {
-    return switch (this) {
-      Success<T> success => onSuccess(success.validated),
-      Failure<T> failure => onFailure(failure.error),
-    };
-  }
+  Either<ValidationError, R> _fail<R>(String message) =>
+      Left(ValidationError(fieldName, message));
 }
 
-class Success<T> extends ValidationStep<T> {
-  @override
-  final T validated;
+class SyncValidationStep<T> extends ValidationStep<T> {
+  final Either<ValidationError, T> _value;
 
-  const Success(super.fieldName, this.validated);
+  const SyncValidationStep({
+    required Either<ValidationError, T> value,
+    required super.fieldName,
+  }) : _value = value;
 
   @override
-  ValidationStep<R> next<R>(Validator<T, R> onValidate) {
-    return onValidate(validated);
+  SyncValidationStep<R> bind<R>(Either<ValidationError, R> Function(T) f) {
+    return SyncValidationStep(value: _value.flatMap(f), fieldName: fieldName);
   }
 
   @override
-  AsyncValidationStep<R> nextAsync<R>(AsyncValidator<T, R> onValidate) {
-    return AsyncValidationStep(onValidate(validated));
+  AsyncValidationStep<R> bindAsync<R>(
+    TaskEither<ValidationError, R> Function(T) f,
+  ) {
+    return AsyncValidationStep(
+      value: _value.toTaskEither().flatMap(f),
+      fieldName: fieldName,
+    );
   }
+
+  T validate() => _value.fold((l) => throw l, (r) => r);
+
+  Either<ValidationError, T> validateEither() => _value;
 }
 
-class Failure<T> extends ValidationStep<T> {
-  final ValidationError error;
+class AsyncValidationStep<T> extends ValidationStep<T> {
+  final TaskEither<ValidationError, T> _value;
 
-  const Failure(super.fieldName, this.error);
+  const AsyncValidationStep({
+    required TaskEither<ValidationError, T> value,
+    required super.fieldName,
+  }) : _value = value;
 
   @override
-  ValidationStep<R> next<R>(Validator<T, R> onValidate) {
-    return Failure<R>(fieldName, error);
+  AsyncValidationStep<R> bind<R>(Either<ValidationError, R> Function(T) f) {
+    return AsyncValidationStep(
+      value: _value.chainEither(f),
+      fieldName: fieldName,
+    );
   }
 
   @override
-  AsyncValidationStep<R> nextAsync<R>(AsyncValidator<T, R> onValidate) {
-    return AsyncValidationStep(Future.value(Failure<R>(fieldName, error)));
+  AsyncValidationStep<R> bindAsync<R>(
+    TaskEither<ValidationError, R> Function(T) f,
+  ) {
+    return AsyncValidationStep(value: _value.flatMap(f), fieldName: fieldName);
   }
 
-  @override
-  T get validated => throw error;
+  Future<T> validate() =>
+      _value.run().then((value) => value.fold((l) => throw l, (r) => r));
+
+  TaskEither<ValidationError, T> validateTaskEither() => _value;
 }
