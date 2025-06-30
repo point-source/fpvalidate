@@ -534,7 +534,7 @@ The library provides descriptive error messages that include the field name:
 
 ## Localization
 
-Currently, all error messages in fpvalidate are provided in English only and are not localizable. However, I recognize the importance of internationalization for a validation library and are actively interested in community contributions to implement localization support.
+Currently, all error messages in fpvalidate are provided in English only and are not localizable. However, I recognize the importance of internationalization for a validation library and am actively interested in community contributions to implement localization support.
 
 I'd welcome contributions in the following areas:
 
