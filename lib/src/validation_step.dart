@@ -22,6 +22,13 @@ sealed class ValidationStep<T> {
 
   /// Creates a new validation step with the specified field name.
   const ValidationStep({required this.fieldName});
+
+  /// Prevents calling .field() on a ValidationStep by shadowing the extension method.
+  // ignore: avoid-shadowing
+  Never field(String fieldName) => throw UnsupportedError(
+    'Calling .field() on a ValidationStep is not allowed. '
+    'You should only call .field() on raw values, not on validation steps.',
+  );
 }
 
 /// A synchronous validation step that performs validation operations immediately.
