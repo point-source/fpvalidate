@@ -172,6 +172,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> isPowerOfTwo() => bind((value) {
     if (value <= 0) return _fail('$fieldName must be a power of 2');
+    if (value == 1) return _success(value); // 2^0 = 1
     if (value is int) {
       return (value & (value - 1)) == 0
           ? _success(value)
@@ -185,26 +186,6 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     }
 
     return v == 1 ? _success(value) : _fail('$fieldName must be a power of 2');
-  });
-
-  /// Validates that the value is a perfect square.
-  ///
-  /// A perfect square is a number that is the square of an integer.
-  /// Examples: 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, etc.
-  ///
-  /// Returns a [ValidationError] if the value is not a perfect square.
-  ///
-  /// Example:
-  /// ```dart
-  /// final result = number.field('Number').isPerfectSquare().validateEither();
-  /// ```
-  SyncValidationStep<T> isPerfectSquare() => bind((value) {
-    if (value < 0) return _fail('$fieldName must be a perfect square');
-    final sqrt = math.sqrt(value);
-
-    return sqrt * sqrt == value
-        ? _success(value)
-        : _fail('$fieldName must be a perfect square');
   });
 
   /// Validates that the value is a valid port number (1-65535).

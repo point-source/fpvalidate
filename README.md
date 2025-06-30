@@ -170,7 +170,6 @@ age.field('Age')
     .isEven()             // Must be even
     .isOdd()              // Must be odd
     .isPowerOfTwo()       // Must be a power of 2
-    .isPerfectSquare()    // Must be a perfect square
     .isPortNumber()       // Must be a valid port number (1-65535)
     .isWithinPercentage(target, 5.0) // Within 5% of target value
     .validate();

@@ -138,6 +138,10 @@ extension StringExtension on SyncValidationStep<String> {
   /// final result = phone.field('Phone').isPhone().validateEither();
   /// ```
   SyncValidationStep<String> isPhone() => bind((value) {
+    final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length < 10) {
+      return _fail('$fieldName must be a valid phone number');
+    }
     return RegExp(kPhoneRegex).hasMatch(value)
         ? _success(value)
         : _fail('$fieldName must be a valid phone number');
@@ -278,10 +282,42 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isCreditCard() => bind((value) {
     final cleanValue = value.replaceAll(RegExp(r'\s+'), '');
-    return RegExp(kCreditCardRegex).hasMatch(cleanValue)
-        ? _success(value)
-        : _fail('$fieldName must be a valid credit card number');
+
+    // Check format with regex
+    if (!RegExp(kCreditCardRegex).hasMatch(cleanValue)) {
+      return _fail('$fieldName must be a valid credit card number');
+    }
+
+    // Validate Luhn algorithm
+    if (!_isValidLuhn(cleanValue)) {
+      return _fail('$fieldName must be a valid credit card number');
+    }
+
+    return _success(value);
   });
+
+  /// Validates Luhn algorithm for credit card numbers
+  bool _isValidLuhn(String cardNumber) {
+    if (cardNumber.isEmpty) return false;
+
+    int sum = 0;
+    bool alternate = false;
+
+    // Loop through values starting from the rightmost side
+    for (int i = cardNumber.length - 1; i >= 0; i--) {
+      int n = int.parse(cardNumber[i]);
+      if (alternate) {
+        n *= 2;
+        if (n > 9) {
+          n = (n % 10) + 1;
+        }
+      }
+      sum += n;
+      alternate = !alternate;
+    }
+
+    return (sum % 10 == 0);
+  }
 
   /// Validates that the string is a valid postal code.
   ///
@@ -329,15 +365,30 @@ extension StringExtension on SyncValidationStep<String> {
   /// Validates that the string is a valid 24-hour time in HH:MM format.
   ///
   /// Uses a regex pattern to validate 24-hour time format (00:00 to 23:59).
+  /// [requireLeadingZero] determines whether hours and minutes must have leading zeros.
   /// Returns a [ValidationError] if the string is not a valid 24-hour time.
   ///
   /// Example:
   /// ```dart
   /// final result = time.field('Time').isTime24Hour().validateEither();
+  /// final result2 = time.field('Time').isTime24Hour(requireLeadingZero: true).validateEither();
   /// ```
-  SyncValidationStep<String> isTime24Hour() => bind((value) {
-    return RegExp(kTime24HourRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must be in 24-hour format (HH:MM)');
-  });
+  SyncValidationStep<String> isTime24Hour({bool requireLeadingZero = false}) =>
+      bind((value) {
+        // First check basic format
+        if (!RegExp(kTime24HourRegex).hasMatch(value)) {
+          return _fail('$fieldName must be in 24-hour format (HH:MM)');
+        }
+
+        // If leading zeros are required, check the format more strictly
+        if (requireLeadingZero) {
+          if (!RegExp(kTime24HourStrictRegex).hasMatch(value)) {
+            return _fail(
+              '$fieldName must be in 24-hour format (HH:MM) with leading zeros',
+            );
+          }
+        }
+
+        return _success(value);
+      });
 }
