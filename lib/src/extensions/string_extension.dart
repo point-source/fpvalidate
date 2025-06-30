@@ -280,24 +280,25 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```dart
   /// final result = cardNumber.field('Card Number').isCreditCard().validateEither();
   /// ```
-  SyncValidationStep<String> isCreditCard() => bind((value) {
-    final cleanValue = value.replaceAll(RegExp(r'\s+'), '');
+  SyncValidationStep<String> isCreditCard({bool validateLuhn = true}) =>
+      bind((value) {
+        final cleanValue = value.replaceAll(RegExp(r'\s+'), '');
 
-    // Check format with regex
-    if (!RegExp(kCreditCardRegex).hasMatch(cleanValue)) {
-      return _fail('$fieldName must be a valid credit card number');
-    }
+        // Check format with regex
+        if (!RegExp(kCreditCardRegex).hasMatch(cleanValue)) {
+          return _fail('$fieldName must be a valid credit card number');
+        }
 
-    // Validate Luhn algorithm
-    if (!_isValidLuhn(cleanValue)) {
-      return _fail('$fieldName must be a valid credit card number');
-    }
+        // Validate Luhn algorithm
+        if (validateLuhn && !_isValidLuhn(cleanValue)) {
+          return _fail('$fieldName must be a valid credit card number');
+        }
 
-    return _success(value);
-  });
+        return _success(value);
+      });
 
   /// Validates Luhn algorithm for credit card numbers
-  bool _isValidLuhn(String cardNumber) {
+  static bool _isValidLuhn(String cardNumber) {
     if (cardNumber.isEmpty) return false;
 
     int sum = 0;

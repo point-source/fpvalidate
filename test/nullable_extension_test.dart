@@ -1,3 +1,5 @@
+// ignore_for_file: avoid-unnecessary-type-casts
+
 import 'package:test/test.dart';
 import 'package:fpvalidate/fpvalidate.dart';
 
