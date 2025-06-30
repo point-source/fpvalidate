@@ -202,9 +202,9 @@ void main() {
     });
 
     test('should handle Future that throws error', () async {
-      final step = Future.error('Test error').field('ErrorField');
+      final step = Future<String>.error('Test error').field('ErrorField');
 
-      expect(step, isA<AsyncValidationStep<dynamic>>());
+      expect(step, isA<AsyncValidationStep<String>>());
       expect(step.fieldName, equals('ErrorField'));
 
       final result = await step.validateEither();

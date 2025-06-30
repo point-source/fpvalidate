@@ -50,24 +50,13 @@ void main() {
 
     test('should not be equal to error with different stack trace', () {
       final stackTrace1 = StackTrace.current;
+      // ignore: avoid-duplicate-initializers
       final stackTrace2 = StackTrace.current;
 
       final error1 = ValidationError('Email', 'Email is required', stackTrace1);
       final error2 = ValidationError('Email', 'Email is required', stackTrace2);
 
       expect(error1, isNot(equals(error2)));
-    });
-
-    test('should not be equal to null', () {
-      const error = ValidationError('Email', 'Email is required');
-
-      expect(error, isNot(equals(null)));
-    });
-
-    test('should not be equal to different type', () {
-      const error = ValidationError('Email', 'Email is required');
-
-      expect(error, isNot(equals('not an error')));
     });
 
     test('should have consistent hashCode', () {

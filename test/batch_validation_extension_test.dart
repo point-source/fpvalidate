@@ -1,5 +1,6 @@
+// ignore_for_file: avoid-unsafe-collection-methods
+
 import 'package:test/test.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:fpvalidate/fpvalidate.dart';
 
 void main() {
@@ -40,7 +41,7 @@ void main() {
         expect(result[2], equals(25));
       });
 
-      test('should throw first validation error', () async {
+      test('should throw first validation error', () {
         final steps = [
           ''.field('Email').notEmpty().isEmail(),
           'password123'.field('Password').notEmpty().minLength(8),
@@ -50,7 +51,7 @@ void main() {
         expect(() => steps.validateAsync(), throwsA(isA<ValidationError>()));
       });
 
-      test('should handle async validation errors', () async {
+      test('should handle async validation errors', () {
         final steps = [
           'test@example.com'.field('Email').notEmpty().isEmail(),
           Future.value('')
@@ -226,7 +227,7 @@ void main() {
         expect(result[2], equals(25));
       });
 
-      test('should throw first validation error', () async {
+      test('should throw first validation error', () {
         final steps = <AsyncValidationStep>[
           Future.value('')
               .field('Email')

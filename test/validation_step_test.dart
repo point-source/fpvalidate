@@ -337,7 +337,7 @@ void main() {
         expect(result, equals('test'));
       });
 
-      test('should throw ValidationError when failed', () async {
+      test('should throw ValidationError when failed', () {
         final step = Future.value('')
             .field('String')
             .check(
