@@ -24,6 +24,8 @@ A functional validation library for Dart with support for TaskEither and Either 
 - **Custom Validators**: Easy creation of custom validation logic
 - **Batch Validation**: Validate multiple fields at once
 - **Nullable Support**: Specialized validators for handling optional fields
+- **Type Casting & Transformation**: Convert between types while validating (String to int, nullable to non-nullable, etc.)
+- **Flutter Form Compatibility**: Built-in support for Flutter form validation with `asFormValidator()` method
 - **Error Handling**: Detailed error messages with field names and descriptions
 
 ## Getting Started
@@ -47,6 +49,14 @@ import 'package:fpvalidate/fpvalidate.dart';
 ### Basic Single Field Validation
 
 ```dart
+// Functional validation with Either
+final result = email
+    .field('Email')
+    .notEmpty()
+    .isEmail()
+    .validateEither()
+    .mapLeft((error) => 'Validation failed: ${error.message}');
+
 // Simple validation with exception handling
 try {
   final validatedEmail = email
@@ -60,14 +70,6 @@ try {
     print('Validation failed: ${e.message}');
   }
 }
-
-// Functional validation with Either
-final result = email
-    .field('Email')
-    .notEmpty()
-    .isEmail()
-    .validateEither()
-    .mapLeft((error) => 'Validation failed: ${error.message}');
 ```
 
 ### Multiple Field Validation
