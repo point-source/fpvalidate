@@ -86,7 +86,14 @@ class SyncValidationStep<T> extends ValidationStep<T> {
     String Function(String fieldName) onFalse,
   ) => _copy(
     _value.flatMap(
-      (value) => f(value) ? _success(value) : _fail(onFalse(fieldName)),
+      (value) =>
+          Either.tryCatch(
+            () => f(value),
+            (error, stackTrace) =>
+                ValidationError(fieldName, error.toString(), stackTrace),
+          ).flatMap(
+            (success) => success ? _success(value) : _fail(onFalse(fieldName)),
+          ),
     ),
   );
 
@@ -212,11 +219,18 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Returns a new [AsyncValidationStep] with the same value or an error.
   AsyncValidationStep<T> check(
-    bool Function(T) f,
+    Future<bool> Function(T) f,
     String Function(String fieldName) onFalse,
   ) => _copy(
     _value.flatMap(
-      (value) => f(value) ? _success(value) : _fail(onFalse(fieldName)),
+      (value) =>
+          TaskEither.tryCatch(
+            () async => await f(value),
+            (error, stackTrace) =>
+                ValidationError(fieldName, error.toString(), stackTrace),
+          ).flatMap(
+            (success) => success ? _success(value) : _fail(onFalse(fieldName)),
+          ),
     ),
   );
 
