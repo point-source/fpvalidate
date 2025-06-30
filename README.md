@@ -412,6 +412,22 @@ The library provides descriptive error messages that include the field name:
 - `"Age must be between 13 and 120"`
 - `"Phone must be a valid phone number"`
 
+## Localization
+
+Currently, all error messages in fpvalidate are provided in English only and are not localizable. However, I recognize the importance of internationalization for a validation library and are actively interested in community contributions to implement localization support.
+
+I'd welcome contributions in the following areas:
+
+- **Design Discussion**: Help us design the best approach for implementing localization in the validation library
+- **Implementation**: Contribute code to add localization infrastructure and support
+- **Translations**: Provide translations for error messages once localization is implemented
+
+If you're interested in contributing to localization efforts, please:
+
+1. Open an issue to discuss the design approach
+2. Share your thoughts on the best way to integrate localization with the existing API
+3. Contribute translations for your target languages
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
