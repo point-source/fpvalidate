@@ -37,8 +37,7 @@ extension NullableExtension<T> on SyncValidationStep<T?> {
   ///     .validateEither();
   /// ```
   SyncValidationStep<T> isNotNull() => bind(
-    (value) => value == null
-        ? _fail<T>('Field $fieldName is null')
-        : _success<T>(value),
+    (value) =>
+        value == null ? fail<T>('Field $fieldName is null') : pass<T>(value),
   );
 }

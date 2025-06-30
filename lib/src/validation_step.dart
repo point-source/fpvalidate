@@ -87,14 +87,11 @@ class SyncValidationStep<T> extends ValidationStep<T> {
     String Function(String fieldName) onFalse,
   ) => _copy(
     _value.flatMap(
-      (value) =>
-          Either.tryCatch(
-            () => f(value),
-            (error, stackTrace) =>
-                ValidationError(fieldName, error.toString(), stackTrace),
-          ).flatMap(
-            (success) => success ? _success(value) : _fail(onFalse(fieldName)),
-          ),
+      (value) => Either.tryCatch(
+        () => f(value),
+        (error, stackTrace) =>
+            ValidationError(fieldName, error.toString(), stackTrace),
+      ).flatMap((success) => success ? pass(value) : fail(onFalse(fieldName))),
     ),
   );
 
@@ -111,13 +108,15 @@ class SyncValidationStep<T> extends ValidationStep<T> {
 
   /// Creates a successful result with the given value.
   ///
-  /// This is an internal helper method that wraps a value in a [Either.right].
-  Either<ValidationError, R> _success<R>(R value) => Right(value);
+  /// This is a helper method for use with custom validation logic.
+  /// It wraps a value in a [Either.right].
+  Either<ValidationError, R> pass<R>(R value) => Right(value);
 
   /// Creates a failed result with the given error message.
   ///
-  /// This is an internal helper method that creates a [ValidationError] and wraps it in a [Either.left].
-  Either<ValidationError, R> _fail<R>(String message) =>
+  /// This is a helper method for use with custom validation logic.
+  /// It creates a [ValidationError] and wraps it in a [Either.left].
+  Either<ValidationError, R> fail<R>(String message) =>
       Left(ValidationError(fieldName, message));
 
   /// Converts this synchronous validation step to an asynchronous validation step.

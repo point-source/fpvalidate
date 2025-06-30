@@ -36,10 +36,10 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> notEmpty({bool allowWhitespace = false}) => bind(
     (value) => value.isEmpty
-        ? _fail('Field $fieldName is empty')
+        ? fail('Field $fieldName is empty')
         : !allowWhitespace && value.trim().isEmpty
-        ? _fail('Field $fieldName is empty')
-        : _success(value),
+        ? fail('Field $fieldName is empty')
+        : pass(value),
   );
 
   /// Converts the string to an integer and returns a new validation step.
@@ -66,8 +66,8 @@ extension StringExtension on SyncValidationStep<String> {
     final parsed = int.tryParse(value);
 
     return parsed != null
-        ? _success<int>(parsed)
-        : _fail<int>('Value $value for field $fieldName is not a number');
+        ? pass<int>(parsed)
+        : fail<int>('Value $value for field $fieldName is not a number');
   });
 
   /// Validates that the string has a minimum length of [length].
@@ -80,8 +80,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> minLength(int length) => bind(
     (value) => value.length >= length
-        ? _success(value)
-        : _fail('$fieldName must be at least $length characters long'),
+        ? pass(value)
+        : fail('$fieldName must be at least $length characters long'),
   );
 
   /// Validates that the string has a maximum length of [length].
@@ -94,8 +94,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> maxLength(int length) => bind(
     (value) => value.length <= length
-        ? _success(value)
-        : _fail('$fieldName must be no more than $length characters long'),
+        ? pass(value)
+        : fail('$fieldName must be no more than $length characters long'),
   );
 
   /// Validates that the string is a valid email address.
@@ -109,8 +109,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isEmail() => bind((value) {
     return RegExp(kEmailRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must be a valid email address');
+        ? pass(value)
+        : fail('$fieldName must be a valid email address');
   });
 
   /// Validates that the string is a valid URL.
@@ -124,8 +124,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isUrl() => bind((value) {
     return RegExp(kUrlRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must be a valid URL');
+        ? pass(value)
+        : fail('$fieldName must be a valid URL');
   });
 
   /// Validates that the string is a valid phone number.
@@ -140,11 +140,11 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isPhone() => bind((value) {
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
     if (digitsOnly.length < 10) {
-      return _fail('$fieldName must be a valid phone number');
+      return fail('$fieldName must be a valid phone number');
     }
     return RegExp(kPhoneRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must be a valid phone number');
+        ? pass(value)
+        : fail('$fieldName must be a valid phone number');
   });
 
   /// Validates that the string matches a custom regex pattern.
@@ -164,8 +164,8 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isPattern(RegExp regex, String description) =>
       bind(
         (value) => regex.hasMatch(value)
-            ? _success(value)
-            : _fail('$fieldName must match pattern: $description'),
+            ? pass(value)
+            : fail('$fieldName must match pattern: $description'),
       );
 
   /// Validates that the string contains the specified [substring].
@@ -178,8 +178,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> contains(String substring) => bind(
     (value) => value.contains(substring)
-        ? _success(value)
-        : _fail('$fieldName must contain "$substring"'),
+        ? pass(value)
+        : fail('$fieldName must contain "$substring"'),
   );
 
   /// Validates that the string starts with the specified [prefix].
@@ -192,8 +192,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> startsWith(String prefix) => bind(
     (value) => value.startsWith(prefix)
-        ? _success(value)
-        : _fail('$fieldName must start with "$prefix"'),
+        ? pass(value)
+        : fail('$fieldName must start with "$prefix"'),
   );
 
   /// Validates that the string ends with the specified [suffix].
@@ -206,8 +206,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> endsWith(String suffix) => bind(
     (value) => value.endsWith(suffix)
-        ? _success(value)
-        : _fail('$fieldName must end with "$suffix"'),
+        ? pass(value)
+        : fail('$fieldName must end with "$suffix"'),
   );
 
   /// Validates that the string contains only alphanumeric characters (letters and digits).
@@ -220,8 +220,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> alphanumeric() => bind((value) {
     return RegExp(kAlphanumericRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must contain only alphanumeric characters');
+        ? pass(value)
+        : fail('$fieldName must contain only alphanumeric characters');
   });
 
   /// Validates that the string contains only letters (a-z, A-Z).
@@ -234,8 +234,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> lettersOnly() => bind((value) {
     return RegExp(kLettersOnlyRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must contain only letters');
+        ? pass(value)
+        : fail('$fieldName must contain only letters');
   });
 
   /// Validates that the string contains only digits (0-9).
@@ -248,8 +248,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> digitsOnly() => bind((value) {
     return RegExp(kDigitsOnlyRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must contain only digits');
+        ? pass(value)
+        : fail('$fieldName must contain only digits');
   });
 
   /// Validates that the string is a valid UUID (Universally Unique Identifier).
@@ -265,8 +265,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isUuid() => bind((value) {
     return RegExp(kUuidRegex, caseSensitive: false).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must be a valid UUID');
+        ? pass(value)
+        : fail('$fieldName must be a valid UUID');
   });
 
   /// Validates that the string is a valid credit card number.
@@ -286,15 +286,15 @@ extension StringExtension on SyncValidationStep<String> {
 
         // Check format with regex
         if (!RegExp(kCreditCardRegex).hasMatch(cleanValue)) {
-          return _fail('$fieldName must be a valid credit card number');
+          return fail('$fieldName must be a valid credit card number');
         }
 
         // Validate Luhn algorithm
         if (validateLuhn && !_isValidLuhn(cleanValue)) {
-          return _fail('$fieldName must be a valid credit card number');
+          return fail('$fieldName must be a valid credit card number');
         }
 
-        return _success(value);
+        return pass(value);
       });
 
   /// Validates Luhn algorithm for credit card numbers
@@ -331,8 +331,8 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isPostalCode() => bind((value) {
     return RegExp(kPostalCodeRegex).hasMatch(value)
-        ? _success(value)
-        : _fail('$fieldName must be a valid postal code');
+        ? pass(value)
+        : fail('$fieldName must be a valid postal code');
   });
 
   /// Validates that the string is a valid ISO date in YYYY-MM-DD format.
@@ -346,7 +346,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isIsoDate() => bind((value) {
     if (!RegExp(kIsoDateRegex).hasMatch(value)) {
-      return _fail('$fieldName must be in ISO date format (YYYY-MM-DD)');
+      return fail('$fieldName must be in ISO date format (YYYY-MM-DD)');
     }
 
     try {
@@ -356,10 +356,10 @@ extension StringExtension on SyncValidationStep<String> {
       final day = int.parse(value.substring(8, 10));
 
       return date.year == year && date.month == month && date.day == day
-          ? _success(value)
-          : _fail('$fieldName must be a valid date');
+          ? pass(value)
+          : fail('$fieldName must be a valid date');
     } catch (e) {
-      return _fail('$fieldName must be a valid date');
+      return fail('$fieldName must be a valid date');
     }
   });
 
@@ -378,18 +378,18 @@ extension StringExtension on SyncValidationStep<String> {
       bind((value) {
         // First check basic format
         if (!RegExp(kTime24HourRegex).hasMatch(value)) {
-          return _fail('$fieldName must be in 24-hour format (HH:MM)');
+          return fail('$fieldName must be in 24-hour format (HH:MM)');
         }
 
         // If leading zeros are required, check the format more strictly
         if (requireLeadingZero) {
           if (!RegExp(kTime24HourStrictRegex).hasMatch(value)) {
-            return _fail(
+            return fail(
               '$fieldName must be in 24-hour format (HH:MM) with leading zeros',
             );
           }
         }
 
-        return _success(value);
+        return pass(value);
       });
 }

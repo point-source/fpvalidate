@@ -252,6 +252,124 @@ final result = '123'
     .validateEither();
 ```
 
+### Using the bind() Method
+
+The `bind()` method allows you to chain validation steps by passing the current value to a function that returns an `Either`. This is useful for complex validation logic that requires multiple steps or conditional validation.
+
+```dart
+// Complex validation with bind()
+final result = 'user@example.com'
+    .field('Email')
+    .bind((email) {
+      // Check if email is from allowed domains
+      final allowedDomains = ['example.com', 'company.org'];
+      final domain = email.split('@').last;
+
+      if (!allowedDomains.contains(domain)) {
+        return Left(ValidationError('Email', 'Email must be from an allowed domain'));
+      }
+
+      // Check if email is not too long
+      if (email.length > 50) {
+        return Left(ValidationError('Email', 'Email must be less than 50 characters'));
+      }
+
+      return Right(email);
+    })
+    .validateEither();
+
+// Conditional validation with bind()
+final result = age
+    .field('Age')
+    .bind((value) {
+      if (value < 18) {
+        return Left(ValidationError('Age', 'Must be at least 18 years old'));
+      }
+
+      if (value > 65) {
+        return Left(ValidationError('Age', 'Must be under 65 years old'));
+      }
+
+      // Additional business logic
+      if (value == 25) {
+        return Left(ValidationError('Age', 'Age 25 is not allowed for this application'));
+      }
+
+      return Right(value);
+    })
+    .validateEither();
+```
+
+### Creating Custom Extensions
+
+You can create custom extensions for specific types of `ValidationStep` to add domain-specific validators. Use the `pass()` and `fail()` helper methods to create success and failure results.
+
+```dart
+// Custom extension for String validation
+extension CustomStringExtension on SyncValidationStep<String> {
+  /// Validates that the string is a strong password
+  SyncValidationStep<String> isStrongPassword() => bind((value) {
+    if (value.length < 8) {
+      return fail('$fieldName must be at least 8 characters long');
+    }
+
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return fail('$fieldName must contain at least one uppercase letter');
+    }
+
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return fail('$fieldName must contain at least one lowercase letter');
+    }
+
+    if (!RegExp(r'[0-9]').hasMatch(value)) {
+      return fail('$fieldName must contain at least one number');
+    }
+
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+      return fail('$fieldName must contain at least one special character');
+    }
+
+    return pass(value);
+  });
+}
+
+// Custom extension for numeric validation
+extension CustomNumExtension<T extends num> on SyncValidationStep<T> {
+  /// Validates that the number is a valid age for employment
+  SyncValidationStep<T> isEmploymentAge() => bind((value) {
+    if (value < 16) {
+      return fail('$fieldName must be at least 16 years old for employment');
+    }
+
+    if (value > 70) {
+      return fail('$fieldName must be under 70 years old for employment');
+    }
+
+    return pass(value);
+  });
+
+  /// Validates that the number is a valid percentage (0-100)
+  SyncValidationStep<T> isPercentage() => bind((value) {
+    if (value < 0 || value > 100) {
+      return fail('$fieldName must be between 0 and 100');
+    }
+
+    return pass(value);
+  });
+}
+
+// Usage of custom extensions
+final passwordResult = 'MyP@ssw0rd'
+    .field('Password')
+    .isStrongPassword()
+    .validateEither();
+
+final ageResult = 25
+    .field('Age')
+    .isEmploymentAge()
+    .validateEither();
+```
+
 ### Error Handling
 
 ```dart

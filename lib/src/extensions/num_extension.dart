@@ -26,8 +26,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> min(num min) => bind(
     (value) => value >= min
-        ? _success(value)
-        : _fail(
+        ? pass(value)
+        : fail(
             'Value $value of field $fieldName must be greater than or equal to $min',
           ),
   );
@@ -42,8 +42,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> max(num max) => bind(
     (value) => value <= max
-        ? _success(value)
-        : _fail(
+        ? pass(value)
+        : fail(
             'Value $value of field $fieldName must be less than or equal to $max',
           ),
   );
@@ -58,8 +58,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> isEven() => bind(
     (value) => value % 2 == 0
-        ? _success(value)
-        : _fail('Value $value of field $fieldName must be even'),
+        ? pass(value)
+        : fail('Value $value of field $fieldName must be even'),
   );
 
   /// Validates that the value is odd (not divisible by 2).
@@ -72,8 +72,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> isOdd() => bind(
     (value) => value % 2 == 1
-        ? _success(value)
-        : _fail('Value $value of field $fieldName must be odd'),
+        ? pass(value)
+        : fail('Value $value of field $fieldName must be odd'),
   );
 
   /// Validates that the value is positive (greater than 0).
@@ -85,8 +85,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isPositive().validateEither();
   /// ```
   SyncValidationStep<T> isPositive() => bind(
-    (value) =>
-        value > 0 ? _success(value) : _fail('$fieldName must be positive'),
+    (value) => value > 0 ? pass(value) : fail('$fieldName must be positive'),
   );
 
   /// Validates that the value is non-negative (greater than or equal to 0).
@@ -99,7 +98,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> isNonNegative() => bind(
     (value) =>
-        value >= 0 ? _success(value) : _fail('$fieldName must be non-negative'),
+        value >= 0 ? pass(value) : fail('$fieldName must be non-negative'),
   );
 
   /// Validates that the value is negative (less than 0).
@@ -111,8 +110,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isNegative().validateEither();
   /// ```
   SyncValidationStep<T> isNegative() => bind(
-    (value) =>
-        value < 0 ? _success(value) : _fail('$fieldName must be negative'),
+    (value) => value < 0 ? pass(value) : fail('$fieldName must be negative'),
   );
 
   /// Validates that the value is non-positive (less than or equal to 0).
@@ -125,7 +123,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> isNonPositive() => bind(
     (value) =>
-        value <= 0 ? _success(value) : _fail('$fieldName must be non-positive'),
+        value <= 0 ? pass(value) : fail('$fieldName must be non-positive'),
   );
 
   /// Validates that the value is an integer and converts it to [int] type.
@@ -150,13 +148,13 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<int> isInt() => bind((value) {
     if (value is int) {
-      return _success<int>(value);
+      return pass<int>(value);
     }
     if (value is double && value == value.toInt()) {
-      return _success<int>(value.toInt());
+      return pass<int>(value.toInt());
     }
 
-    return _fail<int>('$fieldName must be an integer');
+    return fail<int>('$fieldName must be an integer');
   });
 
   /// Validates that the value is a power of 2.
@@ -171,21 +169,21 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isPowerOfTwo().validateEither();
   /// ```
   SyncValidationStep<T> isPowerOfTwo() => bind((value) {
-    if (value <= 0) return _fail('$fieldName must be a power of 2');
-    if (value == 1) return _success(value); // 2^0 = 1
+    if (value <= 0) return fail('$fieldName must be a power of 2');
+    if (value == 1) return pass(value); // 2^0 = 1
     if (value is int) {
       return (value & (value - 1)) == 0
-          ? _success(value)
-          : _fail('$fieldName must be a power of 2');
+          ? pass(value)
+          : fail('$fieldName must be a power of 2');
     }
     // For doubles, check if it's a power of 2
     double v = value.toDouble();
     while (v > 1) {
-      if (v % 2 != 0) return _fail('$fieldName must be a power of 2');
+      if (v % 2 != 0) return fail('$fieldName must be a power of 2');
       v /= 2;
     }
 
-    return v == 1 ? _success(value) : _fail('$fieldName must be a power of 2');
+    return v == 1 ? pass(value) : fail('$fieldName must be a power of 2');
   });
 
   /// Validates that the value is a valid port number (1-65535).
@@ -201,8 +199,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> isPortNumber() => bind(
     (value) => value >= 1 && value <= 65535
-        ? _success(value)
-        : _fail('$fieldName must be a valid port number (1-65535)'),
+        ? pass(value)
+        : fail('$fieldName must be a valid port number (1-65535)'),
   );
 
   /// Validates that the value is within a specified percentage of a target value.
@@ -229,8 +227,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         final max = target + tolerance;
 
         return value >= min && value <= max
-            ? _success(value)
-            : _fail('$fieldName must be within $percentage% of $target');
+            ? pass(value)
+            : fail('$fieldName must be within $percentage% of $target');
       });
 
   /// Validates that the value is within the specified range [min] to [max] (inclusive).
@@ -246,8 +244,8 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<T> inRange(num min, num max) => bind(
     (value) => value >= min && value <= max
-        ? _success(value)
-        : _fail(
+        ? pass(value)
+        : fail(
             'Value $value of field $fieldName must be between $min and $max',
           ),
   );
