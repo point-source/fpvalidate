@@ -41,7 +41,7 @@ void main() async {
       );
   print(ageResult);
 
-  // String extension methods
+  // String validators
   final urlResult = 'https://example.com/api'
       .field('URL')
       .startsWith('https')
@@ -94,7 +94,7 @@ void main() async {
       );
   print(customResult);
 
-  // Async validation
+  // Async validation with TaskEither
   final asyncResult = await 'async@example.com'
       .field('Async Email')
       .notEmpty()
@@ -122,6 +122,21 @@ void main() async {
       );
   print(asyncResult);
 
+  // Async validation with Either
+  final asyncEitherResult = await 'async@example.com'
+      .field('Async Email Either')
+      .notEmpty()
+      .isEmail()
+      .toAsync()
+      .validateEither()
+      .then(
+        (either) => either.fold(
+          (error) => '❌ Async Either validation failed: ${error.message}',
+          (value) => '✅ Async Either validation passed: $value',
+        ),
+      );
+  print(asyncEitherResult);
+
   // Date and time validation
   final dateResult = '2023-12-25'
       .field('Date')
@@ -146,4 +161,35 @@ void main() async {
   // Error handling with errorOrNull
   final errorOrNullResult = ''.field('Empty String').notEmpty().errorOrNull();
   print('Error or null result: ${errorOrNullResult ?? 'No error'}');
+
+  // Form validator convenience method
+  final formValidatorResult = 'test@example.com'
+      .field('Form Email')
+      .notEmpty()
+      .isEmail()
+      .asFormValidator();
+  print('Form validator result: ${formValidatorResult ?? 'No error'}');
+
+  // notEmpty with allowWhitespace parameter
+  final whitespaceResult = '   '
+      .field('Whitespace String')
+      .notEmpty(allowWhitespace: true)
+      .validateEither()
+      .fold(
+        (error) => '❌ Whitespace validation failed: ${error.message}',
+        (value) => '✅ Whitespace validation passed: $value',
+      );
+  print(whitespaceResult);
+
+  // Type conversion with toInt()
+  final intConversionResult = '123'
+      .field('Number String')
+      .toInt()
+      .validateEither()
+      .fold(
+        (error) => '❌ Int conversion failed: ${error.message}',
+        (value) =>
+            '✅ Int conversion passed: $value (type: ${value.runtimeType})',
+      );
+  print(intConversionResult);
 }

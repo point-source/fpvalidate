@@ -52,7 +52,7 @@ try {
   final validatedEmail = email
       .field('Email')
       .notEmpty()
-      .email()
+      .isEmail()
       .validate();
   print('Valid email: $validatedEmail');
 } catch (e) {
@@ -65,7 +65,7 @@ try {
 final result = email
     .field('Email')
     .notEmpty()
-    .email()
+    .isEmail()
     .validateEither()
     .mapLeft((error) => 'Validation failed: ${error.message}');
 ```
@@ -74,7 +74,7 @@ final result = email
 
 ```dart
 final validationResult = [
-  email.field('Email').notEmpty().email(),
+  email.field('Email').notEmpty().isEmail(),
   password.field('Password').notEmpty().minLength(8),
   age.field('Age').min(13).max(120),
 ].validateEither()
@@ -88,16 +88,26 @@ final validationResult = [
 final result = await email
     .field('Email')
     .notEmpty()
-    .email()
-    .customAsync((email) async {
+    .isEmail()
+    .toAsync()
+    .tryMap((email) async {
       // Check if email exists in database
       final exists = await userService.emailExists(email);
-      return exists
-          ? ValidationFailure('Email already registered')
-          : ValidationSuccess(email);
-    })
+      if (exists) {
+        throw Exception('Email already registered');
+      }
+      return email;
+    }, (fieldName) => '$fieldName already registered')
     .validateTaskEither()
     .run();
+
+// Async validation with Either
+final asyncResult = await email
+    .field('Email')
+    .notEmpty()
+    .isEmail()
+    .toAsync()
+    .validateEither();
 ```
 
 ### Nullable Field Validation
@@ -106,13 +116,13 @@ final result = await email
 // Optional field that must be valid if provided
 final result = optionalEmail
     .field('Optional Email')
-    .custom(NullableValidators.optionalEmail())
+    .isNotNull()
     .validateEither();
 
 // Required nullable field
 final result = requiredField
     .field('Required Field')
-    .nonNull()
+    .isNotNull()
     .notEmpty()
     .validateEither();
 ```
@@ -124,36 +134,28 @@ final result = requiredField
 ```dart
 email.field('Email')
     .notEmpty()           // Ensures field is not empty
-    .email()              // Validates email format
+    .notEmpty(allowWhitespace: true)  // Allows whitespace-only strings
+    .isEmail()            // Validates email format
     .minLength(5)         // Minimum length
     .maxLength(100)       // Maximum length
-    .pattern(RegExp(r'^[a-z]+$'), 'lowercase letters only') // Custom regex
-    .url()                // Validates URL format
-    .phone()              // Validates phone number format
+    .isPattern(RegExp(r'^[a-z]+$'), 'lowercase letters only') // Custom regex
+    .isUrl()              // Validates URL format
+    .isPhone()            // Validates phone number format
+    .contains('required') // Must contain substring
+    .startsWith('https')  // Must start with prefix
+    .endsWith('.com')     // Must end with suffix
+    .alphanumeric()       // Only alphanumeric characters
+    .lettersOnly()        // Only letters
+    .digitsOnly()         // Only digits
+    .isUuid()             // Valid UUID format
+    .isCreditCard()       // Valid credit card number
+    .isPostalCode()       // Valid postal code format
+    .isIsoDate()          // Valid ISO date (YYYY-MM-DD)
+    .isTime24Hour()       // Valid 24-hour time (HH:MM)
     .validate();
 ```
 
-#### String Validators
-
-For even more convenient string validation, you can use the extension methods directly on `ValidationBuilder<String>`:
-
-```dart
-someString.field('Some String')
-    .contains('required')     // Must contain substring
-    .startsWith('https')      // Must start with prefix
-    .endsWith('.com')         // Must end with suffix
-    .alphanumeric()           // Only alphanumeric characters
-    .lettersOnly()            // Only letters
-    .digitsOnly()             // Only digits
-    .uuid()                   // Valid UUID format
-    .creditCard()             // Valid credit card number
-    .postalCode()             // Valid postal code format
-    .isoDate()                // Valid ISO date (YYYY-MM-DD)
-    .time24Hour()             // Valid 24-hour time (HH:MM)
-    .validate();
-```
-
-These extension methods provide the same functionality as the `StringValidators` class but with a more fluent, chainable API. They automatically use the field name in error messages for better user experience.
+These validators provide a fluent, chainable API and automatically use the field name in error messages for better user experience.
 
 ### Numeric Validators
 
@@ -162,22 +164,15 @@ age.field('Age')
     .min(0)               // Minimum value
     .max(120)             // Maximum value
     .inRange(13, 65)      // Value within range
-    .positive()           // Must be positive
-    .nonNegative()        // Must be non-negative
-    .isInteger()          // Must be an integer
+    .isPositive()         // Must be positive
+    .isNonNegative()      // Must be non-negative
+    .isInt()              // Must be an integer
     .isEven()             // Must be even
     .isOdd()              // Must be odd
-    .isPrime()            // Must be prime
     .isPowerOfTwo()       // Must be a power of 2
     .isPerfectSquare()    // Must be a perfect square
     .isPortNumber()       // Must be a valid port number (1-65535)
-    .isYear()             // Must be a valid year (1900-2100)
-    .isMonth()            // Must be a valid month (1-12)
-    .isDayOfMonth()       // Must be a valid day (1-31)
-    .isHour()             // Must be a valid hour (0-23)
-    .isMinute()           // Must be a valid minute (0-59)
-    .isSecond()           // Must be a valid second (0-59)
-    .withinPercentage(target, 5.0) // Within 5% of target value
+    .isWithinPercentage(target, 5.0) // Within 5% of target value
     .validate();
 ```
 
@@ -185,246 +180,243 @@ age.field('Age')
 
 ```dart
 optionalField.field('Optional Field')
-    .custom(NullableValidators.ifPresent(StringValidators.notEmpty()))
-    .custom(NullableValidators.optionalEmail())
-    .custom(NullableValidators.optionalInRange(0, 100))
+    .isNotNull()
     .validate();
 ```
 
-Available nullable validators:
+### Type Casting and Transformation Validators
 
-- `ifPresent()` - Apply validator only if value is not null
-- `optional()` - Alias for ifPresent
-- `required()` - Ensure value is not null and apply validator
-- `optionalNotEmpty()` - Ensure string is not empty if provided
-- `optionalEmail()` - Ensure valid email format if provided
-- `optionalUrl()` - Ensure valid URL format if provided
-- `optionalPhone()` - Ensure valid phone format if provided
-- `optionalInRange(min, max)` - Ensure value is in range if provided
-- `optionalMinLength(length)` - Ensure minimum length if provided
-- `optionalMaxLength(length)` - Ensure maximum length if provided
-
-## Custom Validators
-
-### Creating Custom Validators
+Some validators not only validate but also transform the value type, enabling different validation chains:
 
 ```dart
-// Simple custom validator
-Validator<String> customValidator = (value) {
-  if (value.contains('forbidden')) {
-    return ValidationFailure('contains forbidden word');
-  }
-  return ValidationSuccess(value);
-};
+// String to Integer transformation
+final result = '123'
+    .field('Number String')
+    .toInt()              // Converts String to int, enables numeric validators
+    .min(100)             // Now we can use numeric validators
+    .max(200)
+    .isEven()
+    .validateEither();
 
-// Using custom validator
-final result = someString
-    .field('Some String')
-    .custom(customValidator)
-    .validate();
+// Nullable to Non-nullable transformation
+final result = (someNullableString as String?)
+    .field('Optional String')
+    .isNotNull()          // Converts String? to String, enables string validators
+    .notEmpty()           // Now we can use string validators
+    .isEmail()
+    .validateEither();
+
+// Custom transformation with tryMap
+final result = '2023-12-25'
+    .field('Date String')
+    .tryMap(
+      (value) => DateTime.parse(value),  // Converts String to DateTime
+      (fieldName) => '$fieldName must be a valid date',
+    )
+    .validateEither();
 ```
 
-### Async Custom Validators
+These transformation validators are powerful because they allow you to:
+
+- Convert between types while validating
+- Chain different types of validators
+- Handle nullable to non-nullable conversions
+- Create custom type transformations with `tryMap()`
+
+## Advanced Features
+
+### Custom Validation
 
 ```dart
-AsyncValidator<String> asyncValidator = (value) async {
-  final isValid = await checkDatabase(value);
-  return isValid
-      ? ValidationSuccess(value)
-      : ValidationFailure('not found in database');
-};
+// Custom validation with check()
+final result = 'hello world'
+    .field('Custom String')
+    .check(
+      (value) => value.contains('world'),
+      (fieldName) => '$fieldName must contain "world"',
+    )
+    .validateEither();
 
-final result = await someString
-    .field('Some String')
-    .customAsync(asyncValidator)
-    .validateAsync();
+// Custom transformation with tryMap()
+final result = '123'
+    .field('Number String')
+    .tryMap(
+      (value) => int.tryParse(value) ?? throw Exception('Invalid number'),
+      (fieldName) => '$fieldName must be a valid number',
+    )
+    .validateEither();
+
+// Type conversion with toInt()
+final result = '123'
+    .field('Number String')
+    .toInt()
+    .validateEither();
 ```
 
-### Reusable Validator Functions
+### Error Handling
 
 ```dart
-// Create reusable validators
-class CustomValidators {
-  static Validator<String> containsWord(String word) => (value) {
-    if (!value.contains(word)) {
-      return ValidationFailure('must contain "$word"');
-    }
-    return ValidationSuccess(value);
-  };
-
-  static Validator<num> isEven() => (value) {
-    if (value % 2 != 0) {
-      return ValidationFailure('must be even');
-    }
-    return ValidationSuccess(value);
-  };
-}
-
-// Use them in validation chains
-final result = someString
-    .field('Some String')
-    .custom(CustomValidators.containsWord('required'))
-    .validate();
-```
-
-## Advanced Usage
-
-### Complex Form Validation
-
-```dart
-class UserRegistration {
-  final String email;
-  final String password;
-  final String? phone;
-  final int age;
-
-  UserRegistration({
-    required this.email,
-    required this.password,
-    this.phone,
-    required this.age,
-  });
-}
-
-Future<Either<String, UserRegistration>> validateRegistration({
-  required String email,
-  required String password,
-  String? phone,
-  required int age,
-}) async {
-  final result = await [
-    email.field('Email').notEmpty().email(),
-    password.field('Password').notEmpty().minLength(8),
-    phone?.field('Phone').custom(NullableValidators.optionalPhone()) ??
-        ValidationBuilder(null, 'Phone').custom((_) => ValidationSuccess(null)),
-    age.field('Age').min(13).max(120),
-  ].validateTaskEither()
-  .map((values) => UserRegistration(
-    email: values[0],
-    password: values[1],
-    phone: values[2],
-    age: values[3],
-  ))
-  .mapLeft((error) => 'Validation failed: ${error.message}')
-  .run();
-
-  return result;
-}
-```
-
-### Conditional Validation
-
-```dart
-final result = userType
-    .field('User Type')
-    .custom((type) {
-      if (type == 'business') {
-        return businessEmail
-            .field('Business Email')
-            .notEmpty()
-            .email()
-            .validateEither()
-            .fold(
-              (error) => ValidationFailure(error.message),
-              (value) => ValidationSuccess(type),
-            );
-      }
-      return ValidationSuccess(type);
-    })
-    .validate();
-```
-
-## Error Handling
-
-The library provides multiple ways to handle validation errors:
-
-### Exception-based (Traditional)
-
-```dart
-try {
-  final result = email.field('Email').notEmpty().email().validate();
-} catch (e) {
-  if (e is ValidationError) {
-    print('${e.fieldName}: ${e.message}');
-  }
-}
-```
-
-### Functional (Either/TaskEither)
-
-```dart
-final result = email
+// Get error message or null (useful for Flutter forms)
+final error = email
     .field('Email')
     .notEmpty()
-    .email()
-    .validateEither()
-    .fold(
-      (error) => 'Error: ${error.message}',
-      (value) => 'Success: $value',
-    );
+    .isEmail()
+    .errorOrNull();
+
+if (error != null) {
+  // Display error in UI
+  print('Error: $error');
+}
+
+// Convenience method for Flutter forms
+final formValidator = email
+    .field('Email')
+    .notEmpty()
+    .isEmail()
+    .asFormValidator(); // Same as errorOrNull()
 ```
 
-## Validation Methods
+### Async Validation
 
-The library provides several validation methods to suit different use cases:
-
-### Synchronous Validation
-
-- `validate()` - Throws ValidationError on failure, returns value on success
-- `validateEither()` - Returns Either<ValidationError, T>
-- `validateTaskEither()` - Returns TaskEither<ValidationError, T>
-
-### Asynchronous Validation
-
-- `validateAsync()` - Throws ValidationError on failure, returns Future<T> on success
-- `validateTaskEither()` - Returns TaskEither<ValidationError, T>
-
-### Batch Validation
-
-- `validate()` - Throws ValidationError on first failure, returns List<T> on success
-- `validateAsync()` - Throws ValidationError on first failure, returns Future<List<T>> on success
-- `validateEither()` - Returns Either<ValidationError, List<T>>
-- `validateTaskEither()` - Returns TaskEither<ValidationError, List<T>>
+```dart
+// Convert sync validation to async
+final asyncResult = await email
+    .field('Email')
+    .notEmpty()
+    .isEmail()
+    .toAsync()
+    .tryMap((email) async {
+      // Simulate async validation
+      await Future.delayed(Duration(milliseconds: 100));
+      if (email.contains('async')) {
+        return email;
+      }
+      throw Exception('Email must contain "async"');
+    }, (fieldName) => '$fieldName must contain "async"')
+    .validateTaskEither()
+    .run();
+```
 
 ## Examples
 
-Check out the [example/example.dart](example/example.dart) file for more usage examples:
+### Form Validation
 
 ```dart
-// Basic string validation
-final result = 'https://example.com/api'
-    .field('URL')
-    .startsWith('https')
-    .contains('api')
-    .validate();
+class UserRegistrationForm {
+  final String email;
+  final String password;
+  final int age;
+  final String? phone;
 
-// Complex string validation
-final result = 'user123'
-    .field('Username')
-    .alphanumeric()
-    .minLength(4)
-    .maxLength(20)
-    .validate();
+  UserRegistrationForm({
+    required this.email,
+    required this.password,
+    required this.age,
+    this.phone,
+  });
 
-// Date and time validation
-final dateResult = '2023-12-25'.field('Date').isoDate().validate();
-final timeResult = '14:30'.field('Time').time24Hour().validate();
-
-// Functional validation with Either
-final functionalResult = '550e8400-e29b-41d4-a716-446655440000'
-    .field('UUID')
-    .uuid()
-    .validateEither()
-    .fold(
-      (error) => '❌ UUID validation failed: ${error.message}',
-      (value) => '✅ Valid UUID: $value',
-    );
+  Either<ValidationError, UserRegistrationForm> validate() {
+    return [
+      email.field('Email').notEmpty().isEmail(),
+      password.field('Password').notEmpty().minLength(8),
+      age.field('Age').min(13).max(120),
+      if (phone != null) phone!.field('Phone').isPhone(),
+    ].validateEither().map((_) => this);
+  }
+}
 ```
 
-## Additional Information
+### API Response Validation
 
-- **Repository**: https://github.com/point-source/fpvalidate
-- **Issue Tracker**: https://github.com/point-source/fpvalidate/issues
-- **Dependencies**: Requires [fpdart](https://pub.dev/packages/fpdart) ^1.1.1 for functional programming utilities
+```dart
+Future<Either<ValidationError, User>> validateUserResponse(Map<String, dynamic> json) async {
+  return await json['email']
+      .toString()
+      .field('Email')
+      .notEmpty()
+      .isEmail()
+      .toAsync()
+      .tryMap((email) async {
+        // Additional async validation
+        final userExists = await userService.exists(email);
+        if (!userExists) {
+          throw Exception('User not found');
+        }
+        return User(email: email);
+      }, (fieldName) => '$fieldName not found')
+      .validateTaskEither()
+      .run();
+}
+```
 
-For more examples and advanced usage patterns, check out the test files in the repository.
+### Flutter Form Integration
+
+```dart
+class LoginForm extends StatefulWidget {
+  @override
+  _LoginFormState createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  String? _validateEmail(String? value) {
+    if (value == null) return null;
+    return value
+        .field('Email')
+        .notEmpty()
+        .isEmail()
+        .asFormValidator();
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null) return null;
+    return value
+        .field('Password')
+        .notEmpty()
+        .minLength(8)
+        .asFormValidator();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _emailController,
+            validator: _validateEmail,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+          TextFormField(
+            controller: _passwordController,
+            validator: _validatePassword,
+            decoration: InputDecoration(labelText: 'Password'),
+            obscureText: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Error Messages
+
+The library provides descriptive error messages that include the field name:
+
+- `"Email must be a valid email address"`
+- `"Password must be at least 8 characters long"`
+- `"Age must be between 13 and 120"`
+- `"Phone must be a valid phone number"`
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

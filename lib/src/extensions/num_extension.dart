@@ -49,7 +49,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         value <= 0 ? _success(value) : _fail('$fieldName must be non-positive'),
   );
 
-  SyncValidationStep<int> isInteger() => bind((value) {
+  SyncValidationStep<int> isInt() => bind((value) {
     if (value is int) {
       return _success<int>(value);
     }

@@ -3,9 +3,12 @@
 part of '../validation_step.dart';
 
 extension StringExtension on SyncValidationStep<String> {
-  SyncValidationStep<String> notEmpty() => bind(
-    (value) =>
-        value.isEmpty ? _fail('Field $fieldName is empty') : _success(value),
+  SyncValidationStep<String> notEmpty({bool allowWhitespace = false}) => bind(
+    (value) => value.isEmpty
+        ? _fail('Field $fieldName is empty')
+        : !allowWhitespace && value.trim().isEmpty
+        ? _fail('Field $fieldName is empty')
+        : _success(value),
   );
 
   SyncValidationStep<int> toInt() => bind((value) {

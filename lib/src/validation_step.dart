@@ -150,6 +150,14 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   /// final error = step.errorOrNull();
   /// ```
   String? errorOrNull() => _value.fold((l) => l.message, (r) => null);
+
+  /// Returns the error message if the validation fails, otherwise returns null.
+  ///
+  /// This method is useful for use with Flutter's Form widgets since they expect
+  /// a [String?] to display the error message or [null] to signal success.
+  ///
+  /// This method is a shortcut for [errorOrNull] and is useful for use with Flutter's Form widgets.
+  String? asFormValidator() => errorOrNull();
 }
 
 /// An asynchronous validation step that performs validation operations asynchronously.
@@ -296,6 +304,16 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   Future<T> validate() =>
       _value.run().then((value) => value.fold((l) => throw l, (r) => r));
 
+  /// Runs the underlying [TaskEither] and returns the result as a [Future<Either<ValidationError, T>>]
+  ///
+  /// Returns a [Future] that completes with the validation result.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await step.validateEither();
+  /// ```
+  Future<Either<ValidationError, T>> validateEither() => _value.run();
+
   /// Returns the underlying [TaskEither] containing the validation result.
   ///
   /// This method allows you to handle the success/error cases manually without throwing.
@@ -316,4 +334,12 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   /// ```
   Future<String?> errorOrNull() =>
       _value.run().then((value) => value.fold((l) => l.message, (r) => null));
+
+  /// Returns the error message if the validation fails, otherwise returns null.
+  ///
+  /// This method is useful for use with Flutter's Form widgets since they expect
+  /// a [String?] to display the error message or [null] to signal success.
+  ///
+  /// This method is a shortcut for [errorOrNull] and is useful for use with Flutter's Form widgets.
+  Future<String?> asFormValidator() => errorOrNull();
 }

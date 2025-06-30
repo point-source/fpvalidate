@@ -11,13 +11,13 @@
 /// final result = email
 ///     .field('Email')
 ///     .notEmpty()
-///     .email()
+///     .isEmail()
 ///     .validate()
 ///     .mapLeft((error) => CustomError(error.message));
 ///
 /// // Multiple field validation
 /// final result = [
-///   email.field('Email').notEmpty().email(),
+///   email.field('Email').notEmpty().isEmail(),
 ///   password.field('Password').notEmpty().minLength(8),
 ///   age.field('Age').min(13).max(120),
 /// ].validate()
