@@ -13,7 +13,7 @@ and the Flutter guide for
 
 # fpvalidate
 
-A functional validation library for Dart with support for TaskEither and Either types from the [fpdart](https://pub.dev/packages/fpdart) package.
+A functional validation library for Dart with support for Either and TaskEither types from the [fpdart](https://pub.dev/packages/fpdart) package.
 
 ## Features
 
