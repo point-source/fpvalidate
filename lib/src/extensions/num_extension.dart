@@ -1,6 +1,29 @@
 part of '../validation_step.dart';
 
+/// Extension that provides validation methods for numeric values.
+///
+/// This extension adds comprehensive validation capabilities to numeric types
+/// (int and double), including range validation, mathematical properties,
+/// and type-specific validations.
+///
+/// Example:
+/// ```dart
+/// final result = 25
+///     .field('Age')
+///     .min(18)
+///     .max(65)
+///     .isEven()
+///     .validateEither();
+/// ```
 extension NumExtension<T extends num> on SyncValidationStep<T> {
+  /// Validates that the value is greater than or equal to [min].
+  ///
+  /// Returns a [ValidationError] if the value is less than [min].
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = age.field('Age').min(18).validateEither();
+  /// ```
   SyncValidationStep<T> min(num min) => bind(
     (value) => value >= min
         ? _success(value)
@@ -9,6 +32,14 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
           ),
   );
 
+  /// Validates that the value is less than or equal to [max].
+  ///
+  /// Returns a [ValidationError] if the value is greater than [max].
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = age.field('Age').max(65).validateEither();
+  /// ```
   SyncValidationStep<T> max(num max) => bind(
     (value) => value <= max
         ? _success(value)
@@ -17,38 +48,106 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
           ),
   );
 
+  /// Validates that the value is even (divisible by 2).
+  ///
+  /// Returns a [ValidationError] if the value is odd.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isEven().validateEither();
+  /// ```
   SyncValidationStep<T> isEven() => bind(
     (value) => value % 2 == 0
         ? _success(value)
         : _fail('Value $value of field $fieldName must be even'),
   );
 
+  /// Validates that the value is odd (not divisible by 2).
+  ///
+  /// Returns a [ValidationError] if the value is even.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isOdd().validateEither();
+  /// ```
   SyncValidationStep<T> isOdd() => bind(
     (value) => value % 2 == 1
         ? _success(value)
         : _fail('Value $value of field $fieldName must be odd'),
   );
 
+  /// Validates that the value is positive (greater than 0).
+  ///
+  /// Returns a [ValidationError] if the value is zero or negative.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isPositive().validateEither();
+  /// ```
   SyncValidationStep<T> isPositive() => bind(
     (value) =>
         value > 0 ? _success(value) : _fail('$fieldName must be positive'),
   );
 
+  /// Validates that the value is non-negative (greater than or equal to 0).
+  ///
+  /// Returns a [ValidationError] if the value is negative.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isNonNegative().validateEither();
+  /// ```
   SyncValidationStep<T> isNonNegative() => bind(
     (value) =>
         value >= 0 ? _success(value) : _fail('$fieldName must be non-negative'),
   );
 
+  /// Validates that the value is negative (less than 0).
+  ///
+  /// Returns a [ValidationError] if the value is zero or positive.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isNegative().validateEither();
+  /// ```
   SyncValidationStep<T> isNegative() => bind(
     (value) =>
         value < 0 ? _success(value) : _fail('$fieldName must be negative'),
   );
 
+  /// Validates that the value is non-positive (less than or equal to 0).
+  ///
+  /// Returns a [ValidationError] if the value is positive.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isNonPositive().validateEither();
+  /// ```
   SyncValidationStep<T> isNonPositive() => bind(
     (value) =>
         value <= 0 ? _success(value) : _fail('$fieldName must be non-positive'),
   );
 
+  /// Validates that the value is an integer and converts it to [int] type.
+  ///
+  /// This method checks if the value is an integer (either already an [int] or
+  /// a [double] that equals its integer part). If valid, it returns a new
+  /// [SyncValidationStep<int>] that can be chained with integer-specific validators.
+  ///
+  /// This is a type transformation validator that changes the validator type from
+  /// [SyncValidationStep<T>] to [SyncValidationStep<int>].
+  ///
+  /// Returns a [SyncValidationStep<int>] if the value is an integer.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = 25.0
+  ///     .field('Age')
+  ///     .isInt()              // Converts num to int
+  ///     .min(18)              // Now we can use int validators
+  ///     .max(65)
+  ///     .validateEither();
+  /// ```
   SyncValidationStep<int> isInt() => bind((value) {
     if (value is int) {
       return _success<int>(value);
@@ -60,6 +159,17 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     return _fail<int>('$fieldName must be an integer');
   });
 
+  /// Validates that the value is a power of 2.
+  ///
+  /// A power of 2 is a number that can be written as 2^n where n is a non-negative integer.
+  /// Examples: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, etc.
+  ///
+  /// Returns a [ValidationError] if the value is not a power of 2.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isPowerOfTwo().validateEither();
+  /// ```
   SyncValidationStep<T> isPowerOfTwo() => bind((value) {
     if (value <= 0) return _fail('$fieldName must be a power of 2');
     if (value is int) {
@@ -77,6 +187,17 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     return v == 1 ? _success(value) : _fail('$fieldName must be a power of 2');
   });
 
+  /// Validates that the value is a perfect square.
+  ///
+  /// A perfect square is a number that is the square of an integer.
+  /// Examples: 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, etc.
+  ///
+  /// Returns a [ValidationError] if the value is not a perfect square.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = number.field('Number').isPerfectSquare().validateEither();
+  /// ```
   SyncValidationStep<T> isPerfectSquare() => bind((value) {
     if (value < 0) return _fail('$fieldName must be a perfect square');
     final sqrt = math.sqrt(value);
@@ -86,12 +207,40 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         : _fail('$fieldName must be a perfect square');
   });
 
+  /// Validates that the value is a valid port number (1-65535).
+  ///
+  /// Port numbers are used in networking to identify specific processes or services.
+  /// Valid port numbers range from 1 to 65535.
+  ///
+  /// Returns a [ValidationError] if the value is not a valid port number.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = port.field('Port').isPortNumber().validateEither();
+  /// ```
   SyncValidationStep<T> isPortNumber() => bind(
     (value) => value >= 1 && value <= 65535
         ? _success(value)
         : _fail('$fieldName must be a valid port number (1-65535)'),
   );
 
+  /// Validates that the value is within a specified percentage of a target value.
+  ///
+  /// This method checks if the value falls within a tolerance range around the target.
+  /// The tolerance is calculated as [target] * [percentage] / 100.
+  ///
+  /// [target] is the reference value to compare against.
+  /// [percentage] is the tolerance percentage (e.g., 5.0 for 5%).
+  ///
+  /// Returns a [ValidationError] if the value is outside the tolerance range.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = measurement
+  ///     .field('Measurement')
+  ///     .isWithinPercentage(100.0, 5.0)  // Within 5% of 100
+  ///     .validateEither();
+  /// ```
   SyncValidationStep<T> isWithinPercentage(num target, double percentage) =>
       bind((value) {
         final tolerance = target * (percentage / 100);
@@ -103,6 +252,17 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
             : _fail('$fieldName must be within $percentage% of $target');
       });
 
+  /// Validates that the value is within the specified range [min] to [max] (inclusive).
+  ///
+  /// This method checks if the value is greater than or equal to [min] and
+  /// less than or equal to [max].
+  ///
+  /// Returns a [ValidationError] if the value is outside the range.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = age.field('Age').inRange(18, 65).validateEither();
+  /// ```
   SyncValidationStep<T> inRange(num min, num max) => bind(
     (value) => value >= min && value <= max
         ? _success(value)
