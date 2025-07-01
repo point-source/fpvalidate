@@ -206,7 +206,7 @@ void main() {
 
   group('AsyncValidationStep', () {
     group('tryMap', () {
-      test('should transform value successfully', () async {
+      test('should transform value successfully with async function', () async {
         final step = Future.value('123').field('Number');
         final result = await step
             .tryMap(
@@ -222,41 +222,120 @@ void main() {
         );
       });
 
-      test('should return error when transformation fails', () async {
-        final step = Future.value('abc').field('Number');
+      test('should transform value successfully with sync function', () async {
+        final step = Future.value('123').field('Number');
         final result = await step
             .tryMap(
-              (value) async => int.parse(value),
+              (value) => int.parse(value),
               (fieldName) => '$fieldName must be a number',
-            )
-            .validateEither();
-
-        expect(result.isLeft(), isTrue);
-        result.fold((error) {
-          expect(error.fieldName, equals('Number'));
-          expect(error.message, equals('Number must be a number'));
-        }, (value) => fail('Should return error'));
-      });
-    });
-
-    group('check', () {
-      test('should succeed when condition is true', () async {
-        final step = Future.value('test@example.com').field('Email');
-        final result = await step
-            .check(
-              (value) async => value.contains('@'),
-              (fieldName) => '$fieldName must contain @',
             )
             .validateEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
-          (value) => expect(value, equals('test@example.com')),
+          (value) => expect(value, equals(123)),
         );
       });
 
-      test('should fail when condition is false', () async {
+      test(
+        'should return error when transformation fails with async function',
+        () async {
+          final step = Future.value('abc').field('Number');
+          final result = await step
+              .tryMap(
+                (value) async => int.parse(value),
+                (fieldName) => '$fieldName must be a number',
+              )
+              .validateEither();
+
+          expect(result.isLeft(), isTrue);
+          result.fold((error) {
+            expect(error.fieldName, equals('Number'));
+            expect(error.message, equals('Number must be a number'));
+          }, (value) => fail('Should return error'));
+        },
+      );
+
+      test(
+        'should return error when transformation fails with sync function',
+        () async {
+          final step = Future.value('abc').field('Number');
+          final result = await step
+              .tryMap(
+                (value) => int.parse(value),
+                (fieldName) => '$fieldName must be a number',
+              )
+              .validateEither();
+
+          expect(result.isLeft(), isTrue);
+          result.fold((error) {
+            expect(error.fieldName, equals('Number'));
+            expect(error.message, equals('Number must be a number'));
+          }, (value) => fail('Should return error'));
+        },
+      );
+
+      test(
+        'should handle exceptions in sync transformation function',
+        () async {
+          final step = Future.value('test').field('String');
+          final result = await step
+              .tryMap(
+                (value) => throw Exception('Test exception'),
+                (fieldName) => '$fieldName is invalid',
+              )
+              .validateEither();
+
+          expect(result.isLeft(), isTrue);
+          result.fold((error) {
+            expect(error.fieldName, equals('String'));
+            expect(error.message, equals('String is invalid'));
+          }, (value) => fail('Should return error'));
+        },
+      );
+    });
+
+    group('check', () {
+      test(
+        'should succeed when condition is true with async function',
+        () async {
+          final step = Future.value('test@example.com').field('Email');
+          final result = await step
+              .check(
+                (value) async => value.contains('@'),
+                (fieldName) => '$fieldName must contain @',
+              )
+              .validateEither();
+
+          expect(result.isRight(), isTrue);
+          result.fold(
+            (error) => fail('Should not return error'),
+            (value) => expect(value, equals('test@example.com')),
+          );
+        },
+      );
+
+      test(
+        'should succeed when condition is true with sync function',
+        () async {
+          final step = Future.value('test@example.com').field('Email');
+          final result = await step
+              .check(
+                (value) => value.contains('@'),
+                (fieldName) => '$fieldName must contain @',
+              )
+              .validateEither();
+
+          expect(result.isRight(), isTrue);
+          result.fold(
+            (error) => fail('Should not return error'),
+            (value) => expect(value, equals('test@example.com')),
+          );
+        },
+      );
+
+      test('should fail when condition is false with async function', () async {
         final step = Future.value('invalid-email').field('Email');
         final result = await step
             .check(
@@ -270,6 +349,55 @@ void main() {
           expect(error.fieldName, equals('Email'));
           expect(error.message, equals('Email must contain @'));
         }, (value) => fail('Should return error'));
+      });
+
+      test('should fail when condition is false with sync function', () async {
+        final step = Future.value('invalid-email').field('Email');
+        final result = await step
+            .check(
+              (value) => value.contains('@'),
+              (fieldName) => '$fieldName must contain @',
+            )
+            .validateEither();
+
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Email'));
+          expect(error.message, equals('Email must contain @'));
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should handle exceptions in sync check function', () async {
+        final step = Future.value('test').field('String');
+        final result = await step
+            .check(
+              (value) => throw Exception('Test exception'),
+              (fieldName) => '$fieldName is invalid',
+            )
+            .validateEither();
+
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('String'));
+          expect(error.message, contains('Exception: Test exception'));
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should handle complex validation logic with sync function', () async {
+        final step = Future.value('password123').field('Password');
+        final result = await step
+            .check(
+              (value) => value.length >= 8 && value.contains(RegExp(r'\d')),
+              (fieldName) =>
+                  '$fieldName must be at least 8 characters and contain a number',
+            )
+            .validateEither();
+
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('password123')),
+        );
       });
     });
 

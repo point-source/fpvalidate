@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:fpvalidate/src/constants/regex/regex.dart';
 import 'package:fpvalidate/src/validation_error.dart';
@@ -212,7 +214,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Returns a new [AsyncValidationStep] with the transformed value or an error.
   AsyncValidationStep<R> tryMap<R>(
-    Future<R> Function(T) f,
+    FutureOr<R> Function(T) f,
     String Function(String fieldName) onFail,
   ) => _copy(
     _value.flatMap(
@@ -234,7 +236,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Returns a new [AsyncValidationStep] with the same value or an error.
   AsyncValidationStep<T> check(
-    Future<bool> Function(T) f,
+    FutureOr<bool> Function(T) f,
     String Function(String fieldName) onFalse,
   ) => _copy(
     _value.flatMap(
