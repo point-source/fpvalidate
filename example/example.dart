@@ -192,4 +192,49 @@ void main() async {
             '✅ Int conversion passed: $value (type: ${value.runtimeType})',
       );
   print(intConversionResult);
+
+  // String isOneOf validation
+  final statusResult = 'active'
+      .field('Status')
+      .isOneOf(['active', 'inactive', 'pending'])
+      .validateEither()
+      .fold(
+        (error) => '❌ Status validation failed: ${error.message}',
+        (value) => '✅ Valid status: $value',
+      );
+  print(statusResult);
+
+  // Case-insensitive string isOneOf validation
+  final countryResult = 'USA'
+      .field('Country')
+      .isOneOf(['USA', 'UK', 'CANADA'], caseInsensitive: true)
+      .validateEither()
+      .fold(
+        (error) => '❌ Country validation failed: ${error.message}',
+        (value) => '✅ Valid country: $value',
+      );
+  print(countryResult);
+
+  // Numeric isOneOf validation
+  final priorityResult = 3
+      .field('Priority')
+      .isOneOf([1, 2, 3, 4, 5])
+      .validateEither()
+      .fold(
+        (error) => '❌ Priority validation failed: ${error.message}',
+        (value) => '✅ Valid priority: $value',
+      );
+  print(priorityResult);
+
+  // Combined validation with isOneOf
+  final userRoleResult = 'admin'
+      .field('Role')
+      .notEmpty()
+      .isOneOf(['admin', 'user', 'moderator'])
+      .validateEither()
+      .fold(
+        (error) => '❌ Role validation failed: ${error.message}',
+        (value) => '✅ Valid role: $value',
+      );
+  print(userRoleResult);
 }

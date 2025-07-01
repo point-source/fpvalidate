@@ -249,4 +249,56 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
             'Value $value of field $fieldName must be between $min and $max',
           ),
   );
+
+  /// Validates that the numeric value is one of the specified allowed values.
+  ///
+  /// This method checks if the current value matches any of the values in [allowedValues].
+  ///
+  /// [allowedValues] is a list of numbers that are considered valid.
+  ///
+  /// Returns a [ValidationError] if the value is not in the allowed values list.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = priority
+  ///     .field('Priority')
+  ///     .isOneOf([1, 2, 3, 4, 5])
+  ///     .validateEither();
+  ///
+  /// final result2 = rating
+  ///     .field('Rating')
+  ///     .isOneOf([1.0, 2.0, 3.0, 4.0, 5.0])
+  ///     .validateEither();
+  /// ```
+  SyncValidationStep<T> isOneOf(List<T> allowedValues) => bind(
+    (value) => allowedValues.contains(value)
+        ? pass(value)
+        : fail('$fieldName must be one of: ${allowedValues.join(', ')}'),
+  );
+
+  /// Validates that the numeric value is not one of the specified forbidden values.
+  ///
+  /// This method checks if the current value does not match any of the values in [forbiddenValues].
+  ///
+  /// [forbiddenValues] is a list of numbers that are considered invalid.
+  ///
+  /// Returns a [ValidationError] if the value is in the forbidden values list.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = port
+  ///     .field('Port')
+  ///     .isNoneOf([80, 443, 8080])
+  ///     .validateEither();
+  ///
+  /// final result2 = rating
+  ///     .field('Rating')
+  ///     .isNoneOf([0.0, 1.0, 2.0])
+  ///     .validateEither();
+  /// ```
+  SyncValidationStep<T> isNoneOf(List<T> forbiddenValues) => bind(
+    (value) => !forbiddenValues.contains(value)
+        ? pass(value)
+        : fail('$fieldName must not be one of: ${forbiddenValues.join(', ')}'),
+  );
 }

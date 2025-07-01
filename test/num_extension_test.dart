@@ -549,5 +549,257 @@ void main() {
         }, (value) => fail('Should return error'));
       });
     });
+
+    group('isOneOf', () {
+      test('should succeed when value is in allowed values list', () {
+        final result = 3.field('Priority').isOneOf([
+          1,
+          2,
+          3,
+          4,
+          5,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(3)),
+        );
+      });
+
+      test('should fail when value is not in allowed values list', () {
+        final result = 7.field('Priority').isOneOf([
+          1,
+          2,
+          3,
+          4,
+          5,
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Priority'));
+          expect(
+            error.message,
+            equals('Priority must be one of: 1, 2, 3, 4, 5'),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with single allowed value', () {
+        final result = 42.field('Number').isOneOf([42]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(42)),
+        );
+      });
+
+      test('should work with empty list (always fails)', () {
+        final result = 5.field('Number').isOneOf([]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Number'));
+          expect(error.message, equals('Number must be one of: '));
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with negative numbers', () {
+        final result = (-1).field('Number').isOneOf([
+          -1,
+          0,
+          1,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(-1)),
+        );
+      });
+
+      test('should work with doubles', () {
+        final result = 3.14.field('Pi').isOneOf([
+          3.14,
+          2.71,
+          1.41,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(3.14)),
+        );
+      });
+
+      test('should work with mixed int and double values', () {
+        // ignore: avoid-unnecessary-type-casts
+        final result = (5 as num).field('Number').isOneOf([
+          1,
+          2.5,
+          5,
+          10.0,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(5)),
+        );
+      });
+    });
+
+    group('isNoneOf', () {
+      test('should succeed when value is not in forbidden values list', () {
+        final result = 3000.field('Port').isNoneOf([
+          80,
+          443,
+          8080,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(3000)),
+        );
+      });
+
+      test('should fail when value is in forbidden values list', () {
+        final result = 80.field('Port').isNoneOf([
+          80,
+          443,
+          8080,
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Port'));
+          expect(
+            error.message,
+            equals('Port must not be one of: 80, 443, 8080'),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with single forbidden value', () {
+        final result = 3000.field('Port').isNoneOf([8080]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(3000)),
+        );
+      });
+
+      test('should work with empty list (always succeeds)', () {
+        final result = 5000.field('Port').isNoneOf([]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(5000)),
+        );
+      });
+
+      test('should work with negative numbers', () {
+        final result = (-5).field('Number').isNoneOf([
+          -1,
+          0,
+          1,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(-5)),
+        );
+      });
+
+      test('should fail with negative numbers when value matches', () {
+        final result = (-1).field('Number').isNoneOf([
+          -1,
+          0,
+          1,
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Number'));
+          expect(error.message, equals('Number must not be one of: -1, 0, 1'));
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with doubles', () {
+        final result = 2.5.field('Rating').isNoneOf([
+          0.0,
+          1.0,
+          2.0,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(2.5)),
+        );
+      });
+
+      test('should fail with doubles when value matches', () {
+        final result = 2.0.field('Rating').isNoneOf([
+          0.0,
+          1.0,
+          2.0,
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Rating'));
+          expect(
+            error.message,
+            equals('Rating must not be one of: 0.0, 1.0, 2.0'),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with mixed int and double values', () {
+        // ignore: avoid-unnecessary-type-casts
+        final result = (7 as num).field('Number').isNoneOf([
+          1,
+          2.5,
+          5,
+          10.0,
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(7)),
+        );
+      });
+
+      test(
+        'should fail with mixed int and double values when value matches',
+        () {
+          // ignore: avoid-unnecessary-type-casts
+          final result = (5 as num).field('Number').isNoneOf([
+            1,
+            2.5,
+            5,
+            10.0,
+          ]).validateEither();
+          expect(result.isLeft(), isTrue);
+          result.fold((error) {
+            expect(error.fieldName, equals('Number'));
+            expect(
+              error.message,
+              equals('Number must not be one of: 1, 2.5, 5, 10.0'),
+            );
+          }, (value) => fail('Should return error'));
+        },
+      );
+
+      test('should work with zero', () {
+        final result = 0.field('Number').isNoneOf([-1, 1]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals(0)),
+        );
+      });
+
+      test('should fail with zero when it is forbidden', () {
+        final result = 0.field('Number').isNoneOf([-1, 0, 1]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Number'));
+          expect(error.message, equals('Number must not be one of: -1, 0, 1'));
+        }, (value) => fail('Should return error'));
+      });
+    });
   });
 }

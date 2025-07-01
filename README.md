@@ -156,23 +156,6 @@ final asyncAgeValidated = await asyncAge
     .validateEither();
 ```
 
-### Nullable Field Validation
-
-```dart
-// Optional field that must be valid if provided
-final result = optionalEmail
-    .field('Optional Email')
-    .isNotNull()
-    .validateEither();
-
-// Required nullable field
-final result = requiredField
-    .field('Required Field')
-    .isNotNull()
-    .notEmpty()
-    .validateEither();
-```
-
 ## Built-in Validators
 
 ### String Validators
@@ -198,6 +181,10 @@ email.field('Email')
     .isPostalCode()       // Valid postal code format
     .isIsoDate()          // Valid ISO date (YYYY-MM-DD)
     .isTime24Hour()       // Valid 24-hour time (HH:MM)
+    .isOneOf(['active', 'inactive', 'pending']) // Must be one of specified values
+    .isOneOf(['ACTIVE', 'INACTIVE'], caseInsensitive: true) // Case-insensitive comparison
+    .isNoneOf(['admin', 'root', 'system']) // Must not be one of specified values
+    .isNoneOf(['ADMIN', 'ROOT'], caseInsensitive: true) // Case-insensitive comparison
     .validate();
 ```
 
@@ -218,6 +205,8 @@ age.field('Age')
     .isPowerOfTwo()       // Must be a power of 2
     .isPortNumber()       // Must be a valid port number (1-65535)
     .isWithinPercentage(target, 5.0) // Within 5% of target value
+    .isOneOf([1, 2, 3, 4, 5]) // Must be one of specified values
+    .isNoneOf([80, 443, 8080]) // Must not be one of specified values
     .validate();
 ```
 
@@ -437,27 +426,6 @@ final formValidator = email
     .notEmpty()
     .isEmail()
     .asFormValidator(); // Same as errorOrNull()
-```
-
-### Async Validation
-
-```dart
-// Convert sync validation to async
-final asyncResult = await email
-    .field('Email')
-    .notEmpty()
-    .isEmail()
-    .toAsync()
-    .tryMap((email) async {
-      // Simulate async validation
-      await Future.delayed(Duration(milliseconds: 100));
-      if (email.contains('async')) {
-        return email;
-      }
-      throw Exception('Email must contain "async"');
-    }, (fieldName) => '$fieldName must contain "async"')
-    .validateTaskEither()
-    .run();
 ```
 
 ## Examples

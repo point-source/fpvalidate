@@ -836,5 +836,242 @@ void main() {
         });
       });
     });
+
+    group('isOneOf', () {
+      test('should succeed when string is in allowed values list', () {
+        final result = 'active'.field('Status').isOneOf([
+          'active',
+          'inactive',
+          'pending',
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('active')),
+        );
+      });
+
+      test('should fail when string is not in allowed values list', () {
+        final result = 'invalid'.field('Status').isOneOf([
+          'active',
+          'inactive',
+          'pending',
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Status'));
+          expect(
+            error.message,
+            equals('Status must be one of: active, inactive, pending'),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should succeed with case-insensitive comparison', () {
+        final result = 'ACTIVE'.field('Status').isOneOf([
+          'active',
+          'inactive',
+        ], caseInsensitive: true).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('ACTIVE')),
+        );
+      });
+
+      test('should fail with case-sensitive comparison by default', () {
+        final result = 'ACTIVE'.field('Status').isOneOf([
+          'active',
+          'inactive',
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Status'));
+          expect(
+            error.message,
+            equals('Status must be one of: active, inactive'),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with single allowed value', () {
+        final result = 'test'.field('String').isOneOf([
+          'test',
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('test')),
+        );
+      });
+
+      test('should work with empty list (always fails)', () {
+        final result = 'test'
+            .field('String')
+            .isOneOf(<String>[])
+            .validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('String'));
+          expect(error.message, equals('String must be one of: '));
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with mixed case values in case-insensitive mode', () {
+        final result = 'MixedCase'.field('String').isOneOf([
+          'mixedcase',
+          'MIXEDCASE',
+          'MixedCase',
+        ], caseInsensitive: true).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('MixedCase')),
+        );
+      });
+    });
+
+    group('isNoneOf', () {
+      test('should succeed when string is not in forbidden values list', () {
+        final result = 'valid'.field('Username').isNoneOf([
+          'admin',
+          'root',
+          'system',
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('valid')),
+        );
+      });
+
+      test('should fail when string is in forbidden values list', () {
+        final result = 'admin'.field('Username').isNoneOf([
+          'admin',
+          'root',
+          'system',
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Username'));
+          expect(
+            error.message,
+            equals('Username must not be one of: admin, root, system'),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should succeed with case-insensitive comparison', () {
+        final result = 'VALID'.field('Username').isNoneOf([
+          'admin',
+          'root',
+        ], caseInsensitive: true).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('VALID')),
+        );
+      });
+
+      test(
+        'should fail with case-insensitive comparison when value matches',
+        () {
+          final result = 'ADMIN'.field('Username').isNoneOf([
+            'admin',
+            'root',
+          ], caseInsensitive: true).validateEither();
+          expect(result.isLeft(), isTrue);
+          result.fold((error) {
+            expect(error.fieldName, equals('Username'));
+            expect(
+              error.message,
+              equals('Username must not be one of: admin, root'),
+            );
+          }, (value) => fail('Should return error'));
+        },
+      );
+
+      test('should succeed with case-sensitive comparison by default', () {
+        final result = 'ADMIN'.field('Username').isNoneOf([
+          'admin',
+          'root',
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('ADMIN')),
+        );
+      });
+
+      test('should work with single forbidden value', () {
+        final result = 'test'.field('String').isNoneOf([
+          'forbidden',
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('test')),
+        );
+      });
+
+      test('should work with empty list (always succeeds)', () {
+        final result = 'test'
+            .field('String')
+            .isNoneOf(<String>[])
+            .validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('test')),
+        );
+      });
+
+      test('should work with mixed case values in case-insensitive mode', () {
+        final result = 'ValidCase'.field('String').isNoneOf([
+          'validcase',
+          'VALIDCASE',
+          'ValidCase',
+        ], caseInsensitive: true).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('String'));
+          expect(
+            error.message,
+            equals(
+              'String must not be one of: validcase, VALIDCASE, ValidCase',
+            ),
+          );
+        }, (value) => fail('Should return error'));
+      });
+
+      test('should work with special characters in forbidden values', () {
+        final result = 'user@domain.com'.field('Email').isNoneOf([
+          'admin@domain.com',
+          'root@domain.com',
+        ]).validateEither();
+        expect(result.isRight(), isTrue);
+        result.fold(
+          (error) => fail('Should not return error'),
+          (value) => expect(value, equals('user@domain.com')),
+        );
+      });
+
+      test('should fail with special characters when value matches', () {
+        final result = 'admin@domain.com'.field('Email').isNoneOf([
+          'admin@domain.com',
+          'root@domain.com',
+        ]).validateEither();
+        expect(result.isLeft(), isTrue);
+        result.fold((error) {
+          expect(error.fieldName, equals('Email'));
+          expect(
+            error.message,
+            equals(
+              'Email must not be one of: admin@domain.com, root@domain.com',
+            ),
+          );
+        }, (value) => fail('Should return error'));
+      });
+    });
   });
 }

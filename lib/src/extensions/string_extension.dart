@@ -392,4 +392,76 @@ extension StringExtension on SyncValidationStep<String> {
 
         return pass(value);
       });
+
+  /// Validates that the string is one of the specified allowed values.
+  ///
+  /// This method checks if the current value matches any of the values in [allowedValues].
+  /// The comparison is case-sensitive by default. Use [caseInsensitive: true] for
+  /// case-insensitive comparison.
+  ///
+  /// [allowedValues] is a list of strings that are considered valid.
+  /// [caseInsensitive] determines whether the comparison should be case-insensitive.
+  /// Defaults to false (case-sensitive).
+  ///
+  /// Returns a [ValidationError] if the string is not in the allowed values list.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = status
+  ///     .field('Status')
+  ///     .isOneOf(['active', 'inactive', 'pending'])
+  ///     .validateEither();
+  ///
+  /// // Case-insensitive comparison
+  /// final result2 = status
+  ///     .field('Status')
+  ///     .isOneOf(['ACTIVE', 'INACTIVE'], caseInsensitive: true)
+  ///     .validateEither();
+  /// ```
+  SyncValidationStep<String> isOneOf(
+    List<String> allowedValues, {
+    bool caseInsensitive = false,
+  }) => bind((value) {
+    final normalizedValue = caseInsensitive ? value.toLowerCase() : value;
+    final normalizedAllowed = caseInsensitive
+        ? allowedValues.map((v) => v.toLowerCase()).toList()
+        : allowedValues;
+
+    return normalizedAllowed.contains(normalizedValue)
+        ? pass(value)
+        : fail('$fieldName must be one of: ${allowedValues.join(', ')}');
+  });
+
+  /// Validates that the string is none of the specified forbidden values.
+  ///
+  /// This method checks if the current value does not match any of the values in [forbiddenValues].
+  /// The comparison is case-sensitive by default. Use [caseInsensitive: true] for
+  /// case-insensitive comparison.
+  ///
+  /// [forbiddenValues] is a list of strings that are considered forbidden.
+  /// [caseInsensitive] determines whether the comparison should be case-insensitive.
+  /// Defaults to false (case-sensitive).
+  ///
+  /// Returns a [ValidationError] if the string is in the forbidden values list.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = username.field('Username').isNoneOf(['admin', 'root', 'system']).validateEither();
+  ///
+  /// // Case-insensitive comparison
+  /// final result2 = username.field('Username').isNoneOf(['ADMIN', 'ROOT'], caseInsensitive: true).validateEither();
+  /// ```
+  SyncValidationStep<String> isNoneOf(
+    List<String> forbiddenValues, {
+    bool caseInsensitive = false,
+  }) => bind((value) {
+    final normalizedValue = caseInsensitive ? value.toLowerCase() : value;
+    final normalizedForbidden = caseInsensitive
+        ? forbiddenValues.map((v) => v.toLowerCase()).toList()
+        : forbiddenValues;
+
+    return !normalizedForbidden.contains(normalizedValue)
+        ? pass(value)
+        : fail('$fieldName must not be one of: ${forbiddenValues.join(', ')}');
+  });
 }
