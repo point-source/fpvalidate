@@ -2,6 +2,7 @@
 
 - Added field extensions for Either and TaskEither types from fpdart
 - You can now start validation chains directly from Right, Left, and TaskEither values
+- Permit `FutureOr` in async `check` and `tryMap` methods
 
 ## 0.1.0
 
