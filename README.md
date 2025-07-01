@@ -13,7 +13,7 @@ and the Flutter guide for
 
 # fpvalidate
 
-A functional validation library for Dart with support for Either and TaskEither types from the [fpdart](https://pub.dev/packages/fpdart) package.
+A fluent, flexible, and typesafe validation library that supports async, casting, and [fpdart](https://pub.dev/packages/fpdart) types
 
 ## Features
 
@@ -27,6 +27,7 @@ A functional validation library for Dart with support for Either and TaskEither 
 - **Type Casting & Transformation**: Convert between types while validating (String to int, nullable to non-nullable, etc.)
 - **Flutter Form Compatibility**: Built-in support for Flutter form validation with `asFormValidator()` method
 - **Error Handling**: Detailed error messages with field names and descriptions
+- **Direct Either/TaskEither Support**: Start validation chains directly from [fpdart](https://pub.dev/packages/fpdart)'s `Either` and `TaskEither` values
 
 ## Getting Started
 
@@ -109,6 +110,49 @@ final asyncResult = await email
     .notEmpty()
     .isEmail()
     .toAsync()
+    .validateEither();
+```
+
+### Validation from Either/TaskEither
+
+You can now start validation chains directly from `Right`, `Left`, and `TaskEither` values:
+
+```dart
+import 'package:fpdart/fpdart.dart';
+
+// Start validation from a Right value
+final right = Right<String, String>('test@example.com');
+final validated = right
+    .field('Email')
+    .notEmpty()
+    .isEmail()
+    .validateEither();
+
+// Start validation from a Left value (propagates the error)
+final left = Left<String, String>('Invalid input');
+final error = left.field('Email').validateEither();
+// Result: Left(ValidationError('Email', 'Invalid input'))
+
+// Start validation from a TaskEither value
+final taskEither = TaskEither<String, String>.right('test@example.com');
+final asyncValidated = await taskEither
+    .field('Email')
+    .then((step) => step.notEmpty().isEmail())
+    .validateEither();
+
+// Use with numeric validation
+final ageRight = Right<String, int>(25);
+final ageValidated = ageRight
+    .field('Age')
+    .min(18)
+    .max(65)
+    .validateEither();
+
+// Use with async numeric validation
+final asyncAge = TaskEither<String, int>.right(30);
+final asyncAgeValidated = await asyncAge
+    .field('Age')
+    .then((step) => step.min(18).max(65))
     .validateEither();
 ```
 

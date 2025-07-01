@@ -1,3 +1,8 @@
+## 0.1.1
+
+- Added field extensions for Either and TaskEither types from fpdart
+- You can now start validation chains directly from Right, Left, and TaskEither values
+
 ## 0.1.0
 
 - Initial version with comprehensive validation library

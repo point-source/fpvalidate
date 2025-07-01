@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:fpvalidate/fpvalidate.dart';
 
 void main() {
@@ -230,6 +231,168 @@ void main() {
         expect(error.fieldName, equals('ExceptionField'));
         expect(error.message, contains('Exception: Test exception'));
       }, (value) => fail('Should return error'));
+    });
+  });
+
+  group('FieldExtensionRight', () {
+    test('should create validation step from Right', () {
+      final right = Right<String, String>('test@example.com');
+      final step = right.field('Email');
+
+      expect(step, isA<SyncValidationStep<String>>());
+      expect(step.fieldName, equals('Email'));
+
+      final result = step.validateEither();
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
+    });
+
+    test('should work with string validation on Right', () {
+      final right = Right<String, String>('test@example.com');
+      final result = right.field('Email').notEmpty().isEmail().validateEither();
+
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
+    });
+
+    test('should fail validation on Right with invalid email', () {
+      final right = Right<String, String>('invalid-email');
+      final result = right.field('Email').notEmpty().isEmail().validateEither();
+
+      expect(result.isLeft(), isTrue);
+      expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
+      expect(result.fold((l) => l.message, (r) => null), contains('Email'));
+    });
+
+    test('should handle empty string in Right', () {
+      final right = Right<String, String>('');
+      final result = right.field('Email').notEmpty().validateEither();
+
+      expect(result.isLeft(), isTrue);
+      expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
+      expect(result.fold((l) => l.message, (r) => null), contains('Email'));
+    });
+  });
+
+  group('FieldExtensionLeft', () {
+    test('should propagate left error from Left', () {
+      final left = Left<String, String>('Invalid input');
+      final step = left.field('Email');
+
+      expect(step, isA<SyncValidationStep<String>>());
+      expect(step.fieldName, equals('Email'));
+
+      final result = step.validateEither();
+      expect(result.isLeft(), isTrue);
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Invalid input'),
+      );
+      expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
+    });
+  });
+
+  group('FieldExtensionTaskEither', () {
+    test('should create validation step from Right TaskEither', () async {
+      final taskEither = TaskEither.right('test@example.com');
+      final step = taskEither.field('Email');
+
+      expect(step, isA<AsyncValidationStep<String>>());
+      expect(step.fieldName, equals('Email'));
+
+      final result = await step.validateEither();
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
+    });
+
+    test('should propagate left error from TaskEither', () async {
+      final taskEither = TaskEither<String, String>.left('Invalid input');
+      final step = taskEither.field('Email');
+
+      expect(step, isA<AsyncValidationStep<String>>());
+      expect(step.fieldName, equals('Email'));
+
+      final result = await step.validateEither();
+      expect(result.isLeft(), isTrue);
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Invalid input'),
+      );
+      expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
+    });
+
+    test('should chain validation methods on Right TaskEither', () async {
+      final taskEither = TaskEither.right('test@example.com');
+      final result = await taskEither
+          .field('Email')
+          .then((step) => step.notEmpty().isEmail())
+          .validateEither();
+
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
+    });
+
+    test(
+      'should fail validation on Right TaskEither with invalid email',
+      () async {
+        final taskEither = TaskEither.right('invalid-email');
+        final result = await taskEither
+            .field('Email')
+            .then((step) => step.notEmpty().isEmail())
+            .validateEither();
+
+        expect(result.isLeft(), isTrue);
+        expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
+        expect(result.fold((l) => l.message, (r) => null), contains('Email'));
+      },
+    );
+
+    test('should handle empty string in Right TaskEither', () async {
+      final taskEither = TaskEither.right('');
+      final result = await taskEither
+          .field('Email')
+          .then((step) => step.notEmpty())
+          .validateEither();
+
+      expect(result.isLeft(), isTrue);
+      expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
+      expect(result.fold((l) => l.message, (r) => null), contains('Email'));
+    });
+
+    test('should handle async operations in TaskEither', () async {
+      final taskEither = TaskEither.tryCatch(
+        () async => 'test@example.com',
+        (error, stackTrace) => 'Async error',
+      );
+
+      final result = await taskEither
+          .field('Email')
+          .then((step) => step.notEmpty().isEmail())
+          .validateEither();
+
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
+    });
+  });
+
+  group('Integration tests', () {
+    test('should work with numeric validation on Right', () {
+      final right = Right<Exception, int>(42);
+      final result = right.field('Age').min(18).validateEither();
+
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals(42));
+    });
+
+    test('should work with numeric validation on TaskEither', () async {
+      final taskEither = TaskEither.right(42);
+      final result = await taskEither
+          .field('Age')
+          .then((step) => step.min(18))
+          .validateEither();
+
+      expect(result.isRight(), isTrue);
+      expect(result.fold((l) => null, (r) => r), equals(42));
     });
   });
 }
