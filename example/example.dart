@@ -7,7 +7,7 @@ void main() async {
   try {
     final email = 'test@example.com'
         .field('Email')
-        .notEmpty()
+        .isNotEmpty()
         .isEmail()
         .validate();
     print('✅ Valid email: $email');
@@ -69,8 +69,8 @@ void main() async {
   // Batch validation
   final batchResult =
       [
-        'user@example.com'.field('Email').notEmpty().isEmail(),
-        'password123'.field('Password').notEmpty().minLength(8),
+        'user@example.com'.field('Email').isNotEmpty().isEmail(),
+        'password123'.field('Password').isNotEmpty().minLength(8),
         30.field('Age').min(18).max(65),
       ].validateEither().fold(
         (error) => '❌ Batch validation failed: ${error.message}',
@@ -97,7 +97,7 @@ void main() async {
   // Async validation with TaskEither
   final asyncResult = await 'async@example.com'
       .field('Async Email')
-      .notEmpty()
+      .isNotEmpty()
       .isEmail()
       .toAsync()
       .check(
@@ -125,7 +125,7 @@ void main() async {
   // Async validation with Either
   final asyncEitherResult = await 'async@example.com'
       .field('Async Email Either')
-      .notEmpty()
+      .isNotEmpty()
       .isEmail()
       .toAsync()
       .validateEither()
@@ -159,13 +159,13 @@ void main() async {
   print(timeResult);
 
   // Error handling with errorOrNull
-  final errorOrNullResult = ''.field('Empty String').notEmpty().errorOrNull();
+  final errorOrNullResult = ''.field('Empty String').isNotEmpty().errorOrNull();
   print('Error or null result: ${errorOrNullResult ?? 'No error'}');
 
   // Form validator convenience method
   final formValidatorResult = 'test@example.com'
       .field('Form Email')
-      .notEmpty()
+      .isNotEmpty()
       .isEmail()
       .asFormValidator();
   print('Form validator result: ${formValidatorResult ?? 'No error'}');
@@ -173,7 +173,7 @@ void main() async {
   // notEmpty with allowWhitespace parameter
   final whitespaceResult = '   '
       .field('Whitespace String')
-      .notEmpty(allowWhitespace: true)
+      .isNotEmpty(allowWhitespace: true)
       .validateEither()
       .fold(
         (error) => '❌ Whitespace validation failed: ${error.message}',
@@ -229,7 +229,7 @@ void main() async {
   // Combined validation with isOneOf
   final userRoleResult = 'admin'
       .field('Role')
-      .notEmpty()
+      .isNotEmpty()
       .isOneOf(['admin', 'user', 'moderator'])
       .validateEither()
       .fold(

@@ -249,7 +249,11 @@ void main() {
 
     test('should work with string validation on Right', () {
       final right = Right<String, String>('test@example.com');
-      final result = right.field('Email').notEmpty().isEmail().validateEither();
+      final result = right
+          .field('Email')
+          .isNotEmpty()
+          .isEmail()
+          .validateEither();
 
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
@@ -257,7 +261,11 @@ void main() {
 
     test('should fail validation on Right with invalid email', () {
       final right = Right<String, String>('invalid-email');
-      final result = right.field('Email').notEmpty().isEmail().validateEither();
+      final result = right
+          .field('Email')
+          .isNotEmpty()
+          .isEmail()
+          .validateEither();
 
       expect(result.isLeft(), isTrue);
       expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
@@ -266,7 +274,7 @@ void main() {
 
     test('should handle empty string in Right', () {
       final right = Right<String, String>('');
-      final result = right.field('Email').notEmpty().validateEither();
+      final result = right.field('Email').isNotEmpty().validateEither();
 
       expect(result.isLeft(), isTrue);
       expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
@@ -325,7 +333,7 @@ void main() {
       final taskEither = TaskEither.right('test@example.com');
       final result = await taskEither
           .field('Email')
-          .then((step) => step.notEmpty().isEmail())
+          .then((step) => step.isNotEmpty().isEmail())
           .validateEither();
 
       expect(result.isRight(), isTrue);
@@ -338,7 +346,7 @@ void main() {
         final taskEither = TaskEither.right('invalid-email');
         final result = await taskEither
             .field('Email')
-            .then((step) => step.notEmpty().isEmail())
+            .then((step) => step.isNotEmpty().isEmail())
             .validateEither();
 
         expect(result.isLeft(), isTrue);
@@ -351,7 +359,7 @@ void main() {
       final taskEither = TaskEither.right('');
       final result = await taskEither
           .field('Email')
-          .then((step) => step.notEmpty())
+          .then((step) => step.isNotEmpty())
           .validateEither();
 
       expect(result.isLeft(), isTrue);
@@ -367,7 +375,7 @@ void main() {
 
       final result = await taskEither
           .field('Email')
-          .then((step) => step.notEmpty().isEmail())
+          .then((step) => step.isNotEmpty().isEmail())
           .validateEither();
 
       expect(result.isRight(), isTrue);

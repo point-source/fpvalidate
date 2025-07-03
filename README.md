@@ -53,7 +53,7 @@ import 'package:fpvalidate/fpvalidate.dart';
 // Functional validation with Either
 final result = email
     .field('Email')
-    .notEmpty()
+    .isNotEmpty()
     .isEmail()
     .validateEither()
     .mapLeft((error) => 'Validation failed: ${error.message}');
@@ -62,7 +62,7 @@ final result = email
 try {
   final validatedEmail = email
       .field('Email')
-      .notEmpty()
+      .isNotEmpty()
       .isEmail()
       .validate();
   print('Valid email: $validatedEmail');
@@ -77,8 +77,8 @@ try {
 
 ```dart
 final validationResult = [
-  email.field('Email').notEmpty().isEmail(),
-  password.field('Password').notEmpty().minLength(8),
+  email.field('Email').isNotEmpty().isEmail(),
+  password.field('Password').isNotEmpty().minLength(8),
   age.field('Age').min(13).max(120),
 ].validateEither()
 .mapLeft((error) => 'Validation failed: ${error.message}');
@@ -90,7 +90,7 @@ final validationResult = [
 // Async validation with TaskEither
 final result = await email
     .field('Email')
-    .notEmpty()
+    .isNotEmpty()
     .isEmail()
     .toAsync()
     .tryMap((email) async {
@@ -107,7 +107,7 @@ final result = await email
 // Async validation with Either
 final asyncResult = await email
     .field('Email')
-    .notEmpty()
+    .isNotEmpty()
     .isEmail()
     .toAsync()
     .validateEither();
@@ -124,7 +124,7 @@ import 'package:fpdart/fpdart.dart';
 final right = Right<String, String>('test@example.com');
 final validated = right
     .field('Email')
-    .notEmpty()
+    .isNotEmpty()
     .isEmail()
     .validateEither();
 
@@ -137,7 +137,7 @@ final error = left.field('Email').validateEither();
 final taskEither = TaskEither<String, String>.right('test@example.com');
 final asyncValidated = await taskEither
     .field('Email')
-    .then((step) => step.notEmpty().isEmail())
+    .then((step) => step.isNotEmpty().isEmail())
     .validateEither();
 
 // Use with numeric validation
@@ -162,8 +162,8 @@ final asyncAgeValidated = await asyncAge
 
 ```dart
 email.field('Email')
-    .notEmpty()           // Ensures field is not empty
-    .notEmpty(allowWhitespace: true)  // Allows whitespace-only strings
+    .isNotEmpty()           // Ensures field is not empty
+    .isNotEmpty(allowWhitespace: true)  // Allows whitespace-only strings
     .isEmail()            // Validates email format
     .minLength(5)         // Minimum length
     .maxLength(100)       // Maximum length
@@ -236,7 +236,7 @@ final result = '123'
 final result = (someNullableString as String?)
     .field('Optional String')
     .isNotNull()          // Converts String? to String, enables string validators
-    .notEmpty()           // Now we can use string validators
+    .isNotEmpty()           // Now we can use string validators
     .isEmail()
     .validateEither();
 
@@ -411,7 +411,7 @@ final ageResult = 25
 // Get error message or null (useful for Flutter forms)
 final error = email
     .field('Email')
-    .notEmpty()
+    .isNotEmpty()
     .isEmail()
     .errorOrNull();
 
@@ -423,7 +423,7 @@ if (error != null) {
 // Convenience method for Flutter forms
 final formValidator = email
     .field('Email')
-    .notEmpty()
+    .isNotEmpty()
     .isEmail()
     .asFormValidator(); // Same as errorOrNull()
 ```
@@ -448,8 +448,8 @@ class UserRegistrationForm {
 
   Either<ValidationError, UserRegistrationForm> validate() {
     return [
-      email.field('Email').notEmpty().isEmail(),
-      password.field('Password').notEmpty().minLength(8),
+      email.field('Email').isNotEmpty().isEmail(),
+      password.field('Password').isNotEmpty().minLength(8),
       age.field('Age').min(13).max(120),
       if (phone != null) phone!.field('Phone').isPhone(),
     ].validateEither().map((_) => this);
@@ -464,7 +464,7 @@ Future<Either<ValidationError, User>> validateUserResponse(Map<String, dynamic> 
   return await json['email']
       .toString()
       .field('Email')
-      .notEmpty()
+      .isNotEmpty()
       .isEmail()
       .toAsync()
       .tryMap((email) async {
@@ -497,7 +497,7 @@ class _LoginFormState extends State<LoginForm> {
     if (value == null) return null;
     return value
         .field('Email')
-        .notEmpty()
+        .isNotEmpty()
         .isEmail()
         .asFormValidator();
   }
@@ -506,7 +506,7 @@ class _LoginFormState extends State<LoginForm> {
     if (value == null) return null;
     return value
         .field('Password')
-        .notEmpty()
+        .isNotEmpty()
         .minLength(8)
         .asFormValidator();
   }

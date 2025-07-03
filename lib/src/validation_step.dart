@@ -152,7 +152,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final step = "test@example.com".field("email").notEmpty();
+  /// final step = "test@example.com".field("email").isNotEmpty();
   ///
   /// final error = step.errorOrNull();
   /// ```

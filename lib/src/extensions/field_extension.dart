@@ -10,7 +10,7 @@ part of '../validation_step.dart';
 /// ```dart
 /// final result = 'test@example.com'
 ///     .field('Email')
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .isEmail()
 ///     .validateEither();
 /// ```
@@ -29,7 +29,7 @@ extension FieldExtension<T> on T {
   /// Example:
   /// ```dart
   /// final step = 'test@example.com'.field('Email');
-  /// final result = step.notEmpty().isEmail().validateEither();
+  /// final result = step.isNotEmpty().isEmail().validateEither();
   /// ```
   SyncValidationStep<T> field(String fieldName) =>
       SyncValidationStep._(value: Right(this), fieldName: fieldName);
@@ -45,7 +45,7 @@ extension FieldExtension<T> on T {
 /// ```dart
 /// final result = await Future.value('test@example.com')
 ///     .field('Email')
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .isEmail()
 ///     .validateEither();
 /// ```
@@ -64,7 +64,7 @@ extension FieldExtensionAsync<T> on Future<T> {
   /// Example:
   /// ```dart
   /// final step = Future.value('test@example.com').field('Email');
-  /// final result = await step.notEmpty().isEmail().validateEither();
+  /// final result = await step.isNotEmpty().isEmail().validateEither();
   /// ```
   AsyncValidationStep<T> field(String fieldName) => AsyncValidationStep._(
     value: TaskEither.tryCatch(
@@ -86,7 +86,7 @@ extension FieldExtensionAsync<T> on Future<T> {
 /// ```dart
 /// final result = Right('test@example.com')
 ///     .field('Email')
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .isEmail()
 ///     .validateEither();
 /// ```
@@ -104,7 +104,7 @@ extension FieldExtensionRight<L, R> on Right<L, R> {
   /// Example:
   /// ```dart
   /// final step = Right('test@example.com').field('Email');
-  /// final result = step.notEmpty().isEmail().validateEither();
+  /// final result = step.isNotEmpty().isEmail().validateEither();
   /// ```
   SyncValidationStep<R> field(String fieldName) =>
       SyncValidationStep._(value: Right(value), fieldName: fieldName);
@@ -153,7 +153,7 @@ extension FieldExtensionLeft<L, R> on Left<L, R> {
 /// ```dart
 /// final result = await TaskEither.right('test@example.com')
 ///     .field('Email')
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .isEmail()
 ///     .validateEither();
 /// ```
@@ -172,7 +172,7 @@ extension FieldExtensionTaskEither<L, R> on TaskEither<L, R> {
   /// Example:
   /// ```dart
   /// final step = TaskEither.right('test@example.com').field('Email');
-  /// final result = await step.notEmpty().isEmail().validateEither();
+  /// final result = await step.isNotEmpty().isEmail().validateEither();
   /// ```
   AsyncValidationStep<R> field(String fieldName) => AsyncValidationStep._(
     value: flatMap(

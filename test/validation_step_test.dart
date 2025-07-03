@@ -141,7 +141,7 @@ void main() {
       });
 
       test('should throw ValidationError when failed', () {
-        final step = ''.field('String').notEmpty();
+        final step = ''.field('String').isNotEmpty();
 
         expect(() => step.validate(), throwsA(isA<ValidationError>()));
       });
@@ -160,7 +160,7 @@ void main() {
       });
 
       test('should return Left when failed', () {
-        final step = ''.field('String').notEmpty();
+        final step = ''.field('String').isNotEmpty();
         final result = step.validateEither();
 
         expect(result.isLeft(), isTrue);
@@ -180,7 +180,7 @@ void main() {
       });
 
       test('should return error message when failed', () {
-        final step = ''.field('String').notEmpty();
+        final step = ''.field('String').isNotEmpty();
         final result = step.errorOrNull();
 
         expect(result, equals('Field String is empty'));
@@ -196,7 +196,7 @@ void main() {
       });
 
       test('should return error message when failed', () {
-        final step = ''.field('String').notEmpty();
+        final step = ''.field('String').isNotEmpty();
         final result = step.asFormValidator();
 
         expect(result, equals('Field String is empty'));

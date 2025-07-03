@@ -5,7 +5,7 @@ void main() {
   group('StringExtension', () {
     group('notEmpty', () {
       test('should succeed with non-empty string', () {
-        final result = 'test'.field('String').notEmpty().validateEither();
+        final result = 'test'.field('String').isNotEmpty().validateEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -14,7 +14,7 @@ void main() {
       });
 
       test('should fail with empty string', () {
-        final result = ''.field('String').notEmpty().validateEither();
+        final result = ''.field('String').isNotEmpty().validateEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -23,7 +23,7 @@ void main() {
       });
 
       test('should fail with whitespace-only string by default', () {
-        final result = '   '.field('String').notEmpty().validateEither();
+        final result = '   '.field('String').isNotEmpty().validateEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -36,7 +36,7 @@ void main() {
         () {
           final result = '   '
               .field('String')
-              .notEmpty(allowWhitespace: true)
+              .isNotEmpty(allowWhitespace: true)
               .validateEither();
           expect(result.isRight(), isTrue);
           result.fold(
@@ -47,7 +47,7 @@ void main() {
       );
 
       test('should succeed with string containing whitespace and content', () {
-        final result = '  test  '.field('String').notEmpty().validateEither();
+        final result = '  test  '.field('String').isNotEmpty().validateEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -790,7 +790,7 @@ void main() {
       test('should work with multiple validators', () {
         final result = 'test@example.com'
             .field('Email')
-            .notEmpty()
+            .isNotEmpty()
             .isEmail()
             .minLength(10)
             .validateEither();
@@ -805,7 +805,7 @@ void main() {
       test('should fail on first validation failure', () {
         final result = 'test@example.com'
             .field('Email')
-            .notEmpty()
+            .isNotEmpty()
             .isEmail()
             .minLength(20) // This will fail
             .validateEither();
@@ -823,7 +823,7 @@ void main() {
       test('should work with type transformation', () {
         final result = '123'
             .field('Number')
-            .notEmpty()
+            .isNotEmpty()
             .toInt()
             .min(100)
             .max(200)

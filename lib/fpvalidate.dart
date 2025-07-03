@@ -10,15 +10,15 @@
 /// // Single field validation
 /// final result = email
 ///     .field('Email')
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .isEmail()
 ///     .validate()
 ///     .mapLeft((error) => CustomError(error.message));
 ///
 /// // Multiple field validation
 /// final result = [
-///   email.field('Email').notEmpty().isEmail(),
-///   password.field('Password').notEmpty().minLength(8),
+///   email.field('Email').isNotEmpty().isEmail(),
+///   password.field('Password').isNotEmpty().minLength(8),
 ///   age.field('Age').min(13).max(120),
 /// ].validate()
 /// .mapLeft((error) => CustomError(error.message));

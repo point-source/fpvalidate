@@ -45,7 +45,7 @@ void main() {
           final result = 'test'
               .field('Test Field')
               .isNotNull()
-              .notEmpty()
+              .isNotEmpty()
               .validateEither();
 
           expect(result.isRight(), isTrue);
@@ -62,7 +62,7 @@ void main() {
           final result = (null as String?)
               .field('Test Field')
               .isNotNull()
-              .notEmpty()
+              .isNotEmpty()
               .validateEither();
 
           expect(result.isLeft(), isTrue);
@@ -136,7 +136,7 @@ void main() {
         final result = 'test@example.com'
             .field('Email')
             .isNotNull()
-            .notEmpty()
+            .isNotEmpty()
             .isEmail()
             .validateEither();
 
@@ -151,7 +151,7 @@ void main() {
         final result = (null as String?)
             .field('Email')
             .isNotNull()
-            .notEmpty()
+            .isNotEmpty()
             .isEmail()
             .validateEither();
 

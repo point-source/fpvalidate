@@ -5,6 +5,7 @@
 - Permit `FutureOr` in async `check` and `tryMap` methods
 - Added `isOneOf()` method for string and numeric validation
 - Added `isNoneOf()` method for string and numeric validation
+- Renamed `notEmpty()` to `isNotEmpty()` for consistency
 
 ## 0.1.0
 

@@ -12,7 +12,7 @@ part of '../validation_step.dart';
 /// ```dart
 /// final result = 'test@example.com'
 ///     .field('Email')
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .isEmail()
 ///     .minLength(5)
 ///     .validateEither();
@@ -31,10 +31,10 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = string.field('String').notEmpty().validateEither();
-  /// final result2 = string.field('String').notEmpty(allowWhitespace: true).validateEither();
+  /// final result = string.field('String').isNotEmpty().validateEither();
+  /// final result2 = string.field('String').isNotEmpty(allowWhitespace: true).validateEither();
   /// ```
-  SyncValidationStep<String> notEmpty({bool allowWhitespace = false}) => bind(
+  SyncValidationStep<String> isNotEmpty({bool allowWhitespace = false}) => bind(
     (value) => value.isEmpty
         ? fail('Field $fieldName is empty')
         : !allowWhitespace && value.trim().isEmpty

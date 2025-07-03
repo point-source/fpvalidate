@@ -10,8 +10,8 @@ import 'package:fpvalidate/fpvalidate.dart';
 /// Example:
 /// ```dart
 /// final result = [
-///   email.field('Email').notEmpty().isEmail(),
-///   password.field('Password').notEmpty().minLength(8),
+///   email.field('Email').isNotEmpty().isEmail(),
+///   password.field('Password').isNotEmpty().minLength(8),
 ///   age.field('Age').min(13).max(120),
 /// ].validateEither();
 /// ```
@@ -28,8 +28,8 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   /// Example:
   /// ```dart
   /// final values = await [
-  ///   email.field('Email').notEmpty().isEmail(),
-  ///   password.field('Password').notEmpty().minLength(8),
+  ///   email.field('Email').isNotEmpty().isEmail(),
+  ///   password.field('Password').isNotEmpty().minLength(8),
   /// ].validateAsync();
   /// ```
   Future<List<T>> validateAsync() => Future.wait(
@@ -54,8 +54,8 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   /// Example:
   /// ```dart
   /// final result = await [
-  ///   email.field('Email').notEmpty().isEmail(),
-  ///   password.field('Password').notEmpty().minLength(8),
+  ///   email.field('Email').isNotEmpty().isEmail(),
+  ///   password.field('Password').isNotEmpty().minLength(8),
   /// ].validateTaskEither().run();
   /// ```
   TaskEither<ValidationError, List<T>> validateTaskEither() => map(
@@ -74,8 +74,8 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
 /// Example:
 /// ```dart
 /// final result = [
-///   email.field('Email').notEmpty().isEmail(),
-///   password.field('Password').notEmpty().minLength(8),
+///   email.field('Email').isNotEmpty().isEmail(),
+///   password.field('Password').isNotEmpty().minLength(8),
 /// ].validateEither();
 /// ```
 extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
@@ -89,8 +89,8 @@ extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
   /// Example:
   /// ```dart
   /// final values = [
-  ///   email.field('Email').notEmpty().isEmail(),
-  ///   password.field('Password').notEmpty().minLength(8),
+  ///   email.field('Email').isNotEmpty().isEmail(),
+  ///   password.field('Password').isNotEmpty().minLength(8),
   /// ].validate();
   /// ```
   List<T> validate() => map((step) => step.validate()).toList();
@@ -107,8 +107,8 @@ extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
   /// Example:
   /// ```dart
   /// final result = [
-  ///   email.field('Email').notEmpty().isEmail(),
-  ///   password.field('Password').notEmpty().minLength(8),
+  ///   email.field('Email').isNotEmpty().isEmail(),
+  ///   password.field('Password').isNotEmpty().minLength(8),
   /// ].validateEither();
   /// ```
   Either<ValidationError, List<T>> validateEither() =>
@@ -123,8 +123,8 @@ extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
 /// Example:
 /// ```dart
 /// final result = await [
-///   email.field('Email').toAsync().notEmpty().isEmail(),
-///   password.field('Password').toAsync().notEmpty().minLength(8),
+///   email.field('Email').toAsync().isNotEmpty().isEmail(),
+///   password.field('Password').toAsync().isNotEmpty().minLength(8),
 /// ].validateTaskEither().run();
 /// ```
 extension BatchAsyncValidationExtension<T> on List<AsyncValidationStep<T>> {
@@ -138,8 +138,8 @@ extension BatchAsyncValidationExtension<T> on List<AsyncValidationStep<T>> {
   /// Example:
   /// ```dart
   /// final values = await [
-  ///   email.field('Email').toAsync().notEmpty().isEmail(),
-  ///   password.field('Password').toAsync().notEmpty().minLength(8),
+  ///   email.field('Email').toAsync().isNotEmpty().isEmail(),
+  ///   password.field('Password').toAsync().isNotEmpty().minLength(8),
   /// ].validateAsync();
   /// ```
   Future<List<T>> validateAsync() =>
@@ -157,8 +157,8 @@ extension BatchAsyncValidationExtension<T> on List<AsyncValidationStep<T>> {
   /// Example:
   /// ```dart
   /// final result = await [
-  ///   email.field('Email').toAsync().notEmpty().isEmail(),
-  ///   password.field('Password').toAsync().notEmpty().minLength(8),
+  ///   email.field('Email').toAsync().isNotEmpty().isEmail(),
+  ///   password.field('Password').toAsync().isNotEmpty().minLength(8),
   /// ].validateTaskEither().run();
   /// ```
   TaskEither<ValidationError, List<T>> validateTaskEither() =>

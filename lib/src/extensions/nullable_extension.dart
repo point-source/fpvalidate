@@ -10,7 +10,7 @@ part of '../validation_step.dart';
 /// final result = (someNullableString as String?)
 ///     .field('Optional String')
 ///     .isNotNull()
-///     .notEmpty()
+///     .isNotEmpty()
 ///     .validateEither();
 /// ```
 extension NullableExtension<T> on SyncValidationStep<T?> {
@@ -32,7 +32,7 @@ extension NullableExtension<T> on SyncValidationStep<T?> {
   /// final result = (optionalEmail as String?)
   ///     .field('Optional Email')
   ///     .isNotNull()          // Converts String? to String
-  ///     .notEmpty()           // Now we can use string validators
+  ///     .isNotEmpty()           // Now we can use string validators
   ///     .isEmail()
   ///     .validateEither();
   /// ```

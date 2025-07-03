@@ -8,8 +8,8 @@ void main() {
     group('validateAsync', () {
       test('should validate all sync steps successfully', () async {
         final steps = [
-          'test@example.com'.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -23,7 +23,7 @@ void main() {
 
       test('should validate mixed sync and async steps successfully', () async {
         final steps = <ValidationStep>[
-          'test@example.com'.field('Email').notEmpty().isEmail(),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
           Future.value('password123')
               .field('Password')
               .check(
@@ -43,8 +43,8 @@ void main() {
 
       test('should throw first validation error', () {
         final steps = [
-          ''.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          ''.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -53,7 +53,7 @@ void main() {
 
       test('should handle async validation errors', () {
         final steps = [
-          'test@example.com'.field('Email').notEmpty().isEmail(),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
           Future.value('')
               .field('Password')
               .check(
@@ -69,8 +69,8 @@ void main() {
     group('validateTaskEither', () {
       test('should validate all steps successfully', () async {
         final steps = [
-          'test@example.com'.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -87,8 +87,8 @@ void main() {
 
       test('should return first validation error', () async {
         final steps = [
-          ''.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          ''.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -103,7 +103,7 @@ void main() {
 
       test('should handle mixed sync and async steps', () async {
         final steps = <ValidationStep>[
-          'test@example.com'.field('Email').notEmpty().isEmail(),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
           Future.value('password123')
               .field('Password')
               .check(
@@ -130,8 +130,8 @@ void main() {
     group('validate', () {
       test('should validate all sync steps successfully', () {
         final steps = <SyncValidationStep>[
-          'test@example.com'.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -145,8 +145,8 @@ void main() {
 
       test('should throw first validation error', () {
         final steps = <SyncValidationStep>[
-          ''.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          ''.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -157,8 +157,8 @@ void main() {
     group('validateEither', () {
       test('should validate all sync steps successfully', () {
         final steps = <SyncValidationStep>[
-          'test@example.com'.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
@@ -175,8 +175,8 @@ void main() {
 
       test('should return first validation error', () {
         final steps = <SyncValidationStep>[
-          ''.field('Email').notEmpty().isEmail(),
-          'password123'.field('Password').notEmpty().minLength(8),
+          ''.field('Email').isNotEmpty().isEmail(),
+          'password123'.field('Password').isNotEmpty().minLength(8),
           '25'.field('Age').toInt().min(18),
         ];
 
