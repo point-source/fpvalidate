@@ -25,7 +25,7 @@
 /// ```
 library;
 
-export 'src/validation_error.dart';
+export 'src/errors/validation_error.dart';
 export 'src/validation_step.dart';
 export 'src/extensions/batch_validation_extension.dart';
 

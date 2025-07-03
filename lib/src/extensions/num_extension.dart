@@ -28,6 +28,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     (value) => value >= min
         ? pass(value)
         : fail(
+            InvalidMinValueValidationError.new,
             'Value $value of field $fieldName must be greater than or equal to $min',
           ),
   );
@@ -44,6 +45,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     (value) => value <= max
         ? pass(value)
         : fail(
+            InvalidMaxValueValidationError.new,
             'Value $value of field $fieldName must be less than or equal to $max',
           ),
   );
@@ -59,7 +61,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   SyncValidationStep<T> isEven() => bind(
     (value) => value % 2 == 0
         ? pass(value)
-        : fail('Value $value of field $fieldName must be even'),
+        : fail(
+            InvalidEvenNumberValidationError.new,
+            'Value $value of field $fieldName must be even',
+          ),
   );
 
   /// Validates that the value is odd (not divisible by 2).
@@ -73,7 +78,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   SyncValidationStep<T> isOdd() => bind(
     (value) => value % 2 == 1
         ? pass(value)
-        : fail('Value $value of field $fieldName must be odd'),
+        : fail(
+            InvalidOddNumberValidationError.new,
+            'Value $value of field $fieldName must be odd',
+          ),
   );
 
   /// Validates that the value is positive (greater than 0).
@@ -85,7 +93,12 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isPositive().validateEither();
   /// ```
   SyncValidationStep<T> isPositive() => bind(
-    (value) => value > 0 ? pass(value) : fail('$fieldName must be positive'),
+    (value) => value > 0
+        ? pass(value)
+        : fail(
+            InvalidPositiveNumberValidationError.new,
+            '$fieldName must be positive',
+          ),
   );
 
   /// Validates that the value is non-negative (greater than or equal to 0).
@@ -97,8 +110,12 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isNonNegative().validateEither();
   /// ```
   SyncValidationStep<T> isNonNegative() => bind(
-    (value) =>
-        value >= 0 ? pass(value) : fail('$fieldName must be non-negative'),
+    (value) => value >= 0
+        ? pass(value)
+        : fail(
+            InvalidNonNegativeNumberValidationError.new,
+            '$fieldName must be non-negative',
+          ),
   );
 
   /// Validates that the value is negative (less than 0).
@@ -110,7 +127,12 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isNegative().validateEither();
   /// ```
   SyncValidationStep<T> isNegative() => bind(
-    (value) => value < 0 ? pass(value) : fail('$fieldName must be negative'),
+    (value) => value < 0
+        ? pass(value)
+        : fail(
+            InvalidNegativeNumberValidationError.new,
+            '$fieldName must be negative',
+          ),
   );
 
   /// Validates that the value is non-positive (less than or equal to 0).
@@ -122,8 +144,12 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isNonPositive().validateEither();
   /// ```
   SyncValidationStep<T> isNonPositive() => bind(
-    (value) =>
-        value <= 0 ? pass(value) : fail('$fieldName must be non-positive'),
+    (value) => value <= 0
+        ? pass(value)
+        : fail(
+            InvalidNonPositiveNumberValidationError.new,
+            '$fieldName must be non-positive',
+          ),
   );
 
   /// Validates that the value is an integer and converts it to [int] type.
@@ -148,13 +174,16 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<int> isInt() => bind((value) {
     if (value is int) {
-      return pass<int>(value);
+      return pass<InvalidIntegerValidationError, int>(value);
     }
     if (value is double && value == value.toInt()) {
-      return pass<int>(value.toInt());
+      return pass<InvalidIntegerValidationError, int>(value.toInt());
     }
 
-    return fail<int>('$fieldName must be an integer');
+    return fail<InvalidIntegerValidationError, int>(
+      InvalidIntegerValidationError.new,
+      '$fieldName must be an integer',
+    );
   });
 
   /// Validates that the value is a power of 2.
@@ -169,21 +198,38 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// final result = number.field('Number').isPowerOfTwo().validateEither();
   /// ```
   SyncValidationStep<T> isPowerOfTwo() => bind((value) {
-    if (value <= 0) return fail('$fieldName must be a power of 2');
+    if (value <= 0) {
+      return fail(
+        InvalidPowerOfTwoValidationError.new,
+        '$fieldName must be a power of 2',
+      );
+    }
     if (value == 1) return pass(value); // 2^0 = 1
     if (value is int) {
       return (value & (value - 1)) == 0
           ? pass(value)
-          : fail('$fieldName must be a power of 2');
+          : fail(
+              InvalidPowerOfTwoValidationError.new,
+              '$fieldName must be a power of 2',
+            );
     }
-    // For doubles, check if it's a power of 2
     double v = value.toDouble();
     while (v > 1) {
-      if (v % 2 != 0) return fail('$fieldName must be a power of 2');
+      if (v % 2 != 0) {
+        return fail(
+          InvalidPowerOfTwoValidationError.new,
+          '$fieldName must be a power of 2',
+        );
+      }
       v /= 2;
     }
 
-    return v == 1 ? pass(value) : fail('$fieldName must be a power of 2');
+    return v == 1
+        ? pass(value)
+        : fail(
+            InvalidPowerOfTwoValidationError.new,
+            '$fieldName must be a power of 2',
+          );
   });
 
   /// Validates that the value is a valid port number (1-65535).
@@ -200,7 +246,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   SyncValidationStep<T> isPortNumber() => bind(
     (value) => value >= 1 && value <= 65535
         ? pass(value)
-        : fail('$fieldName must be a valid port number (1-65535)'),
+        : fail(
+            InvalidPortNumberValidationError.new,
+            '$fieldName must be a valid port number (1-65535)',
+          ),
   );
 
   /// Validates that the value is within a specified percentage of a target value.
@@ -228,7 +277,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
         return value >= min && value <= max
             ? pass(value)
-            : fail('$fieldName must be within $percentage% of $target');
+            : fail(
+                InvalidPercentageRangeValidationError.new,
+                '$fieldName must be within $percentage% of $target',
+              );
       });
 
   /// Validates that the value is within the specified range [min] to [max] (inclusive).
@@ -246,6 +298,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     (value) => value >= min && value <= max
         ? pass(value)
         : fail(
+            InvalidRangeValidationError.new,
             'Value $value of field $fieldName must be between $min and $max',
           ),
   );
@@ -273,7 +326,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   SyncValidationStep<T> isOneOf(List<T> allowedValues) => bind(
     (value) => allowedValues.contains(value)
         ? pass(value)
-        : fail('$fieldName must be one of: ${allowedValues.join(', ')}'),
+        : fail(
+            InvalidAllowedNumericValueValidationError.new,
+            '$fieldName must be one of: ${allowedValues.join(', ')}',
+          ),
   );
 
   /// Validates that the numeric value is not one of the specified forbidden values.
@@ -299,6 +355,9 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   SyncValidationStep<T> isNoneOf(List<T> forbiddenValues) => bind(
     (value) => !forbiddenValues.contains(value)
         ? pass(value)
-        : fail('$fieldName must not be one of: ${forbiddenValues.join(', ')}'),
+        : fail(
+            InvalidForbiddenNumericValueValidationError.new,
+            '$fieldName must not be one of: \\${forbiddenValues.join(', ')}',
+          ),
   );
 }

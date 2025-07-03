@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:fpvalidate/src/constants/regex/regex.dart';
-import 'package:fpvalidate/src/validation_error.dart';
+import 'package:fpvalidate/src/errors/validation_error.dart';
 
 part 'extensions/field_extension.dart';
 part 'extensions/nullable_extension.dart';
@@ -83,7 +83,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
       (v) => Either.tryCatch(
         () => f(v),
         (error, stackTrace) =>
-            ValidationError(fieldName, onFail(fieldName), stackTrace),
+            TryMapValidationError(fieldName, onFail(fieldName), stackTrace),
       ),
     ),
   );
@@ -96,11 +96,19 @@ class SyncValidationStep<T> extends ValidationStep<T> {
     String Function(String fieldName) onFalse,
   ) => _copy(
     _value.flatMap(
-      (value) => Either.tryCatch(
-        () => f(value),
-        (error, stackTrace) =>
-            ValidationError(fieldName, error.toString(), stackTrace),
-      ).flatMap((success) => success ? pass(value) : fail(onFalse(fieldName))),
+      (value) =>
+          Either.tryCatch(
+            () => f(value),
+            (error, stackTrace) =>
+                CheckValidationError(fieldName, error.toString(), stackTrace),
+          ).flatMap(
+            (success) => success
+                ? pass(value)
+                : fail<CheckValidationError, T>(
+                    CheckValidationError.new,
+                    onFalse(fieldName),
+                  ),
+          ),
     ),
   );
 
@@ -119,17 +127,18 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// This is a helper method for use with custom validation logic.
   /// It wraps a value in a [Either.right].
-  Either<ValidationError, R> pass<R>(R value) => Right(value);
+  Either<L, R> pass<L, R>(R value) => Right(value);
 
   /// Creates a failed result with the given error message.
   ///
   /// This is a helper method for use with custom validation logic.
   /// It creates a [ValidationError] and wraps it in a [Either.left].
-  Either<ValidationError, R> fail<R>(String message) =>
-      Left(ValidationError(fieldName, message));
+  Either<L, R> fail<L, R>(
+    ValidationErrorFactory<L> errorFactory,
+    String message, [
+    StackTrace? stackTrace,
+  ]) => Left<L, R>(errorFactory(fieldName, message, stackTrace));
 
-  /// Converts this synchronous validation step to an asynchronous validation step.
-  ///
   /// Returns a new [AsyncValidationStep] with the same value so that
   /// asynchronous validation steps can be chained with synchronous validation steps.
   ///
@@ -221,7 +230,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
       (v) => TaskEither.tryCatch(
         () async => await f(v),
         (error, stackTrace) =>
-            ValidationError(fieldName, onFail(fieldName), stackTrace),
+            TryMapValidationError(fieldName, onFail(fieldName), stackTrace),
       ),
     ),
   );
@@ -244,9 +253,14 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
           TaskEither.tryCatch(
             () async => await f(value),
             (error, stackTrace) =>
-                ValidationError(fieldName, error.toString(), stackTrace),
+                CheckValidationError(fieldName, error.toString(), stackTrace),
           ).flatMap(
-            (success) => success ? _success(value) : _fail(onFalse(fieldName)),
+            (success) => success
+                ? pass(value)
+                : fail<CheckValidationError, T>(
+                    CheckValidationError.new,
+                    onFalse(fieldName),
+                  ),
           ),
     ),
   );
@@ -294,14 +308,16 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   /// Creates a successful result with the given value.
   ///
   /// This is an internal helper method that wraps a value in a [TaskEither.right].
-  TaskEither<ValidationError, R> _success<R>(R value) =>
-      TaskEither.right(value);
+  TaskEither<L, R> pass<L, R>(R value) => TaskEither.right(value);
 
   /// Creates a failed result with the given error message.
   ///
   /// This is an internal helper method that creates a [ValidationError] and wraps it in a [TaskEither.left].
-  TaskEither<ValidationError, R> _fail<R>(String message) =>
-      TaskEither.left(ValidationError(fieldName, message));
+  TaskEither<L, R> fail<L, R>(
+    ValidationErrorFactory<L> errorFactory,
+    String message, [
+    StackTrace? stackTrace,
+  ]) => TaskEither.left(errorFactory(fieldName, message, stackTrace));
 
   /// Validates the value and returns it if successful, or throws a [ValidationError] if failed.
   ///

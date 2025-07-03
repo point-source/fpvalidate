@@ -69,8 +69,11 @@ extension FieldExtensionAsync<T> on Future<T> {
   AsyncValidationStep<T> field(String fieldName) => AsyncValidationStep._(
     value: TaskEither.tryCatch(
       () async => await this,
-      (error, stackTrace) =>
-          ValidationError(fieldName, error.toString(), stackTrace),
+      (error, stackTrace) => AsyncFieldInitializationError(
+        fieldName,
+        error.toString(),
+        stackTrace,
+      ),
     ),
     fieldName: fieldName,
   );
@@ -138,7 +141,9 @@ extension FieldExtensionLeft<L, R> on Left<L, R> {
   /// final result = step.validateEither();
   /// ```
   SyncValidationStep<R> field(String fieldName) => SyncValidationStep._(
-    value: Left(ValidationError(fieldName, value.toString())),
+    value: Left(
+      FieldInitializationError(fieldName, value.toString(), StackTrace.current),
+    ),
     fieldName: fieldName,
   );
 }
@@ -175,9 +180,13 @@ extension FieldExtensionTaskEither<L, R> on TaskEither<L, R> {
   /// final result = await step.isNotEmpty().isEmail().validateEither();
   /// ```
   AsyncValidationStep<R> field(String fieldName) => AsyncValidationStep._(
-    value: flatMap(
-      (right) => TaskEither.right(right),
-    ).mapLeft((left) => ValidationError(fieldName, left.toString())),
+    value: flatMap((right) => TaskEither.right(right)).mapLeft(
+      (left) => FieldInitializationError(
+        fieldName,
+        left.toString(),
+        StackTrace.current,
+      ),
+    ),
     fieldName: fieldName,
   );
 }

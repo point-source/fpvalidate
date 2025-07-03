@@ -36,9 +36,9 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isNotEmpty({bool allowWhitespace = false}) => bind(
     (value) => value.isEmpty
-        ? fail('Field $fieldName is empty')
+        ? fail(EmptyStringValidationError.new, 'Field $fieldName is empty')
         : !allowWhitespace && value.trim().isEmpty
-        ? fail('Field $fieldName is empty')
+        ? fail(EmptyStringValidationError.new, 'Field $fieldName is empty')
         : pass(value),
   );
 
@@ -64,10 +64,12 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<int> toInt() => bind((value) {
     final parsed = int.tryParse(value);
-
     return parsed != null
-        ? pass<int>(parsed)
-        : fail<int>('Value $value for field $fieldName is not a number');
+        ? pass<InvalidNumberFormatValidationError, int>(parsed)
+        : fail<InvalidNumberFormatValidationError, int>(
+            InvalidNumberFormatValidationError.new,
+            'Value $value for field $fieldName is not a number',
+          );
   });
 
   /// Validates that the string has a minimum length of [length].
@@ -81,7 +83,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> minLength(int length) => bind(
     (value) => value.length >= length
         ? pass(value)
-        : fail('$fieldName must be at least $length characters long'),
+        : fail(
+            InvalidLengthValidationError.new,
+            '$fieldName must be at least $length characters long',
+          ),
   );
 
   /// Validates that the string has a maximum length of [length].
@@ -95,7 +100,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> maxLength(int length) => bind(
     (value) => value.length <= length
         ? pass(value)
-        : fail('$fieldName must be no more than $length characters long'),
+        : fail(
+            InvalidLengthValidationError.new,
+            '$fieldName must be no more than $length characters long',
+          ),
   );
 
   /// Validates that the string is a valid email address.
@@ -110,7 +118,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isEmail() => bind((value) {
     return RegExp(kEmailRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must be a valid email address');
+        : fail(
+            InvalidEmailValidationError.new,
+            '$fieldName must be a valid email address',
+          );
   });
 
   /// Validates that the string is a valid URL.
@@ -125,7 +136,7 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isUrl() => bind((value) {
     return RegExp(kUrlRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must be a valid URL');
+        : fail(InvalidUrlValidationError.new, '$fieldName must be a valid URL');
   });
 
   /// Validates that the string is a valid phone number.
@@ -140,11 +151,17 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isPhone() => bind((value) {
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
     if (digitsOnly.length < 10) {
-      return fail('$fieldName must be a valid phone number');
+      return fail(
+        InvalidPhoneValidationError.new,
+        '$fieldName must be a valid phone number',
+      );
     }
     return RegExp(kPhoneRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must be a valid phone number');
+        : fail(
+            InvalidPhoneValidationError.new,
+            '$fieldName must be a valid phone number',
+          );
   });
 
   /// Validates that the string matches a custom regex pattern.
@@ -165,7 +182,10 @@ extension StringExtension on SyncValidationStep<String> {
       bind(
         (value) => regex.hasMatch(value)
             ? pass(value)
-            : fail('$fieldName must match pattern: $description'),
+            : fail(
+                InvalidPatternValidationError.new,
+                '$fieldName must match pattern: $description',
+              ),
       );
 
   /// Validates that the string contains the specified [substring].
@@ -179,7 +199,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> contains(String substring) => bind(
     (value) => value.contains(substring)
         ? pass(value)
-        : fail('$fieldName must contain "$substring"'),
+        : fail(
+            MissingSubstringValidationError.new,
+            '$fieldName must contain "$substring"',
+          ),
   );
 
   /// Validates that the string starts with the specified [prefix].
@@ -193,7 +216,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> startsWith(String prefix) => bind(
     (value) => value.startsWith(prefix)
         ? pass(value)
-        : fail('$fieldName must start with "$prefix"'),
+        : fail(
+            InvalidPrefixValidationError.new,
+            '$fieldName must start with "$prefix"',
+          ),
   );
 
   /// Validates that the string ends with the specified [suffix].
@@ -207,7 +233,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> endsWith(String suffix) => bind(
     (value) => value.endsWith(suffix)
         ? pass(value)
-        : fail('$fieldName must end with "$suffix"'),
+        : fail(
+            InvalidSuffixValidationError.new,
+            '$fieldName must end with "$suffix"',
+          ),
   );
 
   /// Validates that the string contains only alphanumeric characters (letters and digits).
@@ -221,7 +250,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> alphanumeric() => bind((value) {
     return RegExp(kAlphanumericRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must contain only alphanumeric characters');
+        : fail(
+            InvalidAlphanumericValidationError.new,
+            '$fieldName must contain only alphanumeric characters',
+          );
   });
 
   /// Validates that the string contains only letters (a-z, A-Z).
@@ -235,7 +267,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> lettersOnly() => bind((value) {
     return RegExp(kLettersOnlyRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must contain only letters');
+        : fail(
+            InvalidLettersOnlyValidationError.new,
+            '$fieldName must contain only letters',
+          );
   });
 
   /// Validates that the string contains only digits (0-9).
@@ -249,7 +284,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> digitsOnly() => bind((value) {
     return RegExp(kDigitsOnlyRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must contain only digits');
+        : fail(
+            InvalidDigitsOnlyValidationError.new,
+            '$fieldName must contain only digits',
+          );
   });
 
   /// Validates that the string is a valid UUID (Universally Unique Identifier).
@@ -266,7 +304,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isUuid() => bind((value) {
     return RegExp(kUuidRegex, caseSensitive: false).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must be a valid UUID');
+        : fail(
+            InvalidUuidValidationError.new,
+            '$fieldName must be a valid UUID',
+          );
   });
 
   /// Validates that the string is a valid credit card number.
@@ -283,17 +324,18 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isCreditCard({bool validateLuhn = true}) =>
       bind((value) {
         final cleanValue = value.replaceAll(RegExp(r'\s+'), '');
-
-        // Check format with regex
         if (!RegExp(kCreditCardRegex).hasMatch(cleanValue)) {
-          return fail('$fieldName must be a valid credit card number');
+          return fail(
+            InvalidCreditCardValidationError.new,
+            '$fieldName must be a valid credit card number',
+          );
         }
-
-        // Validate Luhn algorithm
         if (validateLuhn && !_isValidLuhn(cleanValue)) {
-          return fail('$fieldName must be a valid credit card number');
+          return fail(
+            InvalidCreditCardValidationError.new,
+            '$fieldName must be a valid credit card number',
+          );
         }
-
         return pass(value);
       });
 
@@ -332,7 +374,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isPostalCode() => bind((value) {
     return RegExp(kPostalCodeRegex).hasMatch(value)
         ? pass(value)
-        : fail('$fieldName must be a valid postal code');
+        : fail(
+            InvalidPostalCodeValidationError.new,
+            '$fieldName must be a valid postal code',
+          );
   });
 
   /// Validates that the string is a valid ISO date in YYYY-MM-DD format.
@@ -346,20 +391,27 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isIsoDate() => bind((value) {
     if (!RegExp(kIsoDateRegex).hasMatch(value)) {
-      return fail('$fieldName must be in ISO date format (YYYY-MM-DD)');
+      return fail(
+        InvalidIsoDateValidationError.new,
+        '$fieldName must be in ISO date format (YYYY-MM-DD)',
+      );
     }
-
     try {
       final date = DateTime.parse(value);
       final year = int.parse(value.substring(0, 4));
       final month = int.parse(value.substring(5, 7));
       final day = int.parse(value.substring(8, 10));
-
       return date.year == year && date.month == month && date.day == day
           ? pass(value)
-          : fail('$fieldName must be a valid date');
+          : fail(
+              InvalidIsoDateValidationError.new,
+              '$fieldName must be a valid date',
+            );
     } catch (e) {
-      return fail('$fieldName must be a valid date');
+      return fail(
+        InvalidIsoDateValidationError.new,
+        '$fieldName must be a valid date',
+      );
     }
   });
 
@@ -376,20 +428,20 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isTime24Hour({bool requireLeadingZero = false}) =>
       bind((value) {
-        // First check basic format
         if (!RegExp(kTime24HourRegex).hasMatch(value)) {
-          return fail('$fieldName must be in 24-hour format (HH:MM)');
+          return fail(
+            InvalidTime24HourValidationError.new,
+            '$fieldName must be in 24-hour format (HH:MM)',
+          );
         }
-
-        // If leading zeros are required, check the format more strictly
         if (requireLeadingZero) {
           if (!RegExp(kTime24HourStrictRegex).hasMatch(value)) {
             return fail(
+              InvalidTime24HourValidationError.new,
               '$fieldName must be in 24-hour format (HH:MM) with leading zeros',
             );
           }
         }
-
         return pass(value);
       });
 
@@ -426,10 +478,12 @@ extension StringExtension on SyncValidationStep<String> {
     final normalizedAllowed = caseInsensitive
         ? allowedValues.map((v) => v.toLowerCase()).toList()
         : allowedValues;
-
     return normalizedAllowed.contains(normalizedValue)
         ? pass(value)
-        : fail('$fieldName must be one of: ${allowedValues.join(', ')}');
+        : fail(
+            InvalidAllowedValueValidationError.new,
+            '$fieldName must be one of: ${allowedValues.join(', ')}',
+          );
   });
 
   /// Validates that the string is none of the specified forbidden values.
@@ -459,9 +513,11 @@ extension StringExtension on SyncValidationStep<String> {
     final normalizedForbidden = caseInsensitive
         ? forbiddenValues.map((v) => v.toLowerCase()).toList()
         : forbiddenValues;
-
     return !normalizedForbidden.contains(normalizedValue)
         ? pass(value)
-        : fail('$fieldName must not be one of: ${forbiddenValues.join(', ')}');
+        : fail(
+            InvalidForbiddenValueValidationError.new,
+            '$fieldName must not be one of: ${forbiddenValues.join(', ')}',
+          );
   });
 }

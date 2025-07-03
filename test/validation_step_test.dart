@@ -105,7 +105,9 @@ void main() {
       test('should propagate error from bound step', () {
         final step = 'abc'.field('Number');
         final result = step
-            .bind((value) => Left(ValidationError('Number', 'Invalid number')))
+            .bind(
+              (value) => Left(BindValidationError('Number', 'Invalid number')),
+            )
             .validateEither();
 
         expect(result.isLeft(), isTrue);
@@ -444,7 +446,7 @@ void main() {
               (value) => TaskEither.tryCatch(
                 () async => int.parse(value),
                 (error, stackTrace) =>
-                    ValidationError('Number', 'Invalid number', stackTrace),
+                    BindValidationError('Number', 'Invalid number', stackTrace),
               ),
             )
             .validateEither();
