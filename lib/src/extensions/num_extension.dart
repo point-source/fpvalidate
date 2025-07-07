@@ -174,13 +174,13 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// ```
   SyncValidationStep<int> isInt() => bind((value) {
     if (value is int) {
-      return pass<InvalidIntegerValidationError, int>(value);
+      return pass<int>(value);
     }
     if (value is double && value == value.toInt()) {
-      return pass<InvalidIntegerValidationError, int>(value.toInt());
+      return pass<int>(value.toInt());
     }
 
-    return fail<InvalidIntegerValidationError, int>(
+    return fail<int>(
       InvalidIntegerValidationError.new,
       '$fieldName must be an integer',
     );
@@ -357,7 +357,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidForbiddenNumericValueValidationError.new,
-            '$fieldName must not be one of: \\${forbiddenValues.join(', ')}',
+            '$fieldName must not be one of: ${forbiddenValues.join(', ')}',
           ),
   );
 }

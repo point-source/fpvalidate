@@ -65,8 +65,8 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<int> toInt() => bind((value) {
     final parsed = int.tryParse(value);
     return parsed != null
-        ? pass<InvalidNumberFormatValidationError, int>(parsed)
-        : fail<InvalidNumberFormatValidationError, int>(
+        ? pass<int>(parsed)
+        : fail<int>(
             InvalidNumberFormatValidationError.new,
             'Value $value for field $fieldName is not a number',
           );

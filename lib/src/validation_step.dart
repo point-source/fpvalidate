@@ -97,17 +97,14 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   ) => _copy(
     _value.flatMap(
       (value) =>
-          Either.tryCatch(
+          Either<ValidationError, bool>.tryCatch(
             () => f(value),
             (error, stackTrace) =>
                 CheckValidationError(fieldName, error.toString(), stackTrace),
           ).flatMap(
             (success) => success
                 ? pass(value)
-                : fail<CheckValidationError, T>(
-                    CheckValidationError.new,
-                    onFalse(fieldName),
-                  ),
+                : fail<T>(CheckValidationError.new, onFalse(fieldName)),
           ),
     ),
   );
@@ -127,17 +124,17 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// This is a helper method for use with custom validation logic.
   /// It wraps a value in a [Either.right].
-  Either<L, R> pass<L, R>(R value) => Right(value);
+  Either<ValidationError, R> pass<R>(R value) => Right(value);
 
   /// Creates a failed result with the given error message.
   ///
   /// This is a helper method for use with custom validation logic.
   /// It creates a [ValidationError] and wraps it in a [Either.left].
-  Either<L, R> fail<L, R>(
-    ValidationErrorFactory<L> errorFactory,
+  Either<ValidationError, R> fail<R>(
+    ValidationErrorFactory<ValidationError> errorFactory,
     String message, [
     StackTrace? stackTrace,
-  ]) => Left<L, R>(errorFactory(fieldName, message, stackTrace));
+  ]) => Left<ValidationError, R>(errorFactory(fieldName, message, stackTrace));
 
   /// Returns a new [AsyncValidationStep] with the same value so that
   /// asynchronous validation steps can be chained with synchronous validation steps.
