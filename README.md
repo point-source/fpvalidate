@@ -26,7 +26,7 @@ A fluent, flexible, and typesafe validation library that supports async, casting
 - **Nullable Support**: Specialized validators for handling optional fields
 - **Type Casting & Transformation**: Convert between types while validating (String to int, nullable to non-nullable, etc.)
 - **Flutter Form Compatibility**: Built-in support for Flutter form validation with `asFormValidator()` method
-- **Error Handling**: Detailed error messages with field names and descriptions
+- **Error Handling**: Comprehensive error system with specific error types for different validation scenarios
 - **Direct Either/TaskEither Support**: Start validation chains directly from [fpdart](https://pub.dev/packages/fpdart)'s `Either` and `TaskEither` values
 
 ## Getting Started
@@ -35,7 +35,7 @@ Add fpvalidate to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fpvalidate: ^0.1.0
+  fpvalidate: ^0.2.0
   fpdart: ^1.1.1
 ```
 
@@ -69,6 +69,48 @@ try {
 } catch (e) {
   if (e is ValidationError) {
     print('Validation failed: ${e.message}');
+  }
+}
+```
+
+### Flutter Form Validation
+
+```dart
+class EmailForm extends StatefulWidget {
+  @override
+  _EmailFormState createState() => _EmailFormState();
+}
+
+class _EmailFormState extends State<EmailForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+
+  // This is now a [FormFieldValidator<String?>] that can be used in a [FormField]
+  //
+  // [asFormValidator] causes the validation to return a [String?] instead of a [Either<ValidationError, String>]
+  // This is useful for Flutter forms since they expect a [String?] to display the error message or [null] to signal success.
+  String? _validateEmail(String? value) => value
+        .field('Email')
+        .isNotNull()
+        .isNotEmpty()
+        .isEmail()
+        .asFormValidator(); // Convenience method for Flutter forms (same as errorOrNull())
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _emailController,
+            validator: _validateEmail,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+        ],
+      ),
+    );
   }
 }
 ```
@@ -407,6 +449,20 @@ final ageResult = 25
 
 ### Error Handling
 
+fpvalidate provides a comprehensive error handling system with specific error types for different validation scenarios. This allows for better debugging and more precise error handling in your applications.
+
+### Error Types
+
+The library uses a hierarchical error system:
+
+- **`ValidationError`**: Base error class for all validation failures
+- **`StringValidationError`**: Specific errors for string validation (email, URL, pattern matching, etc.)
+- **`NumericValidationError`**: Specific errors for numeric validation (min/max, range, even/odd, etc.)
+- **`NullableValidationError`**: Specific errors for nullable field validation
+- **Core validation errors**: `FieldInitializationError`, `AsyncFieldInitializationError`, `TryMapValidationError`, `CheckValidationError`, `BindValidationError`
+
+### Basic Error Handling
+
 ```dart
 // Get error message or null (useful for Flutter forms)
 final error = email
@@ -419,13 +475,50 @@ if (error != null) {
   // Display error in UI
   print('Error: $error');
 }
+```
 
-// Convenience method for Flutter forms
-final formValidator = email
-    .field('Email')
-    .isNotEmpty()
-    .isEmail()
-    .asFormValidator(); // Same as errorOrNull()
+### Advanced Error Handling
+
+```dart
+  // Handle specific error types and optionally change the error message
+  final result = 'test@example.com'
+      .field('Email')
+      .isNotEmpty()
+      .isEmail()
+      .validateEither()
+      .fold(
+        (error) => switch (error) {
+          EmptyStringValidationError _ => 'Email field is empty',
+          InvalidEmailValidationError _ => 'Email format is invalid',
+          StringValidationError e => 'Email transformation failed: $e',
+          _ => 'Validation failed: ${error.message}',
+        },
+        (validEmail) => 'Valid email: $validEmail',
+      );
+
+  print(result);
+```
+
+### Error with Stack Traces
+
+All validation errors include optional stack traces for better debugging:
+
+```dart
+try {
+  final result = email
+      .field('Email')
+      .tryMap(
+        (value) => throw Exception('Custom error'),
+        (fieldName) => '$fieldName transformation failed',
+      )
+      .validate();
+} catch (e) {
+  if (e is TryMapValidationError) {
+    print('Error: ${e.message}');
+    print('Field: ${e.fieldName}');
+    print('Stack trace: ${e.stackTrace}');
+  }
+}
 ```
 
 ## Examples
@@ -537,12 +630,12 @@ class _LoginFormState extends State<LoginForm> {
 
 ## Error Messages
 
-The library provides descriptive error messages that include the field name:
+The library provides descriptive error messages that include the field name and uses specific error types for better debugging:
 
-- `"Email must be a valid email address"`
-- `"Password must be at least 8 characters long"`
-- `"Age must be between 13 and 120"`
-- `"Phone must be a valid phone number"`
+- `"Email must be a valid email address"` (InvalidEmailValidationError)
+- `"Password must be at least 8 characters long"` (InvalidLengthValidationError)
+- `"Age must be between 13 and 120"` (InvalidRangeValidationError)
+- `"Phone must be a valid phone number"` (InvalidPhoneValidationError)
 
 ## Localization
 

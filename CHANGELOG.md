@@ -1,3 +1,14 @@
+## 0.2.0
+
+- **BREAKING**: Refactored error system with hierarchical error types for better error handling and debugging
+  - Introduced specific error classes for different validation scenarios
+  - `StringValidationError` for string-specific validation failures
+  - `NumericValidationError` for numeric validation failures
+  - `NullableValidationError` for nullable field validation failures
+  - Core validation errors: `FieldInitializationError`, `AsyncFieldInitializationError`, `TryMapValidationError`, `CheckValidationError`, `BindValidationError`
+- Improved type safety in error handling throughout the validation pipeline
+- Better stack trace support for debugging validation failures
+
 ## 0.1.1
 
 - Added field extensions for Either and TaskEither types from fpdart

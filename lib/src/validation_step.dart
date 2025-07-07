@@ -134,7 +134,9 @@ class SyncValidationStep<T> extends ValidationStep<T> {
     ValidationErrorFactory<ValidationError> errorFactory,
     String message, [
     StackTrace? stackTrace,
-  ]) => Left<ValidationError, R>(errorFactory(fieldName, message, stackTrace));
+  ]) => Left<ValidationError, R>(
+    errorFactory(fieldName, message, stackTrace ?? StackTrace.current),
+  );
 
   /// Returns a new [AsyncValidationStep] with the same value so that
   /// asynchronous validation steps can be chained with synchronous validation steps.
@@ -314,7 +316,9 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
     ValidationErrorFactory<L> errorFactory,
     String message, [
     StackTrace? stackTrace,
-  ]) => TaskEither.left(errorFactory(fieldName, message, stackTrace));
+  ]) => TaskEither.left(
+    errorFactory(fieldName, message, stackTrace ?? StackTrace.current),
+  );
 
   /// Validates the value and returns it if successful, or throws a [ValidationError] if failed.
   ///
