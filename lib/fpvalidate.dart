@@ -28,5 +28,9 @@ library;
 export 'src/errors/validation_error.dart';
 export 'src/validation_step.dart';
 export 'src/extensions/batch_validation_extension.dart';
+export 'src/i18n/validation_messages.dart';
+export 'src/i18n/translations/english_validation_messages.dart';
+export 'src/i18n/validation_messages_mixin.dart';
+export 'src/i18n/validation_i18n.dart';
 
 // TODO: Export any libraries intended for clients of this package.

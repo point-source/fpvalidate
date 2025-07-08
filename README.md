@@ -28,6 +28,7 @@ A fluent, flexible, and typesafe validation library that supports async, casting
 - **Flutter Form Compatibility**: Built-in support for Flutter form validation with `asFormValidator()` method
 - **Error Handling**: Comprehensive error system with specific error types for different validation scenarios
 - **Direct Either/TaskEither Support**: Start validation chains directly from [fpdart](https://pub.dev/packages/fpdart)'s `Either` and `TaskEither` values
+- **Internationalization**: Support for custom validation messages with type-safe interfaces and default English fallbacks
 
 ## Getting Started
 
@@ -637,21 +638,90 @@ The library provides descriptive error messages that include the field name and 
 - `"Age must be between 13 and 120"` (InvalidRangeValidationError)
 - `"Phone must be a valid phone number"` (InvalidPhoneValidationError)
 
-## Localization
+## Internationalization
 
-Currently, all error messages in fpvalidate are provided in English only and are not localizable. However, I recognize the importance of internationalization for a validation library and am actively interested in community contributions to implement localization support.
+fpvalidate supports custom validation messages through a type-safe internationalization system. You can override specific messages or provide complete custom implementations while maintaining default English fallbacks.
 
-I'd welcome contributions in the following areas:
+### Basic Usage
 
-- **Design Discussion**: Help us design the best approach for implementing localization in the validation library
-- **Implementation**: Contribute code to add localization infrastructure and support
-- **Translations**: Provide translations for error messages once localization is implemented
+```dart
+import 'package:fpvalidate/fpvalidate.dart';
 
-If you're interested in contributing to localization efforts, please:
+// Configure custom messages globally
+ValidationStep.configureMessages(CustomValidationMessages());
 
-1. Open an issue to discuss the design approach
-2. Share your thoughts on the best way to integrate localization with the existing API
-3. Contribute translations for your target languages
+// All validation operations will now use your custom messages
+final result = email
+    .field('Email')
+    .isNotEmpty()
+    .isEmail()
+    .validateEither();
+```
+
+### Partial Override with Mixin
+
+Override only the messages you want to customize while keeping the default English implementation for the rest:
+
+```dart
+// Use the ValidationMessagesMixin to override only the messages you want to customize
+class CustomValidationMessages with ValidationMessagesMixin {
+  @override
+  String emptyField(String fieldName) => 'The $fieldName field cannot be empty';
+
+  @override
+  String invalidEmail(String fieldName) => 'Please enter a valid email address for $fieldName';
+
+  // All other messages will use the default English implementation
+}
+
+// Configure the package to use your custom messages
+ValidationStep.configureMessages(CustomValidationMessages());
+```
+
+### Complete Custom Implementation
+
+Implement all messages for a complete translation:
+
+```dart
+// Implement the ValidationMessages interface to provide your own completetranslations
+class SpanishValidationMessages implements ValidationMessages {
+  @override
+  String emptyField(String fieldName) => 'El campo $fieldName está vacío';
+
+  @override
+  String minLength(String fieldName, int length) =>
+      '$fieldName debe tener al menos $length caracteres';
+
+  @override
+  String invalidEmail(String fieldName) =>
+      '$fieldName debe ser una dirección de correo válida';
+
+  // ... implement all other methods
+}
+
+// Configure the package to use Spanish messages
+ValidationStep.configureMessages(SpanishValidationMessages());
+```
+
+### Reset to Defaults
+
+```dart
+// Reset to default English messages
+ValidationStep.resetMessages();
+```
+
+### Type Safety
+
+The internationalization system is fully type-safe:
+
+- Compile-time checking ensures all required methods are implemented
+- Method signatures include proper parameters for string interpolation
+- Default implementations provide English fallbacks for all messages
+- No possibility of missing translations
+
+### Example Implementation
+
+See `example/i18n_example.dart` for a complete working example of the internationalization system.
 
 ## Contributing
 

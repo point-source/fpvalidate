@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:fpdart/fpdart.dart';
 import 'package:fpvalidate/src/constants/regex/regex.dart';
 import 'package:fpvalidate/src/errors/validation_error.dart';
+import 'package:fpvalidate/src/i18n/validation_i18n.dart';
+import 'package:fpvalidate/src/i18n/validation_messages.dart';
 
 part 'extensions/field_extension.dart';
 part 'extensions/nullable_extension.dart';
@@ -31,6 +33,35 @@ sealed class ValidationStep<T> {
     'Calling .field() on a ValidationStep is not allowed. '
     'You should only call .field() on raw values, not on validation steps.',
   );
+
+  /// Configure the global validation messages for the entire package.
+  ///
+  /// This method allows you to set custom validation messages that will be used
+  /// throughout the package. The messages will be used for all validation operations
+  /// until changed again.
+  ///
+  /// [messages] is the implementation to use for all validation messages.
+  ///
+  /// Example:
+  /// ```dart
+  /// ValidationStep.configureMessages(CustomValidationMessages());
+  /// ```
+  static void configureMessages(ValidationMessages messages) {
+    ValidationI18n.setMessages(messages);
+  }
+
+  /// Reset to default validation messages.
+  ///
+  /// This method resets the global configuration to use the default English
+  /// validation messages.
+  ///
+  /// Example:
+  /// ```dart
+  /// ValidationStep.resetMessages();
+  /// ```
+  static void resetMessages() {
+    ValidationI18n.resetToDefaults();
+  }
 }
 
 /// A synchronous validation step that performs validation operations immediately.

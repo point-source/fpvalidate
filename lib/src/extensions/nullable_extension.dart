@@ -38,7 +38,10 @@ extension NullableExtension<T> on SyncValidationStep<T?> {
   /// ```
   SyncValidationStep<T> isNotNull() => bind(
     (value) => value == null
-        ? fail<T>(NullValueValidationError.new, 'Field $fieldName is null')
+        ? fail<T>(
+            NullValueValidationError.new,
+            ValidationI18n.messages.nullField(fieldName),
+          )
         : pass<T>(value),
   );
 }

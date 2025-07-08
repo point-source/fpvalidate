@@ -29,7 +29,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidMinValueValidationError.new,
-            'Value $value of field $fieldName must be greater than or equal to $min',
+            ValidationI18n.messages.invalidMinValue(fieldName, value, min),
           ),
   );
 
@@ -46,7 +46,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidMaxValueValidationError.new,
-            'Value $value of field $fieldName must be less than or equal to $max',
+            ValidationI18n.messages.invalidMaxValue(fieldName, value, max),
           ),
   );
 
@@ -63,7 +63,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidEvenNumberValidationError.new,
-            'Value $value of field $fieldName must be even',
+            ValidationI18n.messages.invalidEvenNumber(fieldName, value),
           ),
   );
 
@@ -80,7 +80,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidOddNumberValidationError.new,
-            'Value $value of field $fieldName must be odd',
+            ValidationI18n.messages.invalidOddNumber(fieldName, value),
           ),
   );
 
@@ -97,7 +97,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidPositiveNumberValidationError.new,
-            '$fieldName must be positive',
+            ValidationI18n.messages.invalidPositiveNumber(fieldName),
           ),
   );
 
@@ -114,7 +114,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidNonNegativeNumberValidationError.new,
-            '$fieldName must be non-negative',
+            ValidationI18n.messages.invalidNonNegativeNumber(fieldName),
           ),
   );
 
@@ -131,7 +131,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidNegativeNumberValidationError.new,
-            '$fieldName must be negative',
+            ValidationI18n.messages.invalidNegativeNumber(fieldName),
           ),
   );
 
@@ -148,7 +148,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidNonPositiveNumberValidationError.new,
-            '$fieldName must be non-positive',
+            ValidationI18n.messages.invalidNonPositiveNumber(fieldName),
           ),
   );
 
@@ -182,7 +182,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
     return fail<int>(
       InvalidIntegerValidationError.new,
-      '$fieldName must be an integer',
+      ValidationI18n.messages.invalidInteger(fieldName),
     );
   });
 
@@ -201,7 +201,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
     if (value <= 0) {
       return fail(
         InvalidPowerOfTwoValidationError.new,
-        '$fieldName must be a power of 2',
+        ValidationI18n.messages.invalidPowerOfTwo(fieldName),
       );
     }
     if (value == 1) return pass(value); // 2^0 = 1
@@ -210,7 +210,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
           ? pass(value)
           : fail(
               InvalidPowerOfTwoValidationError.new,
-              '$fieldName must be a power of 2',
+              ValidationI18n.messages.invalidPowerOfTwo(fieldName),
             );
     }
     double v = value.toDouble();
@@ -218,7 +218,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
       if (v % 2 != 0) {
         return fail(
           InvalidPowerOfTwoValidationError.new,
-          '$fieldName must be a power of 2',
+          ValidationI18n.messages.invalidPowerOfTwo(fieldName),
         );
       }
       v /= 2;
@@ -228,7 +228,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidPowerOfTwoValidationError.new,
-            '$fieldName must be a power of 2',
+            ValidationI18n.messages.invalidPowerOfTwo(fieldName),
           );
   });
 
@@ -248,7 +248,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidPortNumberValidationError.new,
-            '$fieldName must be a valid port number (1-65535)',
+            ValidationI18n.messages.invalidPortNumber(fieldName),
           ),
   );
 
@@ -279,7 +279,11 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
             ? pass(value)
             : fail(
                 InvalidPercentageRangeValidationError.new,
-                '$fieldName must be within $percentage% of $target',
+                ValidationI18n.messages.invalidPercentageRange(
+                  fieldName,
+                  percentage,
+                  target,
+                ),
               );
       });
 
@@ -299,7 +303,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidRangeValidationError.new,
-            'Value $value of field $fieldName must be between $min and $max',
+            ValidationI18n.messages.invalidRange(fieldName, value, min, max),
           ),
   );
 
@@ -328,7 +332,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidAllowedNumericValueValidationError.new,
-            '$fieldName must be one of: ${allowedValues.join(', ')}',
+            ValidationI18n.messages.invalidAllowedNumericValue(
+              fieldName,
+              allowedValues,
+            ),
           ),
   );
 
@@ -357,7 +364,10 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
         ? pass(value)
         : fail(
             InvalidForbiddenNumericValueValidationError.new,
-            '$fieldName must not be one of: ${forbiddenValues.join(', ')}',
+            ValidationI18n.messages.invalidForbiddenNumericValue(
+              fieldName,
+              forbiddenValues,
+            ),
           ),
   );
 }

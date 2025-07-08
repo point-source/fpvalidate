@@ -1,3 +1,14 @@
+## 0.3.0
+
+- **NEW**: Added comprehensive internationalization support for validation messages
+  - Type-safe `ValidationMessages` interface for custom message implementations
+  - `ValidationMessagesMixin` for partial message overrides while keeping default English fallbacks
+  - `EnglishValidationMessages` as the default English implementation
+  - Global configuration via `ValidationStep.configureMessages()` and `ValidationStep.resetMessages()`
+  - Support for all validation scenarios with proper parameter substitution
+  - No breaking changes to existing API - all existing code continues to work unchanged
+  - Added comprehensive example demonstrating partial overrides and complete custom implementations
+
 ## 0.2.0
 
 - **BREAKING**: Refactored error system with hierarchical error types for better error handling and debugging

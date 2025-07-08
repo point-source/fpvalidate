@@ -36,9 +36,15 @@ extension StringExtension on SyncValidationStep<String> {
   /// ```
   SyncValidationStep<String> isNotEmpty({bool allowWhitespace = false}) => bind(
     (value) => value.isEmpty
-        ? fail(EmptyStringValidationError.new, 'Field $fieldName is empty')
+        ? fail(
+            EmptyStringValidationError.new,
+            ValidationI18n.messages.emptyField(fieldName),
+          )
         : !allowWhitespace && value.trim().isEmpty
-        ? fail(EmptyStringValidationError.new, 'Field $fieldName is empty')
+        ? fail(
+            EmptyStringValidationError.new,
+            ValidationI18n.messages.emptyField(fieldName),
+          )
         : pass(value),
   );
 
@@ -68,7 +74,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass<int>(parsed)
         : fail<int>(
             InvalidNumberFormatValidationError.new,
-            'Value $value for field $fieldName is not a number',
+            ValidationI18n.messages.invalidNumberFormat(fieldName, value),
           );
   });
 
@@ -85,7 +91,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidLengthValidationError.new,
-            '$fieldName must be at least $length characters long',
+            ValidationI18n.messages.minLength(fieldName, length),
           ),
   );
 
@@ -102,7 +108,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidLengthValidationError.new,
-            '$fieldName must be no more than $length characters long',
+            ValidationI18n.messages.maxLength(fieldName, length),
           ),
   );
 
@@ -120,7 +126,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidEmailValidationError.new,
-            '$fieldName must be a valid email address',
+            ValidationI18n.messages.invalidEmail(fieldName),
           );
   });
 
@@ -136,7 +142,10 @@ extension StringExtension on SyncValidationStep<String> {
   SyncValidationStep<String> isUrl() => bind((value) {
     return RegExp(kUrlRegex).hasMatch(value)
         ? pass(value)
-        : fail(InvalidUrlValidationError.new, '$fieldName must be a valid URL');
+        : fail(
+            InvalidUrlValidationError.new,
+            ValidationI18n.messages.invalidUrl(fieldName),
+          );
   });
 
   /// Validates that the string is a valid phone number.
@@ -153,14 +162,14 @@ extension StringExtension on SyncValidationStep<String> {
     if (digitsOnly.length < 10) {
       return fail(
         InvalidPhoneValidationError.new,
-        '$fieldName must be a valid phone number',
+        ValidationI18n.messages.invalidPhone(fieldName),
       );
     }
     return RegExp(kPhoneRegex).hasMatch(value)
         ? pass(value)
         : fail(
             InvalidPhoneValidationError.new,
-            '$fieldName must be a valid phone number',
+            ValidationI18n.messages.invalidPhone(fieldName),
           );
   });
 
@@ -184,7 +193,7 @@ extension StringExtension on SyncValidationStep<String> {
             ? pass(value)
             : fail(
                 InvalidPatternValidationError.new,
-                '$fieldName must match pattern: $description',
+                ValidationI18n.messages.invalidPattern(fieldName, description),
               ),
       );
 
@@ -201,7 +210,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             MissingSubstringValidationError.new,
-            '$fieldName must contain "$substring"',
+            ValidationI18n.messages.missingSubstring(fieldName, substring),
           ),
   );
 
@@ -218,7 +227,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidPrefixValidationError.new,
-            '$fieldName must start with "$prefix"',
+            ValidationI18n.messages.invalidPrefix(fieldName, prefix),
           ),
   );
 
@@ -235,7 +244,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidSuffixValidationError.new,
-            '$fieldName must end with "$suffix"',
+            ValidationI18n.messages.invalidSuffix(fieldName, suffix),
           ),
   );
 
@@ -252,7 +261,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidAlphanumericValidationError.new,
-            '$fieldName must contain only alphanumeric characters',
+            ValidationI18n.messages.invalidAlphanumeric(fieldName),
           );
   });
 
@@ -269,7 +278,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidLettersOnlyValidationError.new,
-            '$fieldName must contain only letters',
+            ValidationI18n.messages.invalidLettersOnly(fieldName),
           );
   });
 
@@ -286,7 +295,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidDigitsOnlyValidationError.new,
-            '$fieldName must contain only digits',
+            ValidationI18n.messages.invalidDigitsOnly(fieldName),
           );
   });
 
@@ -306,7 +315,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidUuidValidationError.new,
-            '$fieldName must be a valid UUID',
+            ValidationI18n.messages.invalidUuid(fieldName),
           );
   });
 
@@ -327,13 +336,13 @@ extension StringExtension on SyncValidationStep<String> {
         if (!RegExp(kCreditCardRegex).hasMatch(cleanValue)) {
           return fail(
             InvalidCreditCardValidationError.new,
-            '$fieldName must be a valid credit card number',
+            ValidationI18n.messages.invalidCreditCard(fieldName),
           );
         }
         if (validateLuhn && !_isValidLuhn(cleanValue)) {
           return fail(
             InvalidCreditCardValidationError.new,
-            '$fieldName must be a valid credit card number',
+            ValidationI18n.messages.invalidCreditCard(fieldName),
           );
         }
         return pass(value);
@@ -376,7 +385,7 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidPostalCodeValidationError.new,
-            '$fieldName must be a valid postal code',
+            ValidationI18n.messages.invalidPostalCode(fieldName),
           );
   });
 
@@ -393,7 +402,7 @@ extension StringExtension on SyncValidationStep<String> {
     if (!RegExp(kIsoDateRegex).hasMatch(value)) {
       return fail(
         InvalidIsoDateValidationError.new,
-        '$fieldName must be in ISO date format (YYYY-MM-DD)',
+        ValidationI18n.messages.invalidIsoDate(fieldName),
       );
     }
     try {
@@ -405,12 +414,12 @@ extension StringExtension on SyncValidationStep<String> {
           ? pass(value)
           : fail(
               InvalidIsoDateValidationError.new,
-              '$fieldName must be a valid date',
+              ValidationI18n.messages.invalidDate(fieldName),
             );
     } catch (e) {
       return fail(
         InvalidIsoDateValidationError.new,
-        '$fieldName must be a valid date',
+        ValidationI18n.messages.invalidDate(fieldName),
       );
     }
   });
@@ -431,14 +440,14 @@ extension StringExtension on SyncValidationStep<String> {
         if (!RegExp(kTime24HourRegex).hasMatch(value)) {
           return fail(
             InvalidTime24HourValidationError.new,
-            '$fieldName must be in 24-hour format (HH:MM)',
+            ValidationI18n.messages.invalidTime24Hour(fieldName),
           );
         }
         if (requireLeadingZero) {
           if (!RegExp(kTime24HourStrictRegex).hasMatch(value)) {
             return fail(
               InvalidTime24HourValidationError.new,
-              '$fieldName must be in 24-hour format (HH:MM) with leading zeros',
+              ValidationI18n.messages.invalidTime24HourStrict(fieldName),
             );
           }
         }
@@ -482,7 +491,10 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidAllowedValueValidationError.new,
-            '$fieldName must be one of: ${allowedValues.join(', ')}',
+            ValidationI18n.messages.invalidAllowedValue(
+              fieldName,
+              allowedValues,
+            ),
           );
   });
 
@@ -517,7 +529,10 @@ extension StringExtension on SyncValidationStep<String> {
         ? pass(value)
         : fail(
             InvalidForbiddenValueValidationError.new,
-            '$fieldName must not be one of: ${forbiddenValues.join(', ')}',
+            ValidationI18n.messages.invalidForbiddenValue(
+              fieldName,
+              forbiddenValues,
+            ),
           );
   });
 }
