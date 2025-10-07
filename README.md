@@ -36,7 +36,7 @@ Add fpvalidate to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fpvalidate: ^0.2.0
+  fpvalidate: ^0.4.0
   fpdart: ^1.1.1
 ```
 
@@ -180,7 +180,7 @@ final error = left.field('Email').validateEither();
 final taskEither = TaskEither<String, String>.right('test@example.com');
 final asyncValidated = await taskEither
     .field('Email')
-    .then((step) => step.isNotEmpty().isEmail())
+    .bind((step) => step.isNotEmpty().isEmail())
     .validateEither();
 
 // Use with numeric validation
@@ -195,7 +195,7 @@ final ageValidated = ageRight
 final asyncAge = TaskEither<String, int>.right(30);
 final asyncAgeValidated = await asyncAge
     .field('Age')
-    .then((step) => step.min(18).max(65))
+    .bind((step) => step.min(18).max(65))
     .validateEither();
 ```
 
@@ -305,10 +305,10 @@ These transformation validators are powerful because they allow you to:
 ### Custom Validation
 
 ```dart
-// Custom validation with check()
+// Custom validation with ensure()
 final result = 'hello world'
     .field('Custom String')
-    .check(
+    .ensure(
       (value) => value.contains('world'),
       (fieldName) => '$fieldName must contain "world"',
     )

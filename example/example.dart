@@ -83,7 +83,7 @@ void main() async {
   // Custom validation with check()
   final customResult = 'hello world'
       .field('Custom String')
-      .check(
+      .ensure(
         (value) => value.contains('world'),
         (fieldName) => '$fieldName must contain "world"',
       )
@@ -100,7 +100,7 @@ void main() async {
       .isNotEmpty()
       .isEmail()
       .toAsync()
-      .check(
+      .ensure(
         (email) => Future.value(email.contains('async')),
         (fieldName) => '$fieldName must contain "async"',
       )

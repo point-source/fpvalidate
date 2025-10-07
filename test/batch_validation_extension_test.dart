@@ -26,7 +26,7 @@ void main() {
           'test@example.com'.field('Email').isNotEmpty().isEmail(),
           Future.value('password123')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
@@ -56,7 +56,7 @@ void main() {
           'test@example.com'.field('Email').isNotEmpty().isEmail(),
           Future.value('')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty,
                 (fieldName) => 'Field $fieldName is empty',
               ),
@@ -106,7 +106,7 @@ void main() {
           'test@example.com'.field('Email').isNotEmpty().isEmail(),
           Future.value('password123')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
@@ -197,13 +197,13 @@ void main() {
         final steps = <AsyncValidationStep>[
           Future.value('test@example.com')
               .field('Email')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.contains('@'),
                 (fieldName) => '$fieldName must be a valid email',
               ),
           Future.value('password123')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
@@ -213,7 +213,7 @@ void main() {
                 (value) async => int.parse(value),
                 (fieldName) => '$fieldName must be a number',
               )
-              .check(
+              .ensure(
                 (value) async => value >= 18,
                 (fieldName) => '$fieldName must be at least 18',
               ),
@@ -231,13 +231,13 @@ void main() {
         final steps = <AsyncValidationStep>[
           Future.value('')
               .field('Email')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty,
                 (fieldName) => 'Field $fieldName is empty',
               ),
           Future.value('password123')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
@@ -252,13 +252,13 @@ void main() {
         final steps = <AsyncValidationStep>[
           Future.value('test@example.com')
               .field('Email')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.contains('@'),
                 (fieldName) => '$fieldName must be a valid email',
               ),
           Future.value('password123')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
@@ -268,7 +268,7 @@ void main() {
                 (value) async => int.parse(value),
                 (fieldName) => '$fieldName must be a number',
               )
-              .check(
+              .ensure(
                 (value) async => value >= 18,
                 (fieldName) => '$fieldName must be at least 18',
               ),
@@ -289,13 +289,13 @@ void main() {
         final steps = <AsyncValidationStep>[
           Future.value('')
               .field('Email')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty,
                 (fieldName) => 'Field $fieldName is empty',
               ),
           Future.value('password123')
               .field('Password')
-              .check(
+              .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),

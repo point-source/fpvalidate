@@ -42,7 +42,7 @@ void main() {
       test('should succeed when condition is true', () {
         final step = 'test@example.com'.field('Email');
         final result = step
-            .check(
+            .ensure(
               (value) => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
@@ -58,7 +58,7 @@ void main() {
       test('should fail when condition is false', () {
         final step = 'invalid-email'.field('Email');
         final result = step
-            .check(
+            .ensure(
               (value) => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
@@ -74,7 +74,7 @@ void main() {
       test('should handle exceptions in check function', () {
         final step = 'test'.field('String');
         final result = step
-            .check(
+            .ensure(
               (value) => throw Exception('Test exception'),
               (fieldName) => '$fieldName is invalid',
             )
@@ -304,7 +304,7 @@ void main() {
         () async {
           final step = Future.value('test@example.com').field('Email');
           final result = await step
-              .check(
+              .ensure(
                 (value) async => value.contains('@'),
                 (fieldName) => '$fieldName must contain @',
               )
@@ -323,7 +323,7 @@ void main() {
         () async {
           final step = Future.value('test@example.com').field('Email');
           final result = await step
-              .check(
+              .ensure(
                 (value) => value.contains('@'),
                 (fieldName) => '$fieldName must contain @',
               )
@@ -340,7 +340,7 @@ void main() {
       test('should fail when condition is false with async function', () async {
         final step = Future.value('invalid-email').field('Email');
         final result = await step
-            .check(
+            .ensure(
               (value) async => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
@@ -356,7 +356,7 @@ void main() {
       test('should fail when condition is false with sync function', () async {
         final step = Future.value('invalid-email').field('Email');
         final result = await step
-            .check(
+            .ensure(
               (value) => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
@@ -372,7 +372,7 @@ void main() {
       test('should handle exceptions in sync check function', () async {
         final step = Future.value('test').field('String');
         final result = await step
-            .check(
+            .ensure(
               (value) => throw Exception('Test exception'),
               (fieldName) => '$fieldName is invalid',
             )
@@ -388,7 +388,7 @@ void main() {
       test('should handle complex validation logic with sync function', () async {
         final step = Future.value('password123').field('Password');
         final result = await step
-            .check(
+            .ensure(
               (value) => value.length >= 8 && value.contains(RegExp(r'\d')),
               (fieldName) =>
                   '$fieldName must be at least 8 characters and contain a number',
@@ -470,7 +470,7 @@ void main() {
       test('should throw ValidationError when failed', () {
         final step = Future.value('')
             .field('String')
-            .check(
+            .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
             );
@@ -494,7 +494,7 @@ void main() {
       test('should return Left when failed', () async {
         final step = Future.value('')
             .field('String')
-            .check(
+            .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
             );
@@ -535,7 +535,7 @@ void main() {
       test('should return error message when failed', () async {
         final step = Future.value('')
             .field('String')
-            .check(
+            .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
             );
@@ -556,7 +556,7 @@ void main() {
       test('should return error message when failed', () async {
         final step = Future.value('')
             .field('String')
-            .check(
+            .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
             );

@@ -119,10 +119,11 @@ class SyncValidationStep<T> extends ValidationStep<T> {
     ),
   );
 
-  /// Check if the value satisfies the condition.
+  /// Ensures that the value satisfies the condition.
+  ///
   /// If the condition is not satisfied, return a [ValidationError]
   /// containing the error message returned by the [onFalse] function.
-  SyncValidationStep<T> check(
+  SyncValidationStep<T> ensure(
     bool Function(T) f,
     String Function(String fieldName) onFalse,
   ) => _copy(
@@ -265,7 +266,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
     ),
   );
 
-  /// Validates that the value satisfies the given condition.
+  /// Ensures that the value satisfies the given condition.
   ///
   /// If the condition returns false, it returns a [ValidationError] with the message
   /// provided by [onFalse].
@@ -274,7 +275,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   /// [onFalse] is a function that takes the field name and returns an error message.
   ///
   /// Returns a new [AsyncValidationStep] with the same value or an error.
-  AsyncValidationStep<T> check(
+  AsyncValidationStep<T> ensure(
     FutureOr<bool> Function(T) f,
     String Function(String fieldName) onFalse,
   ) => _copy(

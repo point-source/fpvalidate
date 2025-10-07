@@ -1,3 +1,8 @@
+## 0.4.0
+
+- **BREAKING**: Renamed `check` to `ensure` for clarity
+- **BREAKING**: Renamed `then` to `bind` for consistency with fpdart
+
 ## 0.3.0
 
 - **NEW**: Added comprehensive internationalization support for validation messages
