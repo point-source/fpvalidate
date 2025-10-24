@@ -536,3 +536,24 @@ extension StringExtension on SyncValidationStep<String> {
           );
   });
 }
+
+extension NullableStringExtension on SyncValidationStep<String?> {
+  /// Validates that the string is not null or empty.
+  ///
+  /// By default, this method considers strings containing only whitespace as empty.
+  /// Use [allowWhitespace: true] to allow whitespace-only strings.
+  ///
+  /// [allowWhitespace] determines whether strings containing only whitespace are
+  /// considered valid. Defaults to false.
+  ///
+  /// Returns a [ValidationError] if the string is empty or contains only whitespace
+  /// (when [allowWhitespace] is false).
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = string.field('String').isNotEmpty().validateEither();
+  /// final result2 = string.field('String').isNotEmpty(allowWhitespace: true).validateEither();
+  /// ```
+  SyncValidationStep<String> isNotEmpty({bool allowWhitespace = false}) =>
+      isNotNull().isNotEmpty(allowWhitespace: allowWhitespace);
+}

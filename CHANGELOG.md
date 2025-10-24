@@ -2,6 +2,7 @@
 
 - **BREAKING**: Renamed `check` to `ensure` for clarity
 - **BREAKING**: Renamed `then` to `bind` for consistency with fpdart
+- **NEW**: Added `isNotEmpty()` extension method for nullable strings as shortcut for `isNotNull().isNotEmpty()`
 
 ## 0.3.0
 
