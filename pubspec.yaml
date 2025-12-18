@@ -1,13 +1,12 @@
 name: fpvalidate
 description: A functional validation library for Dart with support for Either and TaskEither types.
-version: 0.4.0
+version: 0.5.0
 repository: https://github.com/point-source/fpvalidate
 issue_tracker: https://github.com/point-source/fpvalidate/issues
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.10.0
 
-# Add regular dependencies here.
 dependencies:
   fpdart: ^1.1.1
 

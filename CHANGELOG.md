@@ -1,3 +1,7 @@
+## 0.5.0
+
+- **BREAKING**: Updated SDK constraint to ^3.10.0
+
 ## 0.4.0
 
 - **BREAKING**: Renamed `check` to `ensure` for clarity
