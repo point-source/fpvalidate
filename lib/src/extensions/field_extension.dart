@@ -32,7 +32,7 @@ extension FieldExtension<T> on T {
   /// final result = step.isNotEmpty().isEmail().validateEither();
   /// ```
   SyncValidationStep<T> field(String fieldName) =>
-      SyncValidationStep._(value: Right(this), fieldName: fieldName);
+      ._(value: Right(this), fieldName: fieldName);
 }
 
 /// Extension that provides the [field] method for creating validation steps from [Future] values.
@@ -66,7 +66,7 @@ extension FieldExtensionAsync<T> on Future<T> {
   /// final step = Future.value('test@example.com').field('Email');
   /// final result = await step.isNotEmpty().isEmail().validateEither();
   /// ```
-  AsyncValidationStep<T> field(String fieldName) => AsyncValidationStep._(
+  AsyncValidationStep<T> field(String fieldName) => ._(
     value: TaskEither.tryCatch(
       () async => await this,
       (error, stackTrace) => AsyncFieldInitializationError(
@@ -110,7 +110,7 @@ extension FieldExtensionRight<L, R> on Right<L, R> {
   /// final result = step.isNotEmpty().isEmail().validateEither();
   /// ```
   SyncValidationStep<R> field(String fieldName) =>
-      SyncValidationStep._(value: Right(value), fieldName: fieldName);
+      ._(value: Right(value), fieldName: fieldName);
 }
 
 /// Extension that provides the [field] method for creating validation steps from [Left] values.
@@ -140,9 +140,9 @@ extension FieldExtensionLeft<L, R> on Left<L, R> {
   /// final step = Left('Invalid input').field('Email');
   /// final result = step.validateEither();
   /// ```
-  SyncValidationStep<R> field(String fieldName) => SyncValidationStep._(
+  SyncValidationStep<R> field(String fieldName) => ._(
     value: Left(
-      FieldInitializationError(fieldName, value.toString(), StackTrace.current),
+      FieldInitializationError(fieldName, value.toString(), .current),
     ),
     fieldName: fieldName,
   );
@@ -179,13 +179,9 @@ extension FieldExtensionTaskEither<L, R> on TaskEither<L, R> {
   /// final step = TaskEither.right('test@example.com').field('Email');
   /// final result = await step.isNotEmpty().isEmail().validateEither();
   /// ```
-  AsyncValidationStep<R> field(String fieldName) => AsyncValidationStep._(
+  AsyncValidationStep<R> field(String fieldName) => ._(
     value: flatMap((right) => TaskEither.right(right)).mapLeft(
-      (left) => FieldInitializationError(
-        fieldName,
-        left.toString(),
-        StackTrace.current,
-      ),
+      (left) => FieldInitializationError(fieldName, left.toString(), .current),
     ),
     fieldName: fieldName,
   );

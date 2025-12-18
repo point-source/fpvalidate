@@ -906,10 +906,7 @@ void main() {
       });
 
       test('should work with empty list (always fails)', () {
-        final result = 'test'
-            .field('String')
-            .isOneOf(<String>[])
-            .validateEither();
+        final result = 'test'.field('String').isOneOf([]).validateEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -1015,10 +1012,7 @@ void main() {
       });
 
       test('should work with empty list (always succeeds)', () {
-        final result = 'test'
-            .field('String')
-            .isNoneOf(<String>[])
-            .validateEither();
+        final result = 'test'.field('String').isNoneOf([]).validateEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),

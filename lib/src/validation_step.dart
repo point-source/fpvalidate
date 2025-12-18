@@ -95,7 +95,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   /// This is an internal method used by other methods to create new validation steps
   /// with different value types while preserving the field name.
   SyncValidationStep<R> _copy<R>(Either<ValidationError, R> value) =>
-      SyncValidationStep._(value: value, fieldName: fieldName);
+      ._(value: value, fieldName: fieldName);
 
   /// Attempts to transform the value using the provided function.
   ///
@@ -167,7 +167,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
     String message, [
     StackTrace? stackTrace,
   ]) => Left<ValidationError, R>(
-    errorFactory(fieldName, message, stackTrace ?? StackTrace.current),
+    errorFactory(fieldName, message, stackTrace ?? .current),
   );
 
   /// Returns a new [AsyncValidationStep] with the same value so that
@@ -178,7 +178,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   /// final step = "test@example.com".field("email").toAsync();
   /// ```
   AsyncValidationStep<T> toAsync() =>
-      AsyncValidationStep._(value: _value.toTaskEither(), fieldName: fieldName);
+      ._(value: _value.toTaskEither(), fieldName: fieldName);
 
   /// Validates the value and returns it if successful, or throws a [ValidationError] if failed.
   T validate() => _value.fold((l) => throw l, (r) => r);
@@ -242,7 +242,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   /// This is an internal method used by other methods to create new validation steps
   /// with different value types while preserving the field name.
   AsyncValidationStep<R> _copy<R>(TaskEither<ValidationError, R> value) =>
-      AsyncValidationStep._(value: value, fieldName: fieldName);
+      ._(value: value, fieldName: fieldName);
 
   /// Attempts to transform the value using the provided asynchronous function.
   ///
@@ -339,7 +339,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   /// Creates a successful result with the given value.
   ///
   /// This is an internal helper method that wraps a value in a [TaskEither.right].
-  TaskEither<L, R> pass<L, R>(R value) => TaskEither.right(value);
+  TaskEither<L, R> pass<L, R>(R value) => .right(value);
 
   /// Creates a failed result with the given error message.
   ///
@@ -348,9 +348,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
     ValidationErrorFactory<L> errorFactory,
     String message, [
     StackTrace? stackTrace,
-  ]) => TaskEither.left(
-    errorFactory(fieldName, message, stackTrace ?? StackTrace.current),
-  );
+  ]) => .left(errorFactory(fieldName, message, stackTrace ?? .current));
 
   /// Validates the value and returns it if successful, or throws a [ValidationError] if failed.
   ///

@@ -35,8 +35,8 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   Future<List<T>> validateAsync() => Future.wait(
     map(
       (step) => switch (step) {
-        SyncValidationStep<T> _ => Future.value(step.validate()),
-        AsyncValidationStep<T> _ => step.validate().then((value) => value),
+        SyncValidationStep<T>() => Future.value(step.validate()),
+        AsyncValidationStep<T>() => step.validate().then((value) => value),
       },
     ),
   );
@@ -60,8 +60,8 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   /// ```
   TaskEither<ValidationError, List<T>> validateTaskEither() => map(
     (step) => switch (step) {
-      SyncValidationStep<T> _ => step.validateEither().toTaskEither(),
-      AsyncValidationStep<T> _ => step.validateTaskEither(),
+      SyncValidationStep<T>() => step.validateEither().toTaskEither(),
+      AsyncValidationStep<T>() => step.validateTaskEither(),
     },
   ).sequenceTaskEither();
 }
