@@ -300,6 +300,170 @@ void main() {
     });
   });
 
+  group('FieldExtensionEither', () {
+    test('should create validation step from Right Either', () {
+      final either = Right<String, String>('test@example.com');
+      final step = either.field('Email');
+
+      expect(step, isA<SyncValidationStep<String>>());
+      expect(step.fieldName, equals('Email'));
+
+      final result = step.validateEither();
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (error) => fail('Should not return error'),
+        (value) => expect(value, equals('test@example.com')),
+      );
+    });
+
+    test('should create validation step from Left Either', () {
+      final either = Left<String, String>('Previous error');
+      final step = either.field('Email');
+
+      expect(step, isA<SyncValidationStep<String>>());
+      expect(step.fieldName, equals('Email'));
+
+      final result = step.validateEither();
+      expect(result.isLeft(), isTrue);
+      result.fold((error) {
+        expect(error, isA<FieldInitializationError>());
+        expect(error.fieldName, equals('Email'));
+        expect(error.message, equals('Previous error'));
+      }, (value) => fail('Should return error'));
+    });
+
+    test('should work with string validation on Right Either', () {
+      final either = Right<String, String>('test@example.com');
+      final result = either
+          .field('Email')
+          .isNotEmpty()
+          .isEmail()
+          .validateEither();
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (error) => fail('Should not return error: ${error.message}'),
+        (value) => expect(value, equals('test@example.com')),
+      );
+    });
+
+    test('should fail validation on Right Either with invalid email', () {
+      final either = Right<String, String>('invalid-email');
+      final result = either
+          .field('Email')
+          .isNotEmpty()
+          .isEmail()
+          .validateEither();
+
+      expect(result.isLeft(), isTrue);
+      result.fold((error) {
+        expect(error.fieldName, equals('Email'));
+        expect(error.message, contains('Email'));
+      }, (value) => fail('Should return error'));
+    });
+
+    test('should handle empty string in Right Either', () {
+      final either = Right<String, String>('');
+      final result = either.field('Email').isNotEmpty().validateEither();
+
+      expect(result.isLeft(), isTrue);
+      result.fold((error) {
+        expect(error.fieldName, equals('Email'));
+        expect(error.message, contains('Email'));
+      }, (value) => fail('Should return error'));
+    });
+
+    test('should propagate left error without additional validation', () {
+      final either = Left<String, String>('Database connection failed');
+      final result = either.field('UserData').validateEither();
+
+      expect(result.isLeft(), isTrue);
+      result.fold((error) {
+        expect(error, isA<FieldInitializationError>());
+        expect(error.fieldName, equals('UserData'));
+        expect(error.message, equals('Database connection failed'));
+      }, (value) => fail('Should return error'));
+    });
+
+    test('should work with numeric validation on Right Either', () {
+      final either = Right<String, int>(42);
+      final result = either.field('Age').min(18).max(100).validateEither();
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (error) => fail('Should not return error: ${error.message}'),
+        (value) => expect(value, equals(42)),
+      );
+    });
+
+    test('should fail numeric validation on Right Either', () {
+      final either = Right<String, int>(15);
+      final result = either.field('Age').min(18).validateEither();
+
+      expect(result.isLeft(), isTrue);
+      result.fold((error) {
+        expect(error.fieldName, equals('Age'));
+        expect(error.message, contains('Age'));
+      }, (value) => fail('Should return error'));
+    });
+
+    test('should handle Either with different left type', () {
+      final either = Left<Exception, String>(Exception('Network error'));
+      final result = either.field('Response').validateEither();
+
+      expect(result.isLeft(), isTrue);
+      result.fold((error) {
+        expect(error, isA<FieldInitializationError>());
+        expect(error.fieldName, equals('Response'));
+        expect(error.message, contains('Exception: Network error'));
+      }, (value) => fail('Should return error'));
+    });
+
+    test('should handle Either with complex right type', () {
+      final either = Right<String, Map<String, dynamic>>({
+        'name': 'John',
+        'age': 30,
+      });
+      final result = either.field('UserData').validateEither();
+
+      expect(result.isRight(), isTrue);
+      result.fold(
+        (error) => fail('Should not return error: ${error.message}'),
+        (value) {
+          expect(value, isA<Map<String, dynamic>>());
+          expect(value['name'], equals('John'));
+          expect(value['age'], equals(30));
+        },
+      );
+    });
+
+    test('should work with Either from computation', () {
+      Either<String, int> parseAge(String input) {
+        final parsed = int.tryParse(input);
+        return parsed != null ? Right(parsed) : Left('Invalid age format');
+      }
+
+      final validResult = parseAge('25').field('Age').min(18).validateEither();
+
+      expect(validResult.isRight(), isTrue);
+      validResult.fold(
+        (error) => fail('Should not return error: ${error.message}'),
+        (value) => expect(value, equals(25)),
+      );
+
+      final invalidResult = parseAge(
+        'not a number',
+      ).field('Age').validateEither();
+
+      expect(invalidResult.isLeft(), isTrue);
+      invalidResult.fold((error) {
+        expect(error, isA<FieldInitializationError>());
+        expect(error.fieldName, equals('Age'));
+        expect(error.message, equals('Invalid age format'));
+      }, (value) => fail('Should return error'));
+    });
+  });
+
   group('FieldExtensionTaskEither', () {
     test('should create validation step from Right TaskEither', () async {
       final taskEither = TaskEither.right('test@example.com');

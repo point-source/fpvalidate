@@ -148,6 +148,66 @@ extension FieldExtensionLeft<L, R> on Left<L, R> {
   );
 }
 
+/// Extension that provides the [field] method for creating validation steps from [Either] values.
+///
+/// This extension allows you to start a validation chain by calling [field] on an [Either].
+/// The [field] method creates a [SyncValidationStep] that validates the right value if it exists,
+/// or propagates the left error wrapped in a [FieldInitializationError] if the [Either] is a left.
+///
+/// This extension is useful when you have an [Either] value from a previous operation and want
+/// to continue with validation. It handles both [Left] and [Right] cases automatically.
+///
+/// Example:
+/// ```dart
+/// final either = Right<String, String>('test@example.com');
+/// final result = either
+///     .field('Email')
+///     .isNotEmpty()
+///     .isEmail()
+///     .validateEither();
+///
+/// final errorEither = Left<String, String>('Previous error');
+/// final errorResult = errorEither
+///     .field('Email')
+///     .validateEither(); // Propagates the error
+/// ```
+extension FieldExtensionEither<L, R> on Either<L, R> {
+  /// Creates a synchronous validation step for the value of this [Either].
+  ///
+  /// This method is the entry point for creating validation chains from [Either] values.
+  /// It uses [fold] to handle both cases:
+  /// - If this is a [Left], it wraps the left value in a [FieldInitializationError] and
+  ///   creates a failing [SyncValidationStep].
+  /// - If this is a [Right], it creates a successful [SyncValidationStep] with the right value.
+  ///
+  /// [fieldName] is used in error messages to identify which field failed validation.
+  /// It should be descriptive and user-friendly (e.g., 'Email', 'Password', 'Age').
+  ///
+  /// Returns a [SyncValidationStep<R>] that can be chained with validation methods.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Success case
+  /// final rightEither = Right<String, String>('valid@email.com');
+  /// final step = rightEither.field('Email');
+  /// final result = step.isEmail().validateEither();
+  /// // result is Right('valid@email.com')
+  ///
+  /// // Error case
+  /// final leftEither = Left<String, String>('Database error');
+  /// final errorStep = leftEither.field('Email');
+  /// final errorResult = errorStep.validateEither();
+  /// // errorResult is Left(FieldInitializationError('Email', 'Database error', ...))
+  /// ```
+  SyncValidationStep<R> field(String fieldName) => fold(
+    (l) => ._(
+      value: Left(FieldInitializationError(fieldName, l.toString(), .current)),
+      fieldName: fieldName,
+    ),
+    (r) => ._(value: Right(r), fieldName: fieldName),
+  );
+}
+
 /// Extension that provides the [field] method for creating validation steps from [TaskEither] values.
 ///
 /// This extension allows you to start an asynchronous validation chain by calling [field]

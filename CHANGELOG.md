@@ -1,6 +1,7 @@
 ## 0.5.0
 
 - **BREAKING**: Updated SDK constraint to ^3.10.0
+- **NEW**: Added missing field extension for Either type from fpdart
 
 ## 0.4.0
 
