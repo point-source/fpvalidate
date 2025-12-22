@@ -161,6 +161,7 @@ String _getErrorType(ValidationError error) {
     TryMapValidationError() => 'TryMapValidationError',
     CheckValidationError() => 'CheckValidationError',
     BindValidationError() => 'BindValidationError',
+    TypeMismatchValidationError() => 'TypeMismatchValidationError',
     StringValidationError() => 'StringValidationError',
     NumericValidationError() => 'NumericValidationError',
     NullableValidationError() => 'NullableValidationError',

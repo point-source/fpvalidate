@@ -164,4 +164,8 @@ class SpanishValidationMessages implements ValidationMessages {
 
   @override
   String nullField(String fieldName) => 'El campo $fieldName es nulo';
+
+  @override
+  String typeMismatch(String fieldName, Type expectedType) =>
+      '$fieldName debe ser de tipo $expectedType';
 }

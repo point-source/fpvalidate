@@ -1,7 +1,10 @@
 ## 0.5.0
 
 - **BREAKING**: Updated SDK constraint to ^3.10.0
-- **NEW**: Added missing field extension for Either type from fpdart
+- **NEW**: Added `CastingExtension` with `isType<T>()` for type-safe validation chains
+- **NEW**: Added `typeMismatch` error message to internationalization system
+- **NEW**: Added `TypeMismatchValidationError` for cleaner type error handling
+- **FIX**: Added missing field extension for Either type from fpdart
 
 ## 0.4.0
 

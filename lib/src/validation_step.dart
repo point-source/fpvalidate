@@ -10,6 +10,7 @@ part 'extensions/field_extension.dart';
 part 'extensions/nullable_extension.dart';
 part 'extensions/num_extension.dart';
 part 'extensions/string_extension.dart';
+part 'extensions/casting_extension.dart';
 
 /// A sealed class representing a validation step that can be either synchronous or asynchronous.
 ///

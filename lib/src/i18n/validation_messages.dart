@@ -70,4 +70,7 @@ abstract class ValidationMessages {
 
   // Nullable validation messages
   String nullField(String fieldName);
+
+  // Dynamic validation messages
+  String typeMismatch(String fieldName, Type expectedType);
 }

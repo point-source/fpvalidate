@@ -10,6 +10,10 @@ class CustomValidationMessages with ValidationMessagesMixin {
   String invalidEmail(String fieldName) =>
       'Please enter a valid email address for $fieldName';
 
+  @override
+  String typeMismatch(String fieldName, Type expectedType) =>
+      'The $fieldName field must be of type $expectedType';
+
   // All other messages will use the default English implementation
 }
 
@@ -177,6 +181,10 @@ class SpanishValidationMessages implements ValidationMessages {
 
   @override
   String nullField(String fieldName) => 'El campo $fieldName es nulo';
+
+  @override
+  String typeMismatch(String fieldName, Type expectedType) =>
+      '$fieldName debe ser de tipo $expectedType';
 }
 
 /// Example demonstrating how to use custom validation messages.

@@ -283,6 +283,16 @@ final result = (someNullableString as String?)
     .isEmail()
     .validateEither();
 
+// Type validation with isType<T>()
+// NOTE: isType<T>() works on Object? or more specific types.
+// It does NOT work directly on dynamic types due to Dart limitations.
+// If you have a dynamic value, cast it to Object? first.
+final result = (someDynamicValue as Object?)
+    .field('Dynamic Field')
+    .isType<int>()        // Validates type is int and returns SyncValidationStep<int>
+    .min(10)              // Now we can use numeric validators
+    .validateEither();
+
 // Custom transformation with tryMap
 final result = '2023-12-25'
     .field('Date String')
@@ -299,6 +309,7 @@ These transformation validators are powerful because they allow you to:
 - Chain different types of validators
 - Handle nullable to non-nullable conversions
 - Create custom type transformations with `tryMap()`
+- Type cast generic or unknown types safely with `isType<T>()`
 
 ## Advanced Features
 

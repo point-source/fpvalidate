@@ -114,3 +114,17 @@ class BindValidationError extends ValidationError {
   /// [stackTrace] is an optional stack trace for debugging purposes.
   const BindValidationError(super.fieldName, super.message, [super.stackTrace]);
 }
+
+/// Represents an error that occurs when a value does not match the expected type.
+class TypeMismatchValidationError extends ValidationError {
+  /// Creates a new type mismatch validation error.
+  ///
+  /// [fieldName] is the name of the field that failed type validation.
+  /// [message] is the error message describing the type mismatch.
+  /// [stackTrace] is an optional stack trace for debugging purposes.
+  const TypeMismatchValidationError(
+    super.fieldName,
+    super.message, [
+    super.stackTrace,
+  ]);
+}
