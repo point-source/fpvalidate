@@ -18,7 +18,6 @@ A fluent, flexible, and typesafe validation library that supports async validato
 ## Features
 
 - **Fluent API**: Chain validation rules with a clean, readable syntax
-
 - **Batch Validation**: Validate multiple fields at once
 - **Nullable Support**: Specialized validators for handling optional fields
 - **Type Casting & Transformation**: Convert between types while validating (String to int, nullable to non-nullable, etc.)
