@@ -37,7 +37,7 @@ Add trust_but_verify to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  trust_but_verify: ^1.0.0
+  trust_but_verify: ^0.6.0
 ```
 
 Import the library:

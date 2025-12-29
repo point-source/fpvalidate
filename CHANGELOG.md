@@ -1,4 +1,4 @@
-## 1.0.0
+## 0.6.0
 
 - **BREAKING**: Renamed package from `fpvalidate` to `trust_but_verify`
 - **BREAKING**: Renamed `field()` to `trust()` - starts a validation chain
