@@ -12,7 +12,7 @@
 - **NEW**: All error classes now have `copyWith({String? message})` for error message customization
 - **NEW**: Improved default messages with cleaner format (e.g., "Email cannot be empty" instead of "Field Email is empty")
 - **IMPROVED**: Docstrings are now more specific about returned error types
-- **IMPROVED**: Readme is now more concise and generalized for non-fpdart users
+- **IMPROVED**: Readme now includes a TOC and is more concise and generalized for non-fpdart users
 
 ## 0.5.0
 

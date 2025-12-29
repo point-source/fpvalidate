@@ -15,6 +15,33 @@ and the Flutter guide for
 
 A fluent, flexible, and typesafe validation library that supports async validators, type casting & transformations, custom error messages,and (optionally) [fpdart](https://pub.dev/packages/fpdart) types
 
+## Table of Contents
+
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+  - [Basic Single Field Validation](#basic-single-field-validation)
+  - [Flutter Form Validation](#flutter-form-validation)
+  - [Multiple Field Validation](#multiple-field-validation)
+  - [Asynchronous Validation](#asynchronous-validation)
+  - [Support for fpdart Functional Types](#support-for-fpdart-functional-types)
+- [Built-in Validators](#built-in-validators)
+  - [String Validators](#string-validators)
+  - [Numeric Validators](#numeric-validators)
+  - [Nullable Validators](#nullable-validators)
+  - [Type Casting and Transformation Validators](#type-casting-and-transformation-validators)
+- [Advanced Features](#advanced-features)
+  - [Custom Validation](#custom-validation)
+    - [Using the bind() Method](#using-the-bind-method)
+  - [Creating Custom Extensions](#creating-custom-extensions)
+  - [Error Handling](#error-handling)
+- [Additional Examples](#additional-examples)
+- [Error Messages](#error-messages)
+- [Internationalization](#internationalization)
+- [Migration from fpvalidate](#migration-from-fpvalidate)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - **Fluent API**: Chain validation rules with a clean, readable syntax
@@ -37,6 +64,7 @@ Add trust_but_verify to your `pubspec.yaml`:
 ```yaml
 dependencies:
   trust_but_verify: ^0.6.0
+  fpdart: ^1.1.1 # Optional - for Either/TaskEither support
 ```
 
 Import the library:
@@ -351,17 +379,11 @@ final result = '123'
       (fieldName) => '$fieldName must be a valid number',
     )
     .verifyEither();
-
-// Type conversion with toInt()
-final result = '123'
-    .trust('Number String')
-    .toInt()
-    .verify();
 ```
 
-### Using the bind() Method
+#### Using the bind() Method
 
-The `bind()` method allows you to chain validation steps by passing the current value to a function that returns an `Either`. This is useful for complex validation logic that requires multiple steps or conditional validation.
+The `bind()` method allows you to chain validation steps by passing the current value to a function that returns an `Either`. This is useful for complex validation logic that requires multiple steps or conditional validation. Alternatively, you can use the pass() and fail() helper methods to create success and failure results without importing fpdart.
 
 ```dart
 // Complex validation with bind()
