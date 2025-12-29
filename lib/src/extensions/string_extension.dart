@@ -114,15 +114,29 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string is a valid email address.
   ///
-  /// Uses a comprehensive regex pattern to validate email format.
+  /// If [allowTopLevelDomains] is `true`, then the validator will
+  /// allow addresses with top-level domains like `email@example`.
+  ///
+  /// If [allowInternational] is `true`, then the validator
+  /// will use the newer International Email standards for validating
+  /// the email address.
+  ///
+  /// Uses [email_validator](https://pub.dev/packages/email_validator) to validate email format.
   /// Returns a [ValidationError] if the string is not a valid email address.
   ///
   /// Example:
   /// ```dart
   /// final result = email.trust('Email').isEmail().verifyEither();
   /// ```
-  SyncValidationStep<String> isEmail() => bind((value) {
-    return RegExp(kEmailRegex).hasMatch(value)
+  SyncValidationStep<String> isEmail({
+    bool allowTopLevelDomains = false,
+    bool allowInternational = true,
+  }) => bind((value) {
+    return EmailValidator.validate(
+          value,
+          allowTopLevelDomains,
+          allowInternational,
+        )
         ? pass(value)
         : fail(
             InvalidEmailValidationError.new,

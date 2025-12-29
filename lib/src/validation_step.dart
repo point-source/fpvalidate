@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:trust_but_verify/src/constants/regex/regex.dart';
 import 'package:trust_but_verify/src/errors/validation_error.dart';

@@ -6,6 +6,7 @@
 - **BREAKING**: Renamed `validateEither()` to `verifyEither()` - executes validation returning Either
 - **BREAKING**: Renamed `validateTaskEither()` to `verifyTaskEither()` - returns TaskEither
 - **BREAKING**: Renamed `validateAsync()` to `verifyAsync()` - async batch validation
+- **BREAKING**: Now using [email_validator](https://pub.dev/packages/email_validator) for email validation
 - **NEW**: Field names are now optional - use `trust()` without arguments for generic messages
 - **NEW**: Custom error messages via lambda in `verify()` - e.g., `verify((fieldName) => 'Custom $fieldName error')`
 - **NEW**: All error classes now have `copyWith({String? message})` for error message customization
