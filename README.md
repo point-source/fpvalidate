@@ -70,7 +70,7 @@ final result = email
     .trust()
     .isNotEmpty()
     .isEmail()
-    .verifyEither();
+    .verify();
 
 // Custom error message at verification time
 final value = email
@@ -133,6 +133,21 @@ class _EmailFormState extends State<EmailForm> {
 ### Multiple Field Validation
 
 ```dart
+// Validate all fields and throw on first error
+try {
+  final values = [
+    email.trust('Email').isNotEmpty().isEmail(),
+    password.trust('Password').isNotEmpty().minLength(8),
+    age.trust('Age').min(13).max(120),
+  ].verify();
+  // values contains [validatedEmail, validatedPassword, validatedAge]
+} catch (e) {
+  if (e is ValidationError) {
+    print('Validation failed: ${e.message}');
+  }
+}
+
+// Or collect result as Either for functional error handling
 final validationResult = [
   email.trust('Email').isNotEmpty().isEmail(),
   password.trust('Password').isNotEmpty().minLength(8),
@@ -161,13 +176,13 @@ final result = await email
     .verifyTaskEither()
     .run();
 
-// Async validation with Either
+// Async validation with verify()
 final asyncResult = await email
     .trust('Email')
     .isNotEmpty()
     .isEmail()
     .toAsync()
-    .verifyEither();
+    .verify();
 ```
 
 ### Validation from Either/TaskEither
@@ -287,7 +302,7 @@ final result = '123'
     .min(100)             // Now we can use numeric validators
     .max(200)
     .isEven()
-    .verifyEither();
+    .verify();
 
 // Nullable to Non-nullable transformation
 final result = (someNullableString as String?)
@@ -295,7 +310,7 @@ final result = (someNullableString as String?)
     .isNotNull()          // Converts String? to String, enables string validators
     .isNotEmpty()           // Now we can use string validators
     .isEmail()
-    .verifyEither();
+    .verify();
 
 // Type validation with isType<T>()
 // NOTE: isType<T>() works on Object? or more specific types.
@@ -305,7 +320,7 @@ final result = (someDynamicValue as Object?)
     .trust('Dynamic Field')
     .isType<int>()        // Validates type is int and returns SyncValidationStep<int>
     .min(10)              // Now we can use numeric validators
-    .verifyEither();
+    .verify();
 
 // Custom transformation with tryMap
 final result = '2023-12-25'
@@ -314,7 +329,7 @@ final result = '2023-12-25'
       (value) => DateTime.parse(value),  // Converts String to DateTime
       (fieldName) => '$fieldName must be a valid date',
     )
-    .verifyEither();
+    .verify();
 ```
 
 These transformation validators are powerful because they allow you to:
@@ -352,7 +367,7 @@ final result = '123'
 final result = '123'
     .trust('Number String')
     .toInt()
-    .verifyEither();
+    .verify();
 ```
 
 ### Using the bind() Method
@@ -465,12 +480,12 @@ extension CustomNumExtension<T extends num> on SyncValidationStep<T> {
 final passwordResult = 'MyP@ssw0rd'
     .trust('Password')
     .isStrongPassword()
-    .verifyEither();
+    .verify();
 
 final ageResult = 25
     .trust('Age')
     .isEmploymentAge()
-    .verifyEither();
+    .verify();
 ```
 
 ### Error Handling
@@ -632,7 +647,7 @@ final result = email
     .trust('Email')
     .isNotEmpty()
     .isEmail()
-    .verifyEither();
+    .verify();
 ```
 
 ### Partial Override with Mixin

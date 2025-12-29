@@ -9,11 +9,11 @@ import 'package:trust_but_verify/trust_but_verify.dart';
 ///
 /// Example:
 /// ```dart
-/// final result = [
+/// final values = [
 ///   email.trust('Email').isNotEmpty().isEmail(),
 ///   password.trust('Password').isNotEmpty().minLength(8),
 ///   age.trust('Age').min(13).max(120),
-/// ].verifyEither();
+/// ].verify();
 /// ```
 extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   /// Validates all validation steps asynchronously and returns a list of verified values.
@@ -73,10 +73,10 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
 ///
 /// Example:
 /// ```dart
-/// final result = [
+/// final values = [
 ///   email.trust('Email').isNotEmpty().isEmail(),
 ///   password.trust('Password').isNotEmpty().minLength(8),
-/// ].verifyEither();
+/// ].verify();
 /// ```
 extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
   /// Verifies all synchronous validation steps and returns a list of verified values.

@@ -11,7 +11,7 @@ part of '../validation_step.dart';
 ///     .trust('Optional String')
 ///     .isNotNull()
 ///     .isNotEmpty()
-///     .verifyEither();
+///     .verify();
 /// ```
 extension NullableExtension<T> on SyncValidationStep<T?> {
   /// Validates that the value is not null and converts it to a non-nullable type.
@@ -34,7 +34,7 @@ extension NullableExtension<T> on SyncValidationStep<T?> {
   ///     .isNotNull()          // Converts String? to String
   ///     .isNotEmpty()           // Now we can use string validators
   ///     .isEmail()
-  ///     .verifyEither();
+  ///     .verify();
   /// ```
   SyncValidationStep<T> isNotNull() => bind(
     (value) => value == null

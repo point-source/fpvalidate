@@ -15,15 +15,15 @@ part of '../validation_step.dart';
 ///     .isType<int>()
 ///     .min(0)
 ///     .max(100)
-///     .verifyEither();
+///     .verify();
 ///
 /// // Handle type mismatch
 /// final Object? stringValue = 'not a number';
 /// final error = stringValue
 ///     .trust('Value')
 ///     .isType<int>()
-///     .verifyEither();
-/// // Result: Left(TypeMismatchValidationError('Value', 'Value must be of type int'))
+///     .verify();
+/// // Throws: TypeMismatchValidationError('Value', 'Value must be of type int')
 /// ```
 extension CastingExtension on SyncValidationStep {
   /// Validates that the value is of type [T] and casts it to that type.
@@ -45,7 +45,7 @@ extension CastingExtension on SyncValidationStep {
   ///     .isType<int>()
   ///     .min(18)
   ///     .max(65)
-  ///     .verifyEither();
+  ///     .verify();
   ///
   /// // Cast dynamic to String and apply string validators
   /// final Object? email = 'user@example.com';
@@ -54,7 +54,7 @@ extension CastingExtension on SyncValidationStep {
   ///     .isType<String>()
   ///     .isNotEmpty()
   ///     .isEmail()
-  ///     .verifyEither();
+  ///     .verify();
   /// ```
   ///
   /// Returns a [SyncValidationStep<T>] that can be used to chain additional

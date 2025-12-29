@@ -214,17 +214,19 @@ void _examplePartialOverride() {
 
   // Test the validation
   final email = '';
-  final result = email
-      .trust('Email')
-      .isNotEmpty() // Uses custom message
-      .isEmail() // Uses custom message
-      .minLength(8) // Uses default message
-      .verifyEither();
-
-  result.fold(
-    (error) => print('Error: ${error.message}'),
-    (value) => print('Success: $value'),
-  );
+  try {
+    final result = email
+        .trust('Email')
+        .isNotEmpty() // Uses custom message
+        .isEmail() // Uses custom message
+        .minLength(8) // Uses default message
+        .verify();
+    print('Success: $result');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('Error: ${e.message}');
+    }
+  }
 }
 
 /// Example showing how to create a complete custom implementation.
@@ -234,16 +236,18 @@ void _exampleCompleteCustom() {
 
   // Test the validation
   final age = 15;
-  final result = age
-      .trust('Edad')
-      .min(18) // Uses Spanish message
-      .max(65) // Uses Spanish message
-      .verifyEither();
-
-  result.fold(
-    (error) => print('Error: ${error.message}'),
-    (value) => print('Success: $value'),
-  );
+  try {
+    final result = age
+        .trust('Edad')
+        .min(18) // Uses Spanish message
+        .max(65) // Uses Spanish message
+        .verify();
+    print('Success: $result');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('Error: ${e.message}');
+    }
+  }
 }
 
 /// Example showing how to reset to default messages.
@@ -253,13 +257,15 @@ void _exampleResetToDefaults() {
 
   // Test the validation
   final password = 'weak';
-  final result = password
-      .trust('Password')
-      .minLength(8) // Uses default English message
-      .verifyEither();
-
-  result.fold(
-    (error) => print('Error: ${error.message}'),
-    (value) => print('Success: $value'),
-  );
+  try {
+    final result = password
+        .trust('Password')
+        .minLength(8) // Uses default English message
+        .verify();
+    print('Success: $result');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('Error: ${e.message}');
+    }
+  }
 }

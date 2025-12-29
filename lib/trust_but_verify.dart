@@ -1,7 +1,8 @@
 /// A fluent validation library for Dart with support for transformation and sync/async validators.
 ///
-/// This library provides a fluent API for validating data with functional programming
-/// principles, supporting both synchronous (Either) and asynchronous (TaskEither) validation.
+/// This library provides a fluent API for validating data, supporting both synchronous
+/// and asynchronous validation. Optional fpdart integration provides functional-style
+/// error handling with Either and TaskEither types.
 ///
 /// Example usage:
 /// ```dart
@@ -12,21 +13,21 @@
 ///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 ///
 /// // Without field name (uses generic messages)
 /// final result = email
 ///     .trust()
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 ///
 /// // Multiple field validation
-/// final result = [
+/// final values = [
 ///   email.trust('Email').isNotEmpty().isEmail(),
 ///   password.trust('Password').isNotEmpty().minLength(8),
 ///   age.trust('Age').min(13).max(120),
-/// ].verifyEither();
+/// ].verify();
 ///
 /// // Custom error messages
 /// final result = step.verify((fieldName) => 'Please enter a valid $fieldName');

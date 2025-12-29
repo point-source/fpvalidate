@@ -13,14 +13,14 @@ part of '../validation_step.dart';
 ///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 ///
 /// // Without field name (uses generic messages)
 /// final result = 'test@example.com'
 ///     .trust()
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 /// ```
 extension TrustExtension<T> on T {
   /// Creates a synchronous validation step for this value.
@@ -38,7 +38,7 @@ extension TrustExtension<T> on T {
   /// Example:
   /// ```dart
   /// final step = 'test@example.com'.trust('Email');
-  /// final result = step.isNotEmpty().isEmail().verifyEither();
+  /// final result = step.isNotEmpty().isEmail().verify();
   /// ```
   SyncValidationStep<T> trust([String fieldName = '']) =>
       ._(value: Right(this), fieldName: fieldName);
@@ -56,7 +56,7 @@ extension TrustExtension<T> on T {
 ///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 /// ```
 extension TrustExtensionAsync<T> on Future<T> {
   /// Creates an asynchronous validation step for this [Future] value.
@@ -74,7 +74,7 @@ extension TrustExtensionAsync<T> on Future<T> {
   /// Example:
   /// ```dart
   /// final step = Future.value('test@example.com').trust('Email');
-  /// final result = await step.isNotEmpty().isEmail().verifyEither();
+  /// final result = await step.isNotEmpty().isEmail().verify();
   /// ```
   AsyncValidationStep<T> trust([String fieldName = '']) => ._(
     value: TaskEither.tryCatch(
@@ -100,7 +100,7 @@ extension TrustExtensionAsync<T> on Future<T> {
 ///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 /// ```
 extension TrustExtensionRight<L, R> on Right<L, R> {
   /// Creates a synchronous validation step for the right value of this [Right].
@@ -117,7 +117,7 @@ extension TrustExtensionRight<L, R> on Right<L, R> {
   /// Example:
   /// ```dart
   /// final step = Right('test@example.com').trust('Email');
-  /// final result = step.isNotEmpty().isEmail().verifyEither();
+  /// final result = step.isNotEmpty().isEmail().verify();
   /// ```
   SyncValidationStep<R> trust([String fieldName = '']) =>
       ._(value: Right(value), fieldName: fieldName);
@@ -132,7 +132,8 @@ extension TrustExtensionRight<L, R> on Right<L, R> {
 /// ```dart
 /// final result = Left('Invalid input')
 ///     .trust('Email')
-///     .verifyEither();
+///     .verify();
+/// // Throws FieldInitializationError
 /// ```
 extension TrustExtensionLeft<L, R> on Left<L, R> {
   /// Creates a synchronous validation step that propagates the left error.
@@ -149,7 +150,7 @@ extension TrustExtensionLeft<L, R> on Left<L, R> {
   /// Example:
   /// ```dart
   /// final step = Left('Invalid input').trust('Email');
-  /// final result = step.verifyEither();
+  /// final result = step.verify(); // Throws FieldInitializationError
   /// ```
   SyncValidationStep<R> trust([String fieldName = '']) => ._(
     value: Left(
@@ -175,12 +176,12 @@ extension TrustExtensionLeft<L, R> on Left<L, R> {
 ///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 ///
 /// final errorEither = Left<String, String>('Previous error');
 /// final errorResult = errorEither
 ///     .trust('Email')
-///     .verifyEither(); // Propagates the error
+///     .verify(); // Throws FieldInitializationError
 /// ```
 extension TrustExtensionEither<L, R> on Either<L, R> {
   /// Creates a synchronous validation step for the value of this [Either].
@@ -202,14 +203,14 @@ extension TrustExtensionEither<L, R> on Either<L, R> {
   /// // Success case
   /// final rightEither = Right<String, String>('valid@email.com');
   /// final step = rightEither.trust('Email');
-  /// final result = step.isEmail().verifyEither();
-  /// // result is Right('valid@email.com')
+  /// final result = step.isEmail().verify();
+  /// // result is 'valid@email.com'
   ///
   /// // Error case
   /// final leftEither = Left<String, String>('Database error');
   /// final errorStep = leftEither.trust('Email');
-  /// final errorResult = errorStep.verifyEither();
-  /// // errorResult is Left(FieldInitializationError('Email', 'Database error', ...))
+  /// final errorResult = errorStep.verify();
+  /// // Throws FieldInitializationError('Email', 'Database error', ...)
   /// ```
   SyncValidationStep<R> trust([String fieldName = '']) => fold(
     (l) => ._(
@@ -232,7 +233,7 @@ extension TrustExtensionEither<L, R> on Either<L, R> {
 ///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .verifyEither();
+///     .verify();
 /// ```
 extension TrustExtensionTaskEither<L, R> on TaskEither<L, R> {
   /// Creates an asynchronous validation step for the right value of this [TaskEither].
@@ -250,7 +251,7 @@ extension TrustExtensionTaskEither<L, R> on TaskEither<L, R> {
   /// Example:
   /// ```dart
   /// final step = TaskEither.right('test@example.com').trust('Email');
-  /// final result = await step.isNotEmpty().isEmail().verifyEither();
+  /// final result = await step.isNotEmpty().isEmail().verify();
   /// ```
   AsyncValidationStep<R> trust([String fieldName = '']) => ._(
     value: flatMap((right) => TaskEither.right(right)).mapLeft(

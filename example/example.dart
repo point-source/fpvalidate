@@ -1,7 +1,7 @@
 import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() async {
-  print('=== fpvalidate Examples ===\n');
+  print('=== trust_but_verify Examples ===\n');
 
   // Basic string validation
   try {
@@ -55,16 +55,18 @@ void main() async {
   print(urlResult);
 
   // Nullable validation
-  // ignore: avoid-unnecessary-type-casts
-  final optionalEmail = ('optional@example.com' as String?)
-      .trust('Optional Email')
-      .isNotNull()
-      .verifyEither()
-      .fold(
-        (error) => '❌ Optional email validation failed: ${error.message}',
-        (value) => '✅ Valid optional email: $value',
-      );
-  print(optionalEmail);
+  try {
+    // ignore: avoid-unnecessary-type-casts
+    final optionalEmail = ('optional@example.com' as String?)
+        .trust('Optional Email')
+        .isNotNull()
+        .verify();
+    print('✅ Valid optional email: $optionalEmail');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('❌ Optional email validation failed: ${e.message}');
+    }
+  }
 
   // Batch validation
   final batchResult =
@@ -94,33 +96,32 @@ void main() async {
       );
   print(customResult);
 
-  // Async validation with TaskEither
-  final asyncResult = await 'async@example.com'
-      .trust('Async Email')
-      .isNotEmpty()
-      .isEmail()
-      .toAsync()
-      .ensure(
-        (email) => Future.value(email.contains('async')),
-        (fieldName) => '$fieldName must contain "async"',
-      )
-      .tryMap((email) async {
-        // Simulate async validation
-        await Future.delayed(Duration(milliseconds: 100));
-        if (email.contains('async')) {
-          return email;
-        }
-        throw Exception('Email must contain "async"');
-      }, (fieldName) => '$fieldName must contain "async"')
-      .verifyTaskEither()
-      .run()
-      .then(
-        (either) => either.fold(
-          (error) => '❌ Async validation failed: ${error.message}',
-          (value) => '✅ Async validation passed: $value',
-        ),
-      );
-  print(asyncResult);
+  // Async validation with Future
+  try {
+    final asyncResult = await 'async@example.com'
+        .trust('Async Email')
+        .isNotEmpty()
+        .isEmail()
+        .toAsync()
+        .ensure(
+          (email) => Future.value(email.contains('async')),
+          (fieldName) => '$fieldName must contain "async"',
+        )
+        .tryMap((email) async {
+          // Simulate async validation
+          await Future.delayed(Duration(milliseconds: 100));
+          if (email.contains('async')) {
+            return email;
+          }
+          throw Exception('Email must contain "async"');
+        }, (fieldName) => '$fieldName must contain "async"')
+        .verify();
+    print('✅ Async validation passed: $asyncResult');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('❌ Async validation failed: ${e.message}');
+    }
+  }
 
   // Async validation with Either
   final asyncEitherResult = await 'async@example.com'
@@ -138,25 +139,17 @@ void main() async {
   print(asyncEitherResult);
 
   // Date and time validation
-  final dateResult = '2023-12-25'
-      .trust('Date')
-      .isIsoDate()
-      .verifyEither()
-      .fold(
-        (error) => '❌ Date validation failed: ${error.message}',
-        (value) => '✅ Valid date: $value',
-      );
-  print(dateResult);
+  try {
+    final date = '2023-12-25'.trust('Date').isIsoDate().verify();
+    print('✅ Valid date: $date');
 
-  final timeResult = '14:30'
-      .trust('Time')
-      .isTime24Hour()
-      .verifyEither()
-      .fold(
-        (error) => '❌ Time validation failed: ${error.message}',
-        (value) => '✅ Valid time: $value',
-      );
-  print(timeResult);
+    final time = '14:30'.trust('Time').isTime24Hour().verify();
+    print('✅ Valid time: $time');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('❌ Date/Time validation failed: ${e.message}');
+    }
+  }
 
   // Error handling with errorOrNull
   final errorOrNullResult = ''.trust('Empty String').isNotEmpty().errorOrNull();
@@ -170,71 +163,26 @@ void main() async {
       .asFormValidator();
   print('Form validator result: ${formValidatorResult ?? 'No error'}');
 
-  // notEmpty with allowWhitespace parameter
-  final whitespaceResult = '   '
-      .trust('Whitespace String')
-      .isNotEmpty(allowWhitespace: true)
-      .verifyEither()
-      .fold(
-        (error) => '❌ Whitespace validation failed: ${error.message}',
-        (value) => '✅ Whitespace validation passed: $value',
-      );
-  print(whitespaceResult);
+  // Additional validators with verify()
+  try {
+    final whitespace = '   '
+        .trust('Whitespace String')
+        .isNotEmpty(allowWhitespace: true)
+        .verify();
+    print('✅ Whitespace validation passed: $whitespace');
 
-  // Type conversion with toInt()
-  final intConversionResult = '123'
-      .trust('Number String')
-      .toInt()
-      .verifyEither()
-      .fold(
-        (error) => '❌ Int conversion failed: ${error.message}',
-        (value) =>
-            '✅ Int conversion passed: $value (type: ${value.runtimeType})',
-      );
-  print(intConversionResult);
+    final intVal = '123'.trust('Number String').toInt().verify();
+    print('✅ Int conversion passed: $intVal');
 
-  // String isOneOf validation
-  final statusResult = 'active'
-      .trust('Status')
-      .isOneOf(['active', 'inactive', 'pending'])
-      .verifyEither()
-      .fold(
-        (error) => '❌ Status validation failed: ${error.message}',
-        (value) => '✅ Valid status: $value',
-      );
-  print(statusResult);
-
-  // Case-insensitive string isOneOf validation
-  final countryResult = 'USA'
-      .trust('Country')
-      .isOneOf(['USA', 'UK', 'CANADA'], caseInsensitive: true)
-      .verifyEither()
-      .fold(
-        (error) => '❌ Country validation failed: ${error.message}',
-        (value) => '✅ Valid country: $value',
-      );
-  print(countryResult);
-
-  // Numeric isOneOf validation
-  final priorityResult = 3
-      .trust('Priority')
-      .isOneOf([1, 2, 3, 4, 5])
-      .verifyEither()
-      .fold(
-        (error) => '❌ Priority validation failed: ${error.message}',
-        (value) => '✅ Valid priority: $value',
-      );
-  print(priorityResult);
-
-  // Combined validation with isOneOf
-  final userRoleResult = 'admin'
-      .trust('Role')
-      .isNotEmpty()
-      .isOneOf(['admin', 'user', 'moderator'])
-      .verifyEither()
-      .fold(
-        (error) => '❌ Role validation failed: ${error.message}',
-        (value) => '✅ Valid role: $value',
-      );
-  print(userRoleResult);
+    final role = 'admin'.trust('Role').isNotEmpty().isOneOf([
+      'admin',
+      'user',
+      'moderator',
+    ]).verify();
+    print('✅ Valid role: $role');
+  } catch (e) {
+    if (e is ValidationError) {
+      print('❌ Validation failed: ${e.message}');
+    }
+  }
 }
