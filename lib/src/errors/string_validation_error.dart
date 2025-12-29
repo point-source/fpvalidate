@@ -14,6 +14,10 @@ class EmptyStringValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  EmptyStringValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidEmailValidationError extends StringValidationError {
@@ -22,6 +26,10 @@ class InvalidEmailValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidEmailValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidUrlValidationError extends StringValidationError {
@@ -30,6 +38,10 @@ class InvalidUrlValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidUrlValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPhoneValidationError extends StringValidationError {
@@ -38,6 +50,10 @@ class InvalidPhoneValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPhoneValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPatternValidationError extends StringValidationError {
@@ -46,6 +62,10 @@ class InvalidPatternValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPatternValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class MissingSubstringValidationError extends StringValidationError {
@@ -54,6 +74,10 @@ class MissingSubstringValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  MissingSubstringValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPrefixValidationError extends StringValidationError {
@@ -62,6 +86,10 @@ class InvalidPrefixValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPrefixValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidSuffixValidationError extends StringValidationError {
@@ -70,6 +98,10 @@ class InvalidSuffixValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidSuffixValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidAlphanumericValidationError extends StringValidationError {
@@ -78,6 +110,10 @@ class InvalidAlphanumericValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidAlphanumericValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidLettersOnlyValidationError extends StringValidationError {
@@ -86,6 +122,10 @@ class InvalidLettersOnlyValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidLettersOnlyValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidDigitsOnlyValidationError extends StringValidationError {
@@ -94,6 +134,10 @@ class InvalidDigitsOnlyValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidDigitsOnlyValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidUuidValidationError extends StringValidationError {
@@ -102,6 +146,10 @@ class InvalidUuidValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidUuidValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidCreditCardValidationError extends StringValidationError {
@@ -110,6 +158,10 @@ class InvalidCreditCardValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidCreditCardValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPostalCodeValidationError extends StringValidationError {
@@ -118,6 +170,10 @@ class InvalidPostalCodeValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPostalCodeValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidIsoDateValidationError extends StringValidationError {
@@ -126,6 +182,10 @@ class InvalidIsoDateValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidIsoDateValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidTime24HourValidationError extends StringValidationError {
@@ -134,6 +194,10 @@ class InvalidTime24HourValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidTime24HourValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidAllowedValueValidationError extends StringValidationError {
@@ -142,6 +206,10 @@ class InvalidAllowedValueValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidAllowedValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidForbiddenValueValidationError extends StringValidationError {
@@ -150,6 +218,10 @@ class InvalidForbiddenValueValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidForbiddenValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidLengthValidationError extends StringValidationError {
@@ -158,6 +230,10 @@ class InvalidLengthValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidLengthValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidNumberFormatValidationError extends StringValidationError {
@@ -166,4 +242,8 @@ class InvalidNumberFormatValidationError extends StringValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidNumberFormatValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }

@@ -1,3 +1,16 @@
+## 1.0.0
+
+- **BREAKING**: Renamed package from `fpvalidate` to `trust_but_verify`
+- **BREAKING**: Renamed `field()` to `trust()` - starts a validation chain
+- **BREAKING**: Renamed `validate()` to `verify()` - executes validation and returns result
+- **BREAKING**: Renamed `validateEither()` to `verifyEither()` - executes validation returning Either
+- **BREAKING**: Renamed `validateTaskEither()` to `verifyTaskEither()` - returns TaskEither
+- **BREAKING**: Renamed `validateAsync()` to `verifyAsync()` - async batch validation
+- **NEW**: Field names are now optional - use `trust()` without arguments for generic messages
+- **NEW**: Custom error messages via lambda in `verify()` - e.g., `verify((fieldName) => 'Custom $fieldName error')`
+- **NEW**: All error classes now have `copyWith({String? message})` for error message customization
+- **NEW**: Improved default messages with cleaner format (e.g., "Email cannot be empty" instead of "Field Email is empty")
+
 ## 0.5.0
 
 - **BREAKING**: Updated SDK constraint to ^3.10.0
@@ -38,7 +51,7 @@
 
 - Added field extensions for Either and TaskEither types from fpdart
 - You can now start validation chains directly from Right, Left, and TaskEither values
-- Permit `FutureOr` in async `check` and `tryMap` methods
+- Permit `FutureOr` in async `ensure` and `tryMap` methods
 - Added `isOneOf()` method for string and numeric validation
 - Added `isNoneOf()` method for string and numeric validation
 - Renamed `notEmpty()` to `isNotEmpty()` for consistency
@@ -53,6 +66,6 @@
 - Numeric validators: min/max, range, even/odd, positive/negative, power of 2, perfect square, port number
 - Batch validation for multiple fields
 - Async validation support
-- Custom validation with check() and tryMap()
+- Custom validation with ensure() and tryMap()
 - Error handling with descriptive messages
 - Nullable field support

@@ -1,11 +1,11 @@
 import 'package:test/test.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('NumExtension', () {
     group('min', () {
       test('should succeed when value is greater than min', () {
-        final result = 10.field('Number').min(5).validateEither();
+        final result = 10.trust('Number').min(5).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -14,7 +14,7 @@ void main() {
       });
 
       test('should succeed when value equals min', () {
-        final result = 5.field('Number').min(5).validateEither();
+        final result = 5.trust('Number').min(5).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -23,21 +23,21 @@ void main() {
       });
 
       test('should fail when value is less than min', () {
-        final result = 3.field('Number').min(5).validateEither();
+        final result = 3.trust('Number').min(5).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
           expect(
             error.message,
             equals(
-              'Value 3 of field Number must be greater than or equal to 5',
+              'Number must be at least 5 (got 3)',
             ),
           );
         }, (value) => fail('Should return error'));
       });
 
       test('should work with negative numbers', () {
-        final result = (-5).field('Number').min(-10).validateEither();
+        final result = (-5).trust('Number').min(-10).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -48,7 +48,7 @@ void main() {
 
     group('max', () {
       test('should succeed when value is less than max', () {
-        final result = 5.field('Number').max(10).validateEither();
+        final result = 5.trust('Number').max(10).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -57,7 +57,7 @@ void main() {
       });
 
       test('should succeed when value equals max', () {
-        final result = 10.field('Number').max(10).validateEither();
+        final result = 10.trust('Number').max(10).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -66,13 +66,13 @@ void main() {
       });
 
       test('should fail when value is greater than max', () {
-        final result = 15.field('Number').max(10).validateEither();
+        final result = 15.trust('Number').max(10).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
           expect(
             error.message,
-            equals('Value 15 of field Number must be less than or equal to 10'),
+            equals('Number must be at most 10 (got 15)'),
           );
         }, (value) => fail('Should return error'));
       });
@@ -80,7 +80,7 @@ void main() {
 
     group('isEven', () {
       test('should succeed with even numbers', () {
-        final result = 4.field('Number').isEven().validateEither();
+        final result = 4.trust('Number').isEven().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -89,16 +89,16 @@ void main() {
       });
 
       test('should fail with odd numbers', () {
-        final result = 5.field('Number').isEven().validateEither();
+        final result = 5.trust('Number').isEven().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
-          expect(error.message, equals('Value 5 of field Number must be even'));
+          expect(error.message, equals('Number must be even (got 5)'));
         }, (value) => fail('Should return error'));
       });
 
       test('should work with zero', () {
-        final result = 0.field('Number').isEven().validateEither();
+        final result = 0.trust('Number').isEven().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -107,7 +107,7 @@ void main() {
       });
 
       test('should work with negative even numbers', () {
-        final result = (-2).field('Number').isEven().validateEither();
+        final result = (-2).trust('Number').isEven().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -118,7 +118,7 @@ void main() {
 
     group('isOdd', () {
       test('should succeed with odd numbers', () {
-        final result = 5.field('Number').isOdd().validateEither();
+        final result = 5.trust('Number').isOdd().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -127,16 +127,16 @@ void main() {
       });
 
       test('should fail with even numbers', () {
-        final result = 4.field('Number').isOdd().validateEither();
+        final result = 4.trust('Number').isOdd().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
-          expect(error.message, equals('Value 4 of field Number must be odd'));
+          expect(error.message, equals('Number must be odd (got 4)'));
         }, (value) => fail('Should return error'));
       });
 
       test('should work with negative odd numbers', () {
-        final result = (-3).field('Number').isOdd().validateEither();
+        final result = (-3).trust('Number').isOdd().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -147,7 +147,7 @@ void main() {
 
     group('isPositive', () {
       test('should succeed with positive numbers', () {
-        final result = 5.field('Number').isPositive().validateEither();
+        final result = 5.trust('Number').isPositive().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -156,7 +156,7 @@ void main() {
       });
 
       test('should fail with zero', () {
-        final result = 0.field('Number').isPositive().validateEither();
+        final result = 0.trust('Number').isPositive().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -165,7 +165,7 @@ void main() {
       });
 
       test('should fail with negative numbers', () {
-        final result = (-5).field('Number').isPositive().validateEither();
+        final result = (-5).trust('Number').isPositive().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -176,7 +176,7 @@ void main() {
 
     group('isNonNegative', () {
       test('should succeed with positive numbers', () {
-        final result = 5.field('Number').isNonNegative().validateEither();
+        final result = 5.trust('Number').isNonNegative().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -185,7 +185,7 @@ void main() {
       });
 
       test('should succeed with zero', () {
-        final result = 0.field('Number').isNonNegative().validateEither();
+        final result = 0.trust('Number').isNonNegative().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -194,7 +194,7 @@ void main() {
       });
 
       test('should fail with negative numbers', () {
-        final result = (-5).field('Number').isNonNegative().validateEither();
+        final result = (-5).trust('Number').isNonNegative().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -205,7 +205,7 @@ void main() {
 
     group('isNegative', () {
       test('should succeed with negative numbers', () {
-        final result = (-5).field('Number').isNegative().validateEither();
+        final result = (-5).trust('Number').isNegative().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -214,7 +214,7 @@ void main() {
       });
 
       test('should fail with zero', () {
-        final result = 0.field('Number').isNegative().validateEither();
+        final result = 0.trust('Number').isNegative().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -223,7 +223,7 @@ void main() {
       });
 
       test('should fail with positive numbers', () {
-        final result = 5.field('Number').isNegative().validateEither();
+        final result = 5.trust('Number').isNegative().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -234,7 +234,7 @@ void main() {
 
     group('isNonPositive', () {
       test('should succeed with negative numbers', () {
-        final result = (-5).field('Number').isNonPositive().validateEither();
+        final result = (-5).trust('Number').isNonPositive().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -243,7 +243,7 @@ void main() {
       });
 
       test('should succeed with zero', () {
-        final result = 0.field('Number').isNonPositive().validateEither();
+        final result = 0.trust('Number').isNonPositive().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -252,7 +252,7 @@ void main() {
       });
 
       test('should fail with positive numbers', () {
-        final result = 5.field('Number').isNonPositive().validateEither();
+        final result = 5.trust('Number').isNonPositive().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -263,7 +263,7 @@ void main() {
 
     group('isInt', () {
       test('should succeed with integer values', () {
-        final result = 5.field('Number').isInt().validateEither();
+        final result = 5.trust('Number').isInt().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
           expect(value, isA<int>());
@@ -272,7 +272,7 @@ void main() {
       });
 
       test('should succeed with double that equals integer', () {
-        final result = 5.0.field('Number').isInt().validateEither();
+        final result = 5.0.trust('Number').isInt().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
           expect(value, isA<int>());
@@ -281,7 +281,7 @@ void main() {
       });
 
       test('should fail with non-integer double', () {
-        final result = 5.5.field('Number').isInt().validateEither();
+        final result = 5.5.trust('Number').isInt().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -290,7 +290,7 @@ void main() {
       });
 
       test('should transform type from num to int', () {
-        final result = 10.field('Number').isInt().min(5).validateEither();
+        final result = 10.trust('Number').isInt().min(5).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
           expect(value, isA<int>());
@@ -303,7 +303,7 @@ void main() {
       test('should succeed with powers of 2', () {
         final powers = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
         for (final power in powers) {
-          final result = power.field('Number').isPowerOfTwo().validateEither();
+          final result = power.trust('Number').isPowerOfTwo().verifyEither();
           expect(
             result.isRight(),
             isTrue,
@@ -320,9 +320,9 @@ void main() {
         final nonPowers = [0, 3, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15];
         for (final nonPower in nonPowers) {
           final result = nonPower
-              .field('Number')
+              .trust('Number')
               .isPowerOfTwo()
-              .validateEither();
+              .verifyEither();
           expect(
             result.isLeft(),
             isTrue,
@@ -336,7 +336,7 @@ void main() {
       });
 
       test('should fail with negative numbers', () {
-        final result = (-2).field('Number').isPowerOfTwo().validateEither();
+        final result = (-2).trust('Number').isPowerOfTwo().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -345,7 +345,7 @@ void main() {
       });
 
       test('should work with double powers of 2', () {
-        final result = 8.0.field('Number').isPowerOfTwo().validateEither();
+        final result = 8.0.trust('Number').isPowerOfTwo().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -358,7 +358,7 @@ void main() {
       test('should succeed with valid port numbers', () {
         final validPorts = [1, 80, 443, 8080, 3000, 5000, 65535];
         for (final port in validPorts) {
-          final result = port.field('Port').isPortNumber().validateEither();
+          final result = port.trust('Port').isPortNumber().verifyEither();
           expect(
             result.isRight(),
             isTrue,
@@ -374,7 +374,7 @@ void main() {
       test('should fail with invalid port numbers', () {
         final invalidPorts = [0, 65536, 70000, -1, -100];
         for (final port in invalidPorts) {
-          final result = port.field('Port').isPortNumber().validateEither();
+          final result = port.trust('Port').isPortNumber().verifyEither();
           expect(
             result.isLeft(),
             isTrue,
@@ -394,9 +394,9 @@ void main() {
     group('isWithinPercentage', () {
       test('should succeed when value is within percentage range', () {
         final result = 95
-            .field('Value')
+            .trust('Value')
             .isWithinPercentage(100, 10)
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -406,9 +406,9 @@ void main() {
 
       test('should succeed when value equals target', () {
         final result = 100
-            .field('Value')
+            .trust('Value')
             .isWithinPercentage(100, 10)
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -418,9 +418,9 @@ void main() {
 
       test('should succeed when value is at boundary', () {
         final result = 90
-            .field('Value')
+            .trust('Value')
             .isWithinPercentage(100, 10)
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -430,9 +430,9 @@ void main() {
 
       test('should fail when value is outside percentage range', () {
         final result = 85
-            .field('Value')
+            .trust('Value')
             .isWithinPercentage(100, 10)
-            .validateEither();
+            .verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Value'));
@@ -442,9 +442,9 @@ void main() {
 
       test('should work with different percentages', () {
         final result = 98
-            .field('Value')
+            .trust('Value')
             .isWithinPercentage(100, 5)
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -455,7 +455,7 @@ void main() {
 
     group('inRange', () {
       test('should succeed when value is within range', () {
-        final result = 5.field('Number').inRange(1, 10).validateEither();
+        final result = 5.trust('Number').inRange(1, 10).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -464,7 +464,7 @@ void main() {
       });
 
       test('should succeed when value equals min', () {
-        final result = 1.field('Number').inRange(1, 10).validateEither();
+        final result = 1.trust('Number').inRange(1, 10).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -473,7 +473,7 @@ void main() {
       });
 
       test('should succeed when value equals max', () {
-        final result = 10.field('Number').inRange(1, 10).validateEither();
+        final result = 10.trust('Number').inRange(1, 10).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -482,31 +482,31 @@ void main() {
       });
 
       test('should fail when value is below range', () {
-        final result = 0.field('Number').inRange(1, 10).validateEither();
+        final result = 0.trust('Number').inRange(1, 10).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
           expect(
             error.message,
-            equals('Value 0 of field Number must be between 1 and 10'),
+            equals('Number must be between 1 and 10 (got 0)'),
           );
         }, (value) => fail('Should return error'));
       });
 
       test('should fail when value is above range', () {
-        final result = 15.field('Number').inRange(1, 10).validateEither();
+        final result = 15.trust('Number').inRange(1, 10).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
           expect(
             error.message,
-            equals('Value 15 of field Number must be between 1 and 10'),
+            equals('Number must be between 1 and 10 (got 15)'),
           );
         }, (value) => fail('Should return error'));
       });
 
       test('should work with negative ranges', () {
-        final result = (-5).field('Number').inRange(-10, 0).validateEither();
+        final result = (-5).trust('Number').inRange(-10, 0).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -518,11 +518,11 @@ void main() {
     group('chaining', () {
       test('should work with multiple validators', () {
         final result = 24
-            .field('Age')
+            .trust('Age')
             .min(18)
             .max(65)
             .isEven()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -533,18 +533,18 @@ void main() {
 
       test('should fail on first validation failure', () {
         final result = 15
-            .field('Age')
+            .trust('Age')
             .min(18)
             .max(65)
             .isEven()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Age'));
           expect(
             error.message,
-            equals('Value 15 of field Age must be greater than or equal to 18'),
+            equals('Age must be at least 18 (got 15)'),
           );
         }, (value) => fail('Should return error'));
       });
@@ -552,13 +552,13 @@ void main() {
 
     group('isOneOf', () {
       test('should succeed when value is in allowed values list', () {
-        final result = 3.field('Priority').isOneOf([
+        final result = 3.trust('Priority').isOneOf([
           1,
           2,
           3,
           4,
           5,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -567,13 +567,13 @@ void main() {
       });
 
       test('should fail when value is not in allowed values list', () {
-        final result = 7.field('Priority').isOneOf([
+        final result = 7.trust('Priority').isOneOf([
           1,
           2,
           3,
           4,
           5,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Priority'));
@@ -585,7 +585,7 @@ void main() {
       });
 
       test('should work with single allowed value', () {
-        final result = 42.field('Number').isOneOf([42]).validateEither();
+        final result = 42.trust('Number').isOneOf([42]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -594,7 +594,7 @@ void main() {
       });
 
       test('should work with empty list (always fails)', () {
-        final result = 5.field('Number').isOneOf([]).validateEither();
+        final result = 5.trust('Number').isOneOf([]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -603,11 +603,11 @@ void main() {
       });
 
       test('should work with negative numbers', () {
-        final result = (-1).field('Number').isOneOf([
+        final result = (-1).trust('Number').isOneOf([
           -1,
           0,
           1,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -616,11 +616,11 @@ void main() {
       });
 
       test('should work with doubles', () {
-        final result = 3.14.field('Pi').isOneOf([
+        final result = 3.14.trust('Pi').isOneOf([
           3.14,
           2.71,
           1.41,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -630,12 +630,12 @@ void main() {
 
       test('should work with mixed int and double values', () {
         // ignore: avoid-unnecessary-type-casts
-        final result = (5 as num).field('Number').isOneOf([
+        final result = (5 as num).trust('Number').isOneOf([
           1,
           2.5,
           5,
           10.0,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -646,11 +646,11 @@ void main() {
 
     group('isNoneOf', () {
       test('should succeed when value is not in forbidden values list', () {
-        final result = 3000.field('Port').isNoneOf([
+        final result = 3000.trust('Port').isNoneOf([
           80,
           443,
           8080,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -659,11 +659,11 @@ void main() {
       });
 
       test('should fail when value is in forbidden values list', () {
-        final result = 80.field('Port').isNoneOf([
+        final result = 80.trust('Port').isNoneOf([
           80,
           443,
           8080,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Port'));
@@ -675,7 +675,7 @@ void main() {
       });
 
       test('should work with single forbidden value', () {
-        final result = 3000.field('Port').isNoneOf([8080]).validateEither();
+        final result = 3000.trust('Port').isNoneOf([8080]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -684,7 +684,7 @@ void main() {
       });
 
       test('should work with empty list (always succeeds)', () {
-        final result = 5000.field('Port').isNoneOf([]).validateEither();
+        final result = 5000.trust('Port').isNoneOf([]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -693,11 +693,11 @@ void main() {
       });
 
       test('should work with negative numbers', () {
-        final result = (-5).field('Number').isNoneOf([
+        final result = (-5).trust('Number').isNoneOf([
           -1,
           0,
           1,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -706,11 +706,11 @@ void main() {
       });
 
       test('should fail with negative numbers when value matches', () {
-        final result = (-1).field('Number').isNoneOf([
+        final result = (-1).trust('Number').isNoneOf([
           -1,
           0,
           1,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
@@ -719,11 +719,11 @@ void main() {
       });
 
       test('should work with doubles', () {
-        final result = 2.5.field('Rating').isNoneOf([
+        final result = 2.5.trust('Rating').isNoneOf([
           0.0,
           1.0,
           2.0,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -732,11 +732,11 @@ void main() {
       });
 
       test('should fail with doubles when value matches', () {
-        final result = 2.0.field('Rating').isNoneOf([
+        final result = 2.0.trust('Rating').isNoneOf([
           0.0,
           1.0,
           2.0,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Rating'));
@@ -749,12 +749,12 @@ void main() {
 
       test('should work with mixed int and double values', () {
         // ignore: avoid-unnecessary-type-casts
-        final result = (7 as num).field('Number').isNoneOf([
+        final result = (7 as num).trust('Number').isNoneOf([
           1,
           2.5,
           5,
           10.0,
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -766,12 +766,12 @@ void main() {
         'should fail with mixed int and double values when value matches',
         () {
           // ignore: avoid-unnecessary-type-casts
-          final result = (5 as num).field('Number').isNoneOf([
+          final result = (5 as num).trust('Number').isNoneOf([
             1,
             2.5,
             5,
             10.0,
-          ]).validateEither();
+          ]).verifyEither();
           expect(result.isLeft(), isTrue);
           result.fold((error) {
             expect(error.fieldName, equals('Number'));
@@ -784,7 +784,7 @@ void main() {
       );
 
       test('should work with zero', () {
-        final result = 0.field('Number').isNoneOf([-1, 1]).validateEither();
+        final result = 0.trust('Number').isNoneOf([-1, 1]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -793,7 +793,7 @@ void main() {
       });
 
       test('should fail with zero when it is forbidden', () {
-        final result = 0.field('Number').isNoneOf([-1, 0, 1]).validateEither();
+        final result = 0.trust('Number').isNoneOf([-1, 0, 1]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));

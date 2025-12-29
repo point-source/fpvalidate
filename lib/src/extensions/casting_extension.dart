@@ -11,18 +11,18 @@ part of '../validation_step.dart';
 /// // Validate and cast a dynamic value to a specific type
 /// final Object? value = 42;
 /// final result = value
-///     .field('Number')
+///     .trust('Number')
 ///     .isType<int>()
 ///     .min(0)
 ///     .max(100)
-///     .validateEither();
+///     .verifyEither();
 ///
 /// // Handle type mismatch
 /// final Object? stringValue = 'not a number';
 /// final error = stringValue
-///     .field('Value')
+///     .trust('Value')
 ///     .isType<int>()
-///     .validateEither();
+///     .verifyEither();
 /// // Result: Left(TypeMismatchValidationError('Value', 'Value must be of type int'))
 /// ```
 extension CastingExtension on SyncValidationStep {
@@ -41,20 +41,20 @@ extension CastingExtension on SyncValidationStep {
   /// // Cast dynamic to int and apply numeric validators
   /// final Object? value = 42;
   /// final result = value
-  ///     .field('Age')
+  ///     .trust('Age')
   ///     .isType<int>()
   ///     .min(18)
   ///     .max(65)
-  ///     .validateEither();
+  ///     .verifyEither();
   ///
   /// // Cast dynamic to String and apply string validators
   /// final Object? email = 'user@example.com';
   /// final emailResult = email
-  ///     .field('Email')
+  ///     .trust('Email')
   ///     .isType<String>()
   ///     .isNotEmpty()
   ///     .isEmail()
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   ///
   /// Returns a [SyncValidationStep<T>] that can be used to chain additional

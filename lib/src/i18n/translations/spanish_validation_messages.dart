@@ -1,171 +1,185 @@
-import 'package:fpvalidate/src/i18n/validation_messages.dart';
+import 'package:trust_but_verify/src/i18n/validation_messages.dart';
 
 /// Complete Spanish implementation of validation messages.
+///
+/// When [fieldName] is empty, messages use "El valor" (The value) as a generic placeholder.
 class SpanishValidationMessages implements ValidationMessages {
   const SpanishValidationMessages();
 
+  /// Helper to get display name - uses "El valor" when fieldName is empty.
+  String _displayName(String fieldName) =>
+      fieldName.isEmpty ? 'El valor' : fieldName;
+
   @override
-  String emptyField(String fieldName) => 'El campo $fieldName está vacío';
+  String emptyField(String fieldName) =>
+      '${_displayName(fieldName)} no puede estar vacío';
 
   @override
   String minLength(String fieldName, int length) =>
-      '$fieldName debe tener al menos $length caracteres';
+      '${_displayName(fieldName)} debe tener al menos $length caracteres';
 
   @override
   String maxLength(String fieldName, int length) =>
-      '$fieldName no debe tener más de $length caracteres';
+      '${_displayName(fieldName)} no debe tener más de $length caracteres';
 
   @override
   String invalidEmail(String fieldName) =>
-      '$fieldName debe ser una dirección de correo válida';
+      '${_displayName(fieldName)} debe ser una dirección de correo válida';
 
   @override
-  String invalidUrl(String fieldName) => '$fieldName debe ser una URL válida';
+  String invalidUrl(String fieldName) =>
+      '${_displayName(fieldName)} debe ser una URL válida';
 
   @override
   String invalidPhone(String fieldName) =>
-      '$fieldName debe ser un número de teléfono válido';
+      '${_displayName(fieldName)} debe ser un número de teléfono válido';
 
   @override
   String invalidPattern(String fieldName, String description) =>
-      '$fieldName debe coincidir con el patrón: $description';
+      '${_displayName(fieldName)} debe coincidir con el patrón: $description';
 
   @override
   String missingSubstring(String fieldName, String substring) =>
-      '$fieldName debe contener "$substring"';
+      '${_displayName(fieldName)} debe contener "$substring"';
 
   @override
   String invalidPrefix(String fieldName, String prefix) =>
-      '$fieldName debe comenzar con "$prefix"';
+      '${_displayName(fieldName)} debe comenzar con "$prefix"';
 
   @override
   String invalidSuffix(String fieldName, String suffix) =>
-      '$fieldName debe terminar con "$suffix"';
+      '${_displayName(fieldName)} debe terminar con "$suffix"';
 
   @override
   String invalidAlphanumeric(String fieldName) =>
-      '$fieldName debe contener solo caracteres alfanuméricos';
+      '${_displayName(fieldName)} debe contener solo caracteres alfanuméricos';
 
   @override
   String invalidLettersOnly(String fieldName) =>
-      '$fieldName debe contener solo letras';
+      '${_displayName(fieldName)} debe contener solo letras';
 
   @override
   String invalidDigitsOnly(String fieldName) =>
-      '$fieldName debe contener solo dígitos';
+      '${_displayName(fieldName)} debe contener solo dígitos';
 
   @override
-  String invalidUuid(String fieldName) => '$fieldName debe ser un UUID válido';
+  String invalidUuid(String fieldName) =>
+      '${_displayName(fieldName)} debe ser un UUID válido';
 
   @override
   String invalidCreditCard(String fieldName) =>
-      '$fieldName debe ser un número de tarjeta de crédito válido';
+      '${_displayName(fieldName)} debe ser un número de tarjeta de crédito válido';
 
   @override
   String invalidPostalCode(String fieldName) =>
-      '$fieldName debe ser un código postal válido';
+      '${_displayName(fieldName)} debe ser un código postal válido';
 
   @override
   String invalidIsoDate(String fieldName) =>
-      '$fieldName debe estar en formato de fecha ISO (YYYY-MM-DD)';
+      '${_displayName(fieldName)} debe estar en formato de fecha ISO (YYYY-MM-DD)';
 
   @override
   String invalidDate(String fieldName) =>
-      '$fieldName debe ser una fecha válida';
+      '${_displayName(fieldName)} debe ser una fecha válida';
 
   @override
   String invalidTime24Hour(String fieldName) =>
-      '$fieldName debe estar en formato de 24 horas (HH:MM)';
+      '${_displayName(fieldName)} debe estar en formato de 24 horas (HH:MM)';
 
   @override
   String invalidTime24HourStrict(String fieldName) =>
-      '$fieldName debe estar en formato de 24 horas (HH:MM) con ceros iniciales';
+      '${_displayName(fieldName)} debe estar en formato de 24 horas (HH:MM) con ceros iniciales';
 
   @override
   String invalidAllowedValue(String fieldName, List<String> allowedValues) =>
-      '$fieldName debe ser uno de: ${allowedValues.join(', ')}';
+      '${_displayName(fieldName)} debe ser uno de: ${allowedValues.join(', ')}';
 
   @override
   String invalidForbiddenValue(
     String fieldName,
     List<String> forbiddenValues,
-  ) => '$fieldName no debe ser uno de: ${forbiddenValues.join(', ')}';
+  ) =>
+      '${_displayName(fieldName)} no debe ser uno de: ${forbiddenValues.join(', ')}';
 
   @override
   String invalidNumberFormat(String fieldName, String value) =>
-      'El valor $value del campo $fieldName no es un número';
+      '"$value" no es un número válido${fieldName.isEmpty ? '' : ' para ${_displayName(fieldName)}'}';
 
   @override
   String invalidMinValue(String fieldName, num value, num min) =>
-      'El valor $value del campo $fieldName debe ser mayor o igual a $min';
+      '${_displayName(fieldName)} debe ser al menos $min (tiene $value)';
 
   @override
   String invalidMaxValue(String fieldName, num value, num max) =>
-      'El valor $value del campo $fieldName debe ser menor o igual a $max';
+      '${_displayName(fieldName)} debe ser como máximo $max (tiene $value)';
 
   @override
   String invalidEvenNumber(String fieldName, num value) =>
-      'El valor $value del campo $fieldName debe ser par';
+      '${_displayName(fieldName)} debe ser par (tiene $value)';
 
   @override
   String invalidOddNumber(String fieldName, num value) =>
-      'El valor $value del campo $fieldName debe ser impar';
+      '${_displayName(fieldName)} debe ser impar (tiene $value)';
 
   @override
   String invalidPositiveNumber(String fieldName) =>
-      '$fieldName debe ser positivo';
+      '${_displayName(fieldName)} debe ser positivo';
 
   @override
   String invalidNonNegativeNumber(String fieldName) =>
-      '$fieldName debe ser no negativo';
+      '${_displayName(fieldName)} debe ser no negativo';
 
   @override
   String invalidNegativeNumber(String fieldName) =>
-      '$fieldName debe ser negativo';
+      '${_displayName(fieldName)} debe ser negativo';
 
   @override
   String invalidNonPositiveNumber(String fieldName) =>
-      '$fieldName debe ser no positivo';
+      '${_displayName(fieldName)} debe ser no positivo';
 
   @override
   String invalidInteger(String fieldName) =>
-      '$fieldName debe ser un número entero';
+      '${_displayName(fieldName)} debe ser un número entero';
 
   @override
   String invalidPowerOfTwo(String fieldName) =>
-      '$fieldName debe ser una potencia de 2';
+      '${_displayName(fieldName)} debe ser una potencia de 2';
 
   @override
   String invalidPortNumber(String fieldName) =>
-      '$fieldName debe ser un número de puerto válido (1-65535)';
+      '${_displayName(fieldName)} debe ser un número de puerto válido (1-65535)';
 
   @override
   String invalidPercentageRange(
     String fieldName,
     double percentage,
     num target,
-  ) => '$fieldName debe estar dentro del $percentage% de $target';
+  ) =>
+      '${_displayName(fieldName)} debe estar dentro del $percentage% de $target';
 
   @override
   String invalidRange(String fieldName, num value, num min, num max) =>
-      'El valor $value del campo $fieldName debe estar entre $min y $max';
+      '${_displayName(fieldName)} debe estar entre $min y $max (tiene $value)';
 
   @override
   String invalidAllowedNumericValue(
     String fieldName,
     List<num> allowedValues,
-  ) => '$fieldName debe ser uno de: ${allowedValues.join(', ')}';
+  ) =>
+      '${_displayName(fieldName)} debe ser uno de: ${allowedValues.join(', ')}';
 
   @override
   String invalidForbiddenNumericValue(
     String fieldName,
     List<num> forbiddenValues,
-  ) => '$fieldName no debe ser uno de: ${forbiddenValues.join(', ')}';
+  ) =>
+      '${_displayName(fieldName)} no debe ser uno de: ${forbiddenValues.join(', ')}';
 
   @override
-  String nullField(String fieldName) => 'El campo $fieldName es nulo';
+  String nullField(String fieldName) =>
+      '${_displayName(fieldName)} no puede ser nulo';
 
   @override
   String typeMismatch(String fieldName, Type expectedType) =>
-      '$fieldName debe ser de tipo $expectedType';
+      '${_displayName(fieldName)} debe ser de tipo $expectedType';
 }

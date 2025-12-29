@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('ValidationError', () {

@@ -1,14 +1,14 @@
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 
 import 'package:test/test.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('CastingExtension', () {
     group('isType', () {
       test('should succeed when value is of the expected type (int)', () {
         final Object? value = 42;
-        final result = value.field('Number').isType<int>().validateEither();
+        final result = value.trust('Number').isType<int>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -19,7 +19,7 @@ void main() {
 
       test('should succeed when value is of the expected type (String)', () {
         final Object? value = 'hello';
-        final result = value.field('Text').isType<String>().validateEither();
+        final result = value.trust('Text').isType<String>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -30,7 +30,7 @@ void main() {
 
       test('should succeed when value is of the expected type (double)', () {
         final Object? value = 3.14;
-        final result = value.field('Pi').isType<double>().validateEither();
+        final result = value.trust('Pi').isType<double>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -41,7 +41,7 @@ void main() {
 
       test('should succeed when value is of the expected type (bool)', () {
         final Object? value = true;
-        final result = value.field('Flag').isType<bool>().validateEither();
+        final result = value.trust('Flag').isType<bool>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -52,7 +52,7 @@ void main() {
 
       test('should succeed when value is of the expected type (List)', () {
         final Object? value = [1, 2, 3];
-        final result = value.field('Numbers').isType<List>().validateEither();
+        final result = value.trust('Numbers').isType<List>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -63,7 +63,7 @@ void main() {
 
       test('should fail when value is not of the expected type (int)', () {
         final Object? value = 'not a number';
-        final result = value.field('Number').isType<int>().validateEither();
+        final result = value.trust('Number').isType<int>().verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -75,7 +75,7 @@ void main() {
 
       test('should fail when value is not of the expected type (String)', () {
         final Object? value = 42;
-        final result = value.field('Text').isType<String>().validateEither();
+        final result = value.trust('Text').isType<String>().verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -87,7 +87,7 @@ void main() {
 
       test('should fail when value is not of the expected type (double)', () {
         final Object? value = 42;
-        final result = value.field('Pi').isType<double>().validateEither();
+        final result = value.trust('Pi').isType<double>().verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -99,7 +99,7 @@ void main() {
 
       test('should fail when value is not of the expected type (bool)', () {
         final Object? value = 'not a bool';
-        final result = value.field('Flag').isType<bool>().validateEither();
+        final result = value.trust('Flag').isType<bool>().verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -112,11 +112,11 @@ void main() {
       test('should allow chaining with type-specific validators (int)', () {
         final Object? value = 42;
         final result = value
-            .field('Age')
+            .trust('Age')
             .isType<int>()
             .min(18)
             .max(65)
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -128,11 +128,11 @@ void main() {
       test('should allow chaining with type-specific validators (String)', () {
         final Object? value = 'test@example.com';
         final result = value
-            .field('Email')
+            .trust('Email')
             .isType<String>()
             .isNotEmpty()
             .isEmail()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -144,10 +144,10 @@ void main() {
       test('should fail when chained validator fails after type check', () {
         final Object? value = 10;
         final result = value
-            .field('Age')
+            .trust('Age')
             .isType<int>()
             .min(18)
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -158,7 +158,7 @@ void main() {
 
       test('should handle num type correctly with int value', () {
         final Object? value = 42;
-        final result = value.field('Number').isType<num>().validateEither();
+        final result = value.trust('Number').isType<num>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -169,7 +169,7 @@ void main() {
 
       test('should handle num type correctly with double value', () {
         final Object? value = 3.14;
-        final result = value.field('Number').isType<num>().validateEither();
+        final result = value.trust('Number').isType<num>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -180,7 +180,7 @@ void main() {
 
       test('should handle nullable types correctly', () {
         final Object? value = null;
-        final result = value.field('Optional').isType<int?>().validateEither();
+        final result = value.trust('Optional').isType<int?>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -190,7 +190,7 @@ void main() {
 
       test('should fail when non-null value expected but null provided', () {
         final Object? value = null;
-        final result = value.field('Required').isType<int>().validateEither();
+        final result = value.trust('Required').isType<int>().verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -202,7 +202,7 @@ void main() {
 
       test('should work with custom types', () {
         final Object? value = DateTime(2023, 1, 1);
-        final result = value.field('Date').isType<DateTime>().validateEither();
+        final result = value.trust('Date').isType<DateTime>().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -213,7 +213,7 @@ void main() {
 
       test('should fail with custom types when type mismatch', () {
         final Object? value = 'not a date';
-        final result = value.field('Date').isType<DateTime>().validateEither();
+        final result = value.trust('Date').isType<DateTime>().verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -226,9 +226,9 @@ void main() {
       test('should work with generic List types', () {
         final Object? value = <int>[1, 2, 3];
         final result = value
-            .field('Numbers')
+            .trust('Numbers')
             .isType<List<int>>()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {
@@ -240,9 +240,9 @@ void main() {
       test('should work with Map types', () {
         final Object? value = {'key': 'value'};
         final result = value
-            .field('Data')
+            .trust('Data')
             .isType<Map<String, String>>()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (v) {

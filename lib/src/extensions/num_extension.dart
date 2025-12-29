@@ -9,11 +9,11 @@ part of '../validation_step.dart';
 /// Example:
 /// ```dart
 /// final result = 25
-///     .field('Age')
+///     .trust('Age')
 ///     .min(18)
 ///     .max(65)
 ///     .isEven()
-///     .validateEither();
+///     .verifyEither();
 /// ```
 extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Validates that the value is greater than or equal to [min].
@@ -22,7 +22,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = age.field('Age').min(18).validateEither();
+  /// final result = age.trust('Age').min(18).verifyEither();
   /// ```
   SyncValidationStep<T> min(num min) => bind(
     (value) => value >= min
@@ -39,7 +39,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = age.field('Age').max(65).validateEither();
+  /// final result = age.trust('Age').max(65).verifyEither();
   /// ```
   SyncValidationStep<T> max(num max) => bind(
     (value) => value <= max
@@ -56,7 +56,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isEven().validateEither();
+  /// final result = number.trust('Number').isEven().verifyEither();
   /// ```
   SyncValidationStep<T> isEven() => bind(
     (value) => value % 2 == 0
@@ -73,7 +73,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isOdd().validateEither();
+  /// final result = number.trust('Number').isOdd().verifyEither();
   /// ```
   SyncValidationStep<T> isOdd() => bind(
     (value) => value % 2 == 1
@@ -90,7 +90,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isPositive().validateEither();
+  /// final result = number.trust('Number').isPositive().verifyEither();
   /// ```
   SyncValidationStep<T> isPositive() => bind(
     (value) => value > 0
@@ -107,7 +107,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isNonNegative().validateEither();
+  /// final result = number.trust('Number').isNonNegative().verifyEither();
   /// ```
   SyncValidationStep<T> isNonNegative() => bind(
     (value) => value >= 0
@@ -124,7 +124,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isNegative().validateEither();
+  /// final result = number.trust('Number').isNegative().verifyEither();
   /// ```
   SyncValidationStep<T> isNegative() => bind(
     (value) => value < 0
@@ -141,7 +141,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isNonPositive().validateEither();
+  /// final result = number.trust('Number').isNonPositive().verifyEither();
   /// ```
   SyncValidationStep<T> isNonPositive() => bind(
     (value) => value <= 0
@@ -166,11 +166,11 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Example:
   /// ```dart
   /// final result = 25.0
-  ///     .field('Age')
+  ///     .trust('Age')
   ///     .isInt()              // Converts num to int
   ///     .min(18)              // Now we can use int validators
   ///     .max(65)
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<int> isInt() => bind((value) {
     if (value is int) {
@@ -195,7 +195,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').isPowerOfTwo().validateEither();
+  /// final result = number.trust('Number').isPowerOfTwo().verifyEither();
   /// ```
   SyncValidationStep<T> isPowerOfTwo() => bind((value) {
     if (value <= 0) {
@@ -241,7 +241,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = port.field('Port').isPortNumber().validateEither();
+  /// final result = port.trust('Port').isPortNumber().verifyEither();
   /// ```
   SyncValidationStep<T> isPortNumber() => bind(
     (value) => value >= 1 && value <= 65535
@@ -265,9 +265,9 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Example:
   /// ```dart
   /// final result = measurement
-  ///     .field('Measurement')
+  ///     .trust('Measurement')
   ///     .isWithinPercentage(100.0, 5.0)  // Within 5% of 100
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<T> isWithinPercentage(num target, double percentage) =>
       bind((value) {
@@ -296,7 +296,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final result = age.field('Age').inRange(18, 65).validateEither();
+  /// final result = age.trust('Age').inRange(18, 65).verifyEither();
   /// ```
   SyncValidationStep<T> inRange(num min, num max) => bind(
     (value) => value >= min && value <= max
@@ -318,14 +318,14 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Example:
   /// ```dart
   /// final result = priority
-  ///     .field('Priority')
+  ///     .trust('Priority')
   ///     .isOneOf([1, 2, 3, 4, 5])
-  ///     .validateEither();
+  ///     .verifyEither();
   ///
   /// final result2 = rating
-  ///     .field('Rating')
+  ///     .trust('Rating')
   ///     .isOneOf([1.0, 2.0, 3.0, 4.0, 5.0])
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<T> isOneOf(List<T> allowedValues) => bind(
     (value) => allowedValues.contains(value)
@@ -350,14 +350,14 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Example:
   /// ```dart
   /// final result = port
-  ///     .field('Port')
+  ///     .trust('Port')
   ///     .isNoneOf([80, 443, 8080])
-  ///     .validateEither();
+  ///     .verifyEither();
   ///
   /// final result2 = rating
-  ///     .field('Rating')
+  ///     .trust('Rating')
   ///     .isNoneOf([0.0, 1.0, 2.0])
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<T> isNoneOf(List<T> forbiddenValues) => bind(
     (value) => !forbiddenValues.contains(value)

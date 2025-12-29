@@ -14,6 +14,10 @@ class InvalidMinValueValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidMinValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidMaxValueValidationError extends NumericValidationError {
@@ -22,6 +26,10 @@ class InvalidMaxValueValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidMaxValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidEvenNumberValidationError extends NumericValidationError {
@@ -30,6 +38,10 @@ class InvalidEvenNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidEvenNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidOddNumberValidationError extends NumericValidationError {
@@ -38,6 +50,10 @@ class InvalidOddNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidOddNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPositiveNumberValidationError extends NumericValidationError {
@@ -46,6 +62,10 @@ class InvalidPositiveNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPositiveNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidNonNegativeNumberValidationError extends NumericValidationError {
@@ -54,6 +74,10 @@ class InvalidNonNegativeNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidNonNegativeNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidNegativeNumberValidationError extends NumericValidationError {
@@ -62,6 +86,10 @@ class InvalidNegativeNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidNegativeNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidNonPositiveNumberValidationError extends NumericValidationError {
@@ -70,6 +98,10 @@ class InvalidNonPositiveNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidNonPositiveNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidIntegerValidationError extends NumericValidationError {
@@ -78,6 +110,10 @@ class InvalidIntegerValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidIntegerValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPowerOfTwoValidationError extends NumericValidationError {
@@ -86,6 +122,10 @@ class InvalidPowerOfTwoValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPowerOfTwoValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPortNumberValidationError extends NumericValidationError {
@@ -94,6 +134,10 @@ class InvalidPortNumberValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPortNumberValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidPercentageRangeValidationError extends NumericValidationError {
@@ -102,6 +146,10 @@ class InvalidPercentageRangeValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidPercentageRangeValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidRangeValidationError extends NumericValidationError {
@@ -110,6 +158,10 @@ class InvalidRangeValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidRangeValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidAllowedNumericValueValidationError extends NumericValidationError {
@@ -118,6 +170,10 @@ class InvalidAllowedNumericValueValidationError extends NumericValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidAllowedNumericValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }
 
 class InvalidForbiddenNumericValueValidationError
@@ -127,4 +183,8 @@ class InvalidForbiddenNumericValueValidationError
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  InvalidForbiddenNumericValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }

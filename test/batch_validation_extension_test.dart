@@ -1,19 +1,19 @@
 // ignore_for_file: avoid-unsafe-collection-methods
 
 import 'package:test/test.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('BatchValidationExtension', () {
     group('validateAsync', () {
       test('should validate all sync steps successfully', () async {
         final steps = [
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = await steps.validateAsync();
+        final result = await steps.verifyAsync();
 
         expect(result, hasLength(3));
         expect(result[0], equals('test@example.com'));
@@ -23,17 +23,17 @@ void main() {
 
       test('should validate mixed sync and async steps successfully', () async {
         final steps = <ValidationStep>[
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
           Future.value('password123')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
-          '25'.field('Age').toInt().min(18),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = await steps.validateAsync();
+        final result = await steps.verifyAsync();
 
         expect(result, hasLength(3));
         expect(result[0], equals('test@example.com'));
@@ -43,38 +43,38 @@ void main() {
 
       test('should throw first validation error', () {
         final steps = [
-          ''.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          ''.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        expect(() => steps.validateAsync(), throwsA(isA<ValidationError>()));
+        expect(() => steps.verifyAsync(), throwsA(isA<ValidationError>()));
       });
 
       test('should handle async validation errors', () {
         final steps = [
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
           Future.value('')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty,
                 (fieldName) => 'Field $fieldName is empty',
               ),
         ];
 
-        expect(() => steps.validateAsync(), throwsA(isA<ValidationError>()));
+        expect(() => steps.verifyAsync(), throwsA(isA<ValidationError>()));
       });
     });
 
     group('validateTaskEither', () {
       test('should validate all steps successfully', () async {
         final steps = [
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = await steps.validateTaskEither().run();
+        final result = await steps.verifyTaskEither().run();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (values) {
@@ -87,33 +87,33 @@ void main() {
 
       test('should return first validation error', () async {
         final steps = [
-          ''.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          ''.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = await steps.validateTaskEither().run();
+        final result = await steps.verifyTaskEither().run();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Email'));
-          expect(error.message, equals('Field Email is empty'));
+          expect(error.message, equals('Email cannot be empty'));
         }, (values) => fail('Should return error'));
       });
 
       test('should handle mixed sync and async steps', () async {
         final steps = <ValidationStep>[
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
           Future.value('password123')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
-          '25'.field('Age').toInt().min(18),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = await steps.validateTaskEither().run();
+        final result = await steps.verifyTaskEither().run();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (values) {
@@ -130,12 +130,12 @@ void main() {
     group('validate', () {
       test('should validate all sync steps successfully', () {
         final steps = <SyncValidationStep>[
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = steps.validate();
+        final result = steps.verify();
 
         expect(result, hasLength(3));
         expect(result[0], equals('test@example.com'));
@@ -145,24 +145,24 @@ void main() {
 
       test('should throw first validation error', () {
         final steps = <SyncValidationStep>[
-          ''.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          ''.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        expect(() => steps.validate(), throwsA(isA<ValidationError>()));
+        expect(() => steps.verify(), throwsA(isA<ValidationError>()));
       });
     });
 
     group('validateEither', () {
       test('should validate all sync steps successfully', () {
         final steps = <SyncValidationStep>[
-          'test@example.com'.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          'test@example.com'.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = steps.validateEither();
+        final result = steps.verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (values) {
@@ -175,17 +175,17 @@ void main() {
 
       test('should return first validation error', () {
         final steps = <SyncValidationStep>[
-          ''.field('Email').isNotEmpty().isEmail(),
-          'password123'.field('Password').isNotEmpty().minLength(8),
-          '25'.field('Age').toInt().min(18),
+          ''.trust('Email').isNotEmpty().isEmail(),
+          'password123'.trust('Password').isNotEmpty().minLength(8),
+          '25'.trust('Age').toInt().min(18),
         ];
 
-        final result = steps.validateEither();
+        final result = steps.verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Email'));
-          expect(error.message, equals('Field Email is empty'));
+          expect(error.message, equals('Email cannot be empty'));
         }, (values) => fail('Should return error'));
       });
     });
@@ -196,19 +196,19 @@ void main() {
       test('should validate all async steps successfully', () async {
         final steps = <AsyncValidationStep>[
           Future.value('test@example.com')
-              .field('Email')
+              .trust('Email')
               .ensure(
                 (value) async => value.isNotEmpty && value.contains('@'),
                 (fieldName) => '$fieldName must be a valid email',
               ),
           Future.value('password123')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
           Future.value('25')
-              .field('Age')
+              .trust('Age')
               .tryMap(
                 (value) async => int.parse(value),
                 (fieldName) => '$fieldName must be a number',
@@ -219,7 +219,7 @@ void main() {
               ),
         ];
 
-        final result = await steps.validateAsync();
+        final result = await steps.verifyAsync();
 
         expect(result, hasLength(3));
         expect(result[0], equals('test@example.com'));
@@ -230,20 +230,20 @@ void main() {
       test('should throw first validation error', () {
         final steps = <AsyncValidationStep>[
           Future.value('')
-              .field('Email')
+              .trust('Email')
               .ensure(
                 (value) async => value.isNotEmpty,
                 (fieldName) => 'Field $fieldName is empty',
               ),
           Future.value('password123')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
         ];
 
-        expect(() => steps.validateAsync(), throwsA(isA<ValidationError>()));
+        expect(() => steps.verifyAsync(), throwsA(isA<ValidationError>()));
       });
     });
 
@@ -251,19 +251,19 @@ void main() {
       test('should validate all async steps successfully', () async {
         final steps = <AsyncValidationStep>[
           Future.value('test@example.com')
-              .field('Email')
+              .trust('Email')
               .ensure(
                 (value) async => value.isNotEmpty && value.contains('@'),
                 (fieldName) => '$fieldName must be a valid email',
               ),
           Future.value('password123')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
           Future.value('25')
-              .field('Age')
+              .trust('Age')
               .tryMap(
                 (value) async => int.parse(value),
                 (fieldName) => '$fieldName must be a number',
@@ -274,7 +274,7 @@ void main() {
               ),
         ];
 
-        final result = await steps.validateTaskEither().run();
+        final result = await steps.verifyTaskEither().run();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (values) {
@@ -288,20 +288,20 @@ void main() {
       test('should return first validation error', () async {
         final steps = <AsyncValidationStep>[
           Future.value('')
-              .field('Email')
+              .trust('Email')
               .ensure(
                 (value) async => value.isNotEmpty,
                 (fieldName) => 'Field $fieldName is empty',
               ),
           Future.value('password123')
-              .field('Password')
+              .trust('Password')
               .ensure(
                 (value) async => value.isNotEmpty && value.length >= 8,
                 (fieldName) => '$fieldName must be at least 8 characters long',
               ),
         ];
 
-        final result = await steps.validateTaskEither().run();
+        final result = await steps.verifyTaskEither().run();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {

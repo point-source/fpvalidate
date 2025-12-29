@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:fpvalidate/src/constants/regex/regex.dart';
+import 'package:trust_but_verify/src/constants/regex/regex.dart';
 
 void main() {
   group('Email Regex', () {

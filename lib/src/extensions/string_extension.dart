@@ -11,11 +11,11 @@ part of '../validation_step.dart';
 /// Example:
 /// ```dart
 /// final result = 'test@example.com'
-///     .field('Email')
+///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
 ///     .minLength(5)
-///     .validateEither();
+///     .verifyEither();
 /// ```
 extension StringExtension on SyncValidationStep<String> {
   /// Validates that the string is not empty.
@@ -31,8 +31,8 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = string.field('String').isNotEmpty().validateEither();
-  /// final result2 = string.field('String').isNotEmpty(allowWhitespace: true).validateEither();
+  /// final result = string.trust('String').isNotEmpty().verifyEither();
+  /// final result2 = string.trust('String').isNotEmpty(allowWhitespace: true).verifyEither();
   /// ```
   SyncValidationStep<String> isNotEmpty({bool allowWhitespace = false}) => bind(
     (value) => value.isEmpty
@@ -62,11 +62,11 @@ extension StringExtension on SyncValidationStep<String> {
   /// Example:
   /// ```dart
   /// final result = '123'
-  ///     .field('Number String')
+  ///     .trust('Number String')
   ///     .toInt()              // Converts String to int
   ///     .min(100)             // Now we can use numeric validators
   ///     .max(200)
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<int> toInt() => bind((value) {
     final parsed = int.tryParse(value);
@@ -84,7 +84,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = password.field('Password').minLength(8).validateEither();
+  /// final result = password.trust('Password').minLength(8).verifyEither();
   /// ```
   SyncValidationStep<String> minLength(int length) => bind(
     (value) => value.length >= length
@@ -101,7 +101,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = username.field('Username').maxLength(20).validateEither();
+  /// final result = username.trust('Username').maxLength(20).verifyEither();
   /// ```
   SyncValidationStep<String> maxLength(int length) => bind(
     (value) => value.length <= length
@@ -119,7 +119,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = email.field('Email').isEmail().validateEither();
+  /// final result = email.trust('Email').isEmail().verifyEither();
   /// ```
   SyncValidationStep<String> isEmail() => bind((value) {
     return RegExp(kEmailRegex).hasMatch(value)
@@ -137,7 +137,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = url.field('URL').isUrl().validateEither();
+  /// final result = url.trust('URL').isUrl().verifyEither();
   /// ```
   SyncValidationStep<String> isUrl() => bind((value) {
     return RegExp(kUrlRegex).hasMatch(value)
@@ -155,7 +155,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = phone.field('Phone').isPhone().validateEither();
+  /// final result = phone.trust('Phone').isPhone().verifyEither();
   /// ```
   SyncValidationStep<String> isPhone() => bind((value) {
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
@@ -183,9 +183,9 @@ extension StringExtension on SyncValidationStep<String> {
   /// Example:
   /// ```dart
   /// final result = string
-  ///     .field('String')
+  ///     .trust('String')
   ///     .isPattern(RegExp(r'^[a-z]+$'), 'lowercase letters only')
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<String> isPattern(RegExp regex, String description) =>
       bind(
@@ -203,7 +203,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = text.field('Text').contains('required').validateEither();
+  /// final result = text.trust('Text').contains('required').verifyEither();
   /// ```
   SyncValidationStep<String> contains(String substring) => bind(
     (value) => value.contains(substring)
@@ -220,7 +220,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = url.field('URL').startsWith('https').validateEither();
+  /// final result = url.trust('URL').startsWith('https').verifyEither();
   /// ```
   SyncValidationStep<String> startsWith(String prefix) => bind(
     (value) => value.startsWith(prefix)
@@ -237,7 +237,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = filename.field('Filename').endsWith('.txt').validateEither();
+  /// final result = filename.trust('Filename').endsWith('.txt').verifyEither();
   /// ```
   SyncValidationStep<String> endsWith(String suffix) => bind(
     (value) => value.endsWith(suffix)
@@ -254,7 +254,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = username.field('Username').alphanumeric().validateEither();
+  /// final result = username.trust('Username').alphanumeric().verifyEither();
   /// ```
   SyncValidationStep<String> alphanumeric() => bind((value) {
     return RegExp(kAlphanumericRegex).hasMatch(value)
@@ -271,7 +271,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = name.field('Name').lettersOnly().validateEither();
+  /// final result = name.trust('Name').lettersOnly().verifyEither();
   /// ```
   SyncValidationStep<String> lettersOnly() => bind((value) {
     return RegExp(kLettersOnlyRegex).hasMatch(value)
@@ -288,7 +288,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = number.field('Number').digitsOnly().validateEither();
+  /// final result = number.trust('Number').digitsOnly().verifyEither();
   /// ```
   SyncValidationStep<String> digitsOnly() => bind((value) {
     return RegExp(kDigitsOnlyRegex).hasMatch(value)
@@ -308,7 +308,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = uuid.field('UUID').isUuid().validateEither();
+  /// final result = uuid.trust('UUID').isUuid().verifyEither();
   /// ```
   SyncValidationStep<String> isUuid() => bind((value) {
     return RegExp(kUuidRegex, caseSensitive: false).hasMatch(value)
@@ -328,7 +328,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = cardNumber.field('Card Number').isCreditCard().validateEither();
+  /// final result = cardNumber.trust('Card Number').isCreditCard().verifyEither();
   /// ```
   SyncValidationStep<String> isCreditCard({bool validateLuhn = true}) =>
       bind((value) {
@@ -378,7 +378,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = postalCode.field('Postal Code').isPostalCode().validateEither();
+  /// final result = postalCode.trust('Postal Code').isPostalCode().verifyEither();
   /// ```
   SyncValidationStep<String> isPostalCode() => bind((value) {
     return RegExp(kPostalCodeRegex).hasMatch(value)
@@ -396,7 +396,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = date.field('Date').isIsoDate().validateEither();
+  /// final result = date.trust('Date').isIsoDate().verifyEither();
   /// ```
   SyncValidationStep<String> isIsoDate() => bind((value) {
     if (!RegExp(kIsoDateRegex).hasMatch(value)) {
@@ -432,8 +432,8 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = time.field('Time').isTime24Hour().validateEither();
-  /// final result2 = time.field('Time').isTime24Hour(requireLeadingZero: true).validateEither();
+  /// final result = time.trust('Time').isTime24Hour().verifyEither();
+  /// final result2 = time.trust('Time').isTime24Hour(requireLeadingZero: true).verifyEither();
   /// ```
   SyncValidationStep<String> isTime24Hour({bool requireLeadingZero = false}) =>
       bind((value) {
@@ -469,15 +469,15 @@ extension StringExtension on SyncValidationStep<String> {
   /// Example:
   /// ```dart
   /// final result = status
-  ///     .field('Status')
+  ///     .trust('Status')
   ///     .isOneOf(['active', 'inactive', 'pending'])
-  ///     .validateEither();
+  ///     .verifyEither();
   ///
   /// // Case-insensitive comparison
   /// final result2 = status
-  ///     .field('Status')
+  ///     .trust('Status')
   ///     .isOneOf(['ACTIVE', 'INACTIVE'], caseInsensitive: true)
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<String> isOneOf(
     List<String> allowedValues, {
@@ -512,10 +512,10 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Example:
   /// ```dart
-  /// final result = username.field('Username').isNoneOf(['admin', 'root', 'system']).validateEither();
+  /// final result = username.trust('Username').isNoneOf(['admin', 'root', 'system']).verifyEither();
   ///
   /// // Case-insensitive comparison
-  /// final result2 = username.field('Username').isNoneOf(['ADMIN', 'ROOT'], caseInsensitive: true).validateEither();
+  /// final result2 = username.trust('Username').isNoneOf(['ADMIN', 'ROOT'], caseInsensitive: true).verifyEither();
   /// ```
   SyncValidationStep<String> isNoneOf(
     List<String> forbiddenValues, {
@@ -551,8 +551,8 @@ extension NullableStringExtension on SyncValidationStep<String?> {
   ///
   /// Example:
   /// ```dart
-  /// final result = string.field('String').isNotEmpty().validateEither();
-  /// final result2 = string.field('String').isNotEmpty(allowWhitespace: true).validateEither();
+  /// final result = string.trust('String').isNotEmpty().verifyEither();
+  /// final result2 = string.trust('String').isNotEmpty(allowWhitespace: true).verifyEither();
   /// ```
   SyncValidationStep<String> isNotEmpty({bool allowWhitespace = false}) =>
       isNotNull().isNotEmpty(allowWhitespace: allowWhitespace);

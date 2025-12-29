@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:fpvalidate/src/constants/regex/regex.dart';
-import 'package:fpvalidate/src/errors/validation_error.dart';
-import 'package:fpvalidate/src/i18n/validation_i18n.dart';
-import 'package:fpvalidate/src/i18n/validation_messages.dart';
+import 'package:trust_but_verify/src/constants/regex/regex.dart';
+import 'package:trust_but_verify/src/errors/validation_error.dart';
+import 'package:trust_but_verify/src/i18n/validation_i18n.dart';
+import 'package:trust_but_verify/src/i18n/validation_messages.dart';
 
-part 'extensions/field_extension.dart';
+part 'extensions/trust_extension.dart';
 part 'extensions/nullable_extension.dart';
 part 'extensions/num_extension.dart';
 part 'extensions/string_extension.dart';
@@ -23,16 +23,17 @@ sealed class ValidationStep<T> {
   /// The name of the field being validated.
   ///
   /// This is used in error messages to identify which field failed validation.
+  /// Can be empty if no field name was provided during trust().
   final String fieldName;
 
   /// Creates a new validation step with the specified field name.
   const ValidationStep({required this.fieldName});
 
-  /// Prevents calling .field() on a ValidationStep by shadowing the extension method.
+  /// Prevents calling .trust() on a ValidationStep by shadowing the extension method.
   // ignore: avoid-shadowing
-  Never field(String fieldName) => throw UnsupportedError(
-    'Calling .field() on a ValidationStep is not allowed. '
-    'You should only call .field() on raw values, not on validation steps.',
+  Never trust([String fieldName = '']) => throw UnsupportedError(
+    'Calling .trust() on a ValidationStep is not allowed. '
+    'You should only call .trust() on raw values, not on validation steps.',
   );
 
   /// Configure the global validation messages for the entire package.
@@ -72,7 +73,7 @@ sealed class ValidationStep<T> {
 ///
 /// Example:
 /// ```dart
-/// final step = "test@example.com".field("email").check(
+/// final step = "test@example.com".trust("email").ensure(
 ///     (email) => email.contains('@'),
 ///     (fieldName) => '$fieldName must be a valid email',
 ///   );
@@ -176,15 +177,45 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final step = "test@example.com".field("email").toAsync();
+  /// final step = "test@example.com".trust("email").toAsync();
   /// ```
   AsyncValidationStep<T> toAsync() =>
       ._(value: _value.toTaskEither(), fieldName: fieldName);
 
-  /// Validates the value and returns it if successful, or throws a [ValidationError] if failed.
-  T validate() => _value.fold((l) => throw l, (r) => r);
+  /// Verifies the value and returns it if successful, or throws a [ValidationError] if failed.
+  ///
+  /// [customMessage] is an optional function to override the error message.
+  /// It receives the field name, allowing you to include it in your custom message.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Without custom message
+  /// final value = step.verify();
+  ///
+  /// // With custom message
+  /// final value = step.verify((fieldName) => 'Please enter a valid $fieldName');
+  /// ```
+  T verify([String Function(String fieldName)? customMessage]) => _value.fold(
+    (l) => throw customMessage != null
+        ? l.copyWith(message: customMessage(l.fieldName))
+        : l,
+    (r) => r,
+  );
 
-  Either<ValidationError, T> validateEither() => _value;
+  /// Verifies the value and returns an [Either] with the result.
+  ///
+  /// [customMessage] is an optional function to override the error message.
+  /// It receives the field name, allowing you to include it in your custom message.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = step.verifyEither();
+  /// ```
+  Either<ValidationError, T> verifyEither([
+    String Function(String fieldName)? customMessage,
+  ]) => customMessage != null
+      ? _value.mapLeft((l) => l.copyWith(message: customMessage(l.fieldName)))
+      : _value;
 
   /// Returns the error message if the validation fails, otherwise returns null.
   ///
@@ -193,7 +224,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final step = "test@example.com".field("email").isNotEmpty();
+  /// final step = "test@example.com".trust("email").isNotEmpty();
   ///
   /// final error = step.errorOrNull();
   /// ```
@@ -215,14 +246,14 @@ class SyncValidationStep<T> extends ValidationStep<T> {
 ///
 /// Example:
 /// ```dart
-/// final step = "test@example.com".field("email").toAsync();
+/// final step = "test@example.com".trust("email").toAsync();
 ///
 /// final validated = await step
-///   .check(
+///   .ensure(
 ///     (email) => email.contains('@'),
 ///     (fieldName) => '$fieldName must be a valid email',
 ///   )
-///   .validate();
+///   .verify();
 /// ```
 class AsyncValidationStep<T> extends ValidationStep<T> {
   /// The value being validated, wrapped in a [TaskEither] to handle success/error cases asynchronously.
@@ -351,30 +382,58 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
     StackTrace? stackTrace,
   ]) => .left(errorFactory(fieldName, message, stackTrace ?? .current));
 
-  /// Validates the value and returns it if successful, or throws a [ValidationError] if failed.
+  /// Verifies the value and returns it if successful, or throws a [ValidationError] if failed.
+  ///
+  /// [customMessage] is an optional function to override the error message.
+  /// It receives the field name, allowing you to include it in your custom message.
   ///
   /// Returns a [Future] that completes with the validated value.
   ///
   /// Throws a [ValidationError] if validation fails.
-  Future<T> validate() =>
-      _value.run().then((value) => value.fold((l) => throw l, (r) => r));
+  ///
+  /// Example:
+  /// ```dart
+  /// // Without custom message
+  /// final value = await step.verify();
+  ///
+  /// // With custom message
+  /// final value = await step.verify((fieldName) => 'Please enter a valid $fieldName');
+  /// ```
+  Future<T> verify([String Function(String fieldName)? customMessage]) =>
+      _value.run().then(
+        (value) => value.fold(
+          (l) => throw customMessage != null
+              ? l.copyWith(message: customMessage(l.fieldName))
+              : l,
+          (r) => r,
+        ),
+      );
 
-  /// Runs the underlying [TaskEither] and returns the result as a [Future<Either<ValidationError, T>>]
+  /// Verifies the value and returns the result as a [Future<Either<ValidationError, T>>].
+  ///
+  /// [customMessage] is an optional function to override the error message.
+  /// It receives the field name, allowing you to include it in your custom message.
   ///
   /// Returns a [Future] that completes with the validation result.
   ///
   /// Example:
   /// ```dart
-  /// final result = await step.validateEither();
+  /// final result = await step.verifyEither();
   /// ```
-  Future<Either<ValidationError, T>> validateEither() => _value.run();
+  Future<Either<ValidationError, T>> verifyEither([
+    String Function(String fieldName)? customMessage,
+  ]) => customMessage != null
+      ? _value
+            .mapLeft((l) => l.copyWith(message: customMessage(l.fieldName)))
+            .run()
+      : _value.run();
 
   /// Returns the underlying [TaskEither] containing the validation result.
   ///
   /// This method allows you to handle the success/error cases manually without throwing.
   ///
   /// Returns a [TaskEither] containing either a [ValidationError] or the validated value.
-  TaskEither<ValidationError, T> validateTaskEither() => _value;
+  TaskEither<ValidationError, T> verifyTaskEither() => _value;
 
   /// Returns the error message if the validation fails, otherwise returns null.
   ///
@@ -383,7 +442,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
   ///
   /// Example:
   /// ```dart
-  /// final step = "test@example.com".field("email").toAsync();
+  /// final step = "test@example.com".trust("email").toAsync();
   ///
   /// final error = await step.errorOrNull();
   /// ```

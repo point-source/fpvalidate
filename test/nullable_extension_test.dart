@@ -1,13 +1,13 @@
 // ignore_for_file: avoid-unnecessary-type-casts
 
 import 'package:test/test.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('NullableExtension', () {
     group('isNotNull', () {
       test('should succeed when value is not null', () {
-        final result = 'test'.field('Test Field').isNotNull().validateEither();
+        final result = 'test'.trust('Test Field').isNotNull().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -18,19 +18,19 @@ void main() {
 
       test('should fail when value is null', () {
         final result = (null as String?)
-            .field('Test Field')
+            .trust('Test Field')
             .isNotNull()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Test Field'));
-          expect(error.message, equals('Field Test Field is null'));
+          expect(error.message, equals('Test Field cannot be null'));
         }, (value) => fail('Should return error for null value'));
       });
 
       test('should transform type from nullable to non-nullable', () {
-        final result = 'test'.field('Test Field').isNotNull().validateEither();
+        final result = 'test'.trust('Test Field').isNotNull().verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
@@ -43,10 +43,10 @@ void main() {
         'should allow chaining with non-nullable validators after isNotNull',
         () {
           final result = 'test'
-              .field('Test Field')
+              .trust('Test Field')
               .isNotNull()
               .isNotEmpty()
-              .validateEither();
+              .verifyEither();
 
           expect(result.isRight(), isTrue);
           result.fold(
@@ -60,15 +60,15 @@ void main() {
         'should fail when chaining with non-nullable validators on null value',
         () {
           final result = (null as String?)
-              .field('Test Field')
+              .trust('Test Field')
               .isNotNull()
               .isNotEmpty()
-              .validateEither();
+              .verifyEither();
 
           expect(result.isLeft(), isTrue);
           result.fold((error) {
             expect(error.fieldName, equals('Test Field'));
-            expect(error.message, equals('Field Test Field is null'));
+            expect(error.message, equals('Test Field cannot be null'));
           }, (value) => fail('Should return error for null value'));
         },
       );
@@ -76,9 +76,9 @@ void main() {
       test('should work with different nullable types', () {
         // Test with int
         final intResult = (42 as int?)
-            .field('Int Field')
+            .trust('Int Field')
             .isNotNull()
-            .validateEither();
+            .verifyEither();
         expect(intResult.isRight(), isTrue);
         intResult.fold(
           (error) => fail('Should not return error for non-null int'),
@@ -87,9 +87,9 @@ void main() {
 
         // Test with double
         final doubleResult = (3.14 as double?)
-            .field('Double Field')
+            .trust('Double Field')
             .isNotNull()
-            .validateEither();
+            .verifyEither();
         expect(doubleResult.isRight(), isTrue);
         doubleResult.fold(
           (error) => fail('Should not return error for non-null double'),
@@ -98,9 +98,9 @@ void main() {
 
         // Test with bool
         final boolResult = (true as bool?)
-            .field('Bool Field')
+            .trust('Bool Field')
             .isNotNull()
-            .validateEither();
+            .verifyEither();
         expect(boolResult.isRight(), isTrue);
         boolResult.fold(
           (error) => fail('Should not return error for non-null bool'),
@@ -111,34 +111,34 @@ void main() {
       test('should fail with null values of different types', () {
         // Test with null int
         final intResult = (null as int?)
-            .field('Int Field')
+            .trust('Int Field')
             .isNotNull()
-            .validateEither();
+            .verifyEither();
         expect(intResult.isLeft(), isTrue);
         intResult.fold((error) {
           expect(error.fieldName, equals('Int Field'));
-          expect(error.message, equals('Field Int Field is null'));
+          expect(error.message, equals('Int Field cannot be null'));
         }, (value) => fail('Should return error for null int'));
 
         // Test with null double
         final doubleResult = (null as double?)
-            .field('Double Field')
+            .trust('Double Field')
             .isNotNull()
-            .validateEither();
+            .verifyEither();
         expect(doubleResult.isLeft(), isTrue);
         doubleResult.fold((error) {
           expect(error.fieldName, equals('Double Field'));
-          expect(error.message, equals('Field Double Field is null'));
+          expect(error.message, equals('Double Field cannot be null'));
         }, (value) => fail('Should return error for null double'));
       });
 
       test('should work with complex chaining scenarios', () {
         final result = 'test@example.com'
-            .field('Email')
+            .trust('Email')
             .isNotNull()
             .isNotEmpty()
             .isEmail()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -149,16 +149,16 @@ void main() {
 
       test('should fail early in complex chaining when value is null', () {
         final result = (null as String?)
-            .field('Email')
+            .trust('Email')
             .isNotNull()
             .isNotEmpty()
             .isEmail()
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Email'));
-          expect(error.message, equals('Field Email is null'));
+          expect(error.message, equals('Email cannot be null'));
         }, (value) => fail('Should return error for null value'));
       });
     });

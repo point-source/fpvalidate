@@ -1,4 +1,4 @@
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 /// Custom validation messages that override only specific messages.
 // ignore: prefer-match-file-name
@@ -215,11 +215,11 @@ void _examplePartialOverride() {
   // Test the validation
   final email = '';
   final result = email
-      .field('Email')
+      .trust('Email')
       .isNotEmpty() // Uses custom message
       .isEmail() // Uses custom message
       .minLength(8) // Uses default message
-      .validateEither();
+      .verifyEither();
 
   result.fold(
     (error) => print('Error: ${error.message}'),
@@ -235,10 +235,10 @@ void _exampleCompleteCustom() {
   // Test the validation
   final age = 15;
   final result = age
-      .field('Edad')
+      .trust('Edad')
       .min(18) // Uses Spanish message
       .max(65) // Uses Spanish message
-      .validateEither();
+      .verifyEither();
 
   result.fold(
     (error) => print('Error: ${error.message}'),
@@ -254,9 +254,9 @@ void _exampleResetToDefaults() {
   // Test the validation
   final password = 'weak';
   final result = password
-      .field('Password')
+      .trust('Password')
       .minLength(8) // Uses default English message
-      .validateEither();
+      .verifyEither();
 
   result.fold(
     (error) => print('Error: ${error.message}'),

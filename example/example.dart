@@ -1,4 +1,4 @@
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() async {
   print('=== fpvalidate Examples ===\n');
@@ -6,10 +6,10 @@ void main() async {
   // Basic string validation
   try {
     final email = 'test@example.com'
-        .field('Email')
+        .trust('Email')
         .isNotEmpty()
         .isEmail()
-        .validate();
+        .verify();
     print('✅ Valid email: $email');
   } catch (e) {
     if (e is ValidationError) {
@@ -19,9 +19,9 @@ void main() async {
 
   // Functional validation with Either
   final uuidResult = '550e8400-e29b-41d4-a716-446655440000'
-      .field('UUID')
+      .trust('UUID')
       .isUuid()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ UUID validation failed: ${error.message}',
         (value) => '✅ Valid UUID: $value',
@@ -30,11 +30,11 @@ void main() async {
 
   // Numeric validation
   final ageResult = 25
-      .field('Age')
+      .trust('Age')
       .min(18)
       .max(65)
       .isEven()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Age validation failed: ${error.message}',
         (value) => '✅ Valid age: $value',
@@ -43,11 +43,11 @@ void main() async {
 
   // String validators
   final urlResult = 'https://example.com/api'
-      .field('URL')
+      .trust('URL')
       .startsWith('https')
       .contains('api')
       .isUrl()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ URL validation failed: ${error.message}',
         (value) => '✅ Valid URL: $value',
@@ -57,9 +57,9 @@ void main() async {
   // Nullable validation
   // ignore: avoid-unnecessary-type-casts
   final optionalEmail = ('optional@example.com' as String?)
-      .field('Optional Email')
+      .trust('Optional Email')
       .isNotNull()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Optional email validation failed: ${error.message}',
         (value) => '✅ Valid optional email: $value',
@@ -69,10 +69,10 @@ void main() async {
   // Batch validation
   final batchResult =
       [
-        'user@example.com'.field('Email').isNotEmpty().isEmail(),
-        'password123'.field('Password').isNotEmpty().minLength(8),
-        30.field('Age').min(18).max(65),
-      ].validateEither().fold(
+        'user@example.com'.trust('Email').isNotEmpty().isEmail(),
+        'password123'.trust('Password').isNotEmpty().minLength(8),
+        30.trust('Age').min(18).max(65),
+      ].verifyEither().fold(
         (error) => '❌ Batch validation failed: ${error.message}',
         (values) =>
             // ignore: avoid-unsafe-collection-methods
@@ -82,12 +82,12 @@ void main() async {
 
   // Custom validation with check()
   final customResult = 'hello world'
-      .field('Custom String')
+      .trust('Custom String')
       .ensure(
         (value) => value.contains('world'),
         (fieldName) => '$fieldName must contain "world"',
       )
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Custom validation failed: ${error.message}',
         (value) => '✅ Custom validation passed: $value',
@@ -96,7 +96,7 @@ void main() async {
 
   // Async validation with TaskEither
   final asyncResult = await 'async@example.com'
-      .field('Async Email')
+      .trust('Async Email')
       .isNotEmpty()
       .isEmail()
       .toAsync()
@@ -112,7 +112,7 @@ void main() async {
         }
         throw Exception('Email must contain "async"');
       }, (fieldName) => '$fieldName must contain "async"')
-      .validateTaskEither()
+      .verifyTaskEither()
       .run()
       .then(
         (either) => either.fold(
@@ -124,11 +124,11 @@ void main() async {
 
   // Async validation with Either
   final asyncEitherResult = await 'async@example.com'
-      .field('Async Email Either')
+      .trust('Async Email Either')
       .isNotEmpty()
       .isEmail()
       .toAsync()
-      .validateEither()
+      .verifyEither()
       .then(
         (either) => either.fold(
           (error) => '❌ Async Either validation failed: ${error.message}',
@@ -139,9 +139,9 @@ void main() async {
 
   // Date and time validation
   final dateResult = '2023-12-25'
-      .field('Date')
+      .trust('Date')
       .isIsoDate()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Date validation failed: ${error.message}',
         (value) => '✅ Valid date: $value',
@@ -149,9 +149,9 @@ void main() async {
   print(dateResult);
 
   final timeResult = '14:30'
-      .field('Time')
+      .trust('Time')
       .isTime24Hour()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Time validation failed: ${error.message}',
         (value) => '✅ Valid time: $value',
@@ -159,12 +159,12 @@ void main() async {
   print(timeResult);
 
   // Error handling with errorOrNull
-  final errorOrNullResult = ''.field('Empty String').isNotEmpty().errorOrNull();
+  final errorOrNullResult = ''.trust('Empty String').isNotEmpty().errorOrNull();
   print('Error or null result: ${errorOrNullResult ?? 'No error'}');
 
   // Form validator convenience method
   final formValidatorResult = 'test@example.com'
-      .field('Form Email')
+      .trust('Form Email')
       .isNotEmpty()
       .isEmail()
       .asFormValidator();
@@ -172,9 +172,9 @@ void main() async {
 
   // notEmpty with allowWhitespace parameter
   final whitespaceResult = '   '
-      .field('Whitespace String')
+      .trust('Whitespace String')
       .isNotEmpty(allowWhitespace: true)
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Whitespace validation failed: ${error.message}',
         (value) => '✅ Whitespace validation passed: $value',
@@ -183,9 +183,9 @@ void main() async {
 
   // Type conversion with toInt()
   final intConversionResult = '123'
-      .field('Number String')
+      .trust('Number String')
       .toInt()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Int conversion failed: ${error.message}',
         (value) =>
@@ -195,9 +195,9 @@ void main() async {
 
   // String isOneOf validation
   final statusResult = 'active'
-      .field('Status')
+      .trust('Status')
       .isOneOf(['active', 'inactive', 'pending'])
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Status validation failed: ${error.message}',
         (value) => '✅ Valid status: $value',
@@ -206,9 +206,9 @@ void main() async {
 
   // Case-insensitive string isOneOf validation
   final countryResult = 'USA'
-      .field('Country')
+      .trust('Country')
       .isOneOf(['USA', 'UK', 'CANADA'], caseInsensitive: true)
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Country validation failed: ${error.message}',
         (value) => '✅ Valid country: $value',
@@ -217,9 +217,9 @@ void main() async {
 
   // Numeric isOneOf validation
   final priorityResult = 3
-      .field('Priority')
+      .trust('Priority')
       .isOneOf([1, 2, 3, 4, 5])
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Priority validation failed: ${error.message}',
         (value) => '✅ Valid priority: $value',
@@ -228,10 +228,10 @@ void main() async {
 
   // Combined validation with isOneOf
   final userRoleResult = 'admin'
-      .field('Role')
+      .trust('Role')
       .isNotEmpty()
       .isOneOf(['admin', 'user', 'moderator'])
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => '❌ Role validation failed: ${error.message}',
         (value) => '✅ Valid role: $value',

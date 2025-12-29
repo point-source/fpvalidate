@@ -1,16 +1,16 @@
 import 'package:test/test.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('FieldExtension', () {
     test('should create sync validation step for string', () {
-      final step = 'test@example.com'.field('Email');
+      final step = 'test@example.com'.trust('Email');
 
       expect(step, isA<SyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -19,12 +19,12 @@ void main() {
     });
 
     test('should create sync validation step for int', () {
-      final step = 42.field('Age');
+      final step = 42.trust('Age');
 
       expect(step, isA<SyncValidationStep<int>>());
       expect(step.fieldName, equals('Age'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -33,12 +33,12 @@ void main() {
     });
 
     test('should create sync validation step for double', () {
-      final step = 3.14.field('Pi');
+      final step = 3.14.trust('Pi');
 
       expect(step, isA<SyncValidationStep<double>>());
       expect(step.fieldName, equals('Pi'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -47,12 +47,12 @@ void main() {
     });
 
     test('should create sync validation step for bool', () {
-      final step = true.field('IsActive');
+      final step = true.trust('IsActive');
 
       expect(step, isA<SyncValidationStep<bool>>());
       expect(step.fieldName, equals('IsActive'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -61,12 +61,12 @@ void main() {
     });
 
     test('should create sync validation step for list', () {
-      final step = [1, 2, 3].field('Numbers');
+      final step = [1, 2, 3].trust('Numbers');
 
       expect(step, isA<SyncValidationStep<List<int>>>());
       expect(step.fieldName, equals('Numbers'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -75,12 +75,12 @@ void main() {
     });
 
     test('should create sync validation step for map', () {
-      final step = {'key': 'value'}.field('Config');
+      final step = {'key': 'value'}.trust('Config');
 
       expect(step, isA<SyncValidationStep<Map<String, String>>>());
       expect(step.fieldName, equals('Config'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -89,12 +89,12 @@ void main() {
     });
 
     test('should create sync validation step for null', () {
-      final step = null.field('Nullable');
+      final step = null.trust('Nullable');
 
       expect(step, isA<SyncValidationStep<Null>>());
       expect(step.fieldName, equals('Nullable'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -105,12 +105,12 @@ void main() {
 
   group('FieldExtensionAsync', () {
     test('should create async validation step for Future string', () async {
-      final step = Future.value('test@example.com').field('Email');
+      final step = Future.value('test@example.com').trust('Email');
 
       expect(step, isA<AsyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -119,12 +119,12 @@ void main() {
     });
 
     test('should create async validation step for Future int', () async {
-      final step = Future.value(42).field('Age');
+      final step = Future.value(42).trust('Age');
 
       expect(step, isA<AsyncValidationStep<int>>());
       expect(step.fieldName, equals('Age'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -133,12 +133,12 @@ void main() {
     });
 
     test('should create async validation step for Future double', () async {
-      final step = Future.value(3.14).field('Pi');
+      final step = Future.value(3.14).trust('Pi');
 
       expect(step, isA<AsyncValidationStep<double>>());
       expect(step.fieldName, equals('Pi'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -147,12 +147,12 @@ void main() {
     });
 
     test('should create async validation step for Future bool', () async {
-      final step = Future.value(true).field('IsActive');
+      final step = Future.value(true).trust('IsActive');
 
       expect(step, isA<AsyncValidationStep<bool>>());
       expect(step.fieldName, equals('IsActive'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -161,12 +161,12 @@ void main() {
     });
 
     test('should create async validation step for Future list', () async {
-      final step = Future.value([1, 2, 3]).field('Numbers');
+      final step = Future.value([1, 2, 3]).trust('Numbers');
 
       expect(step, isA<AsyncValidationStep<List<int>>>());
       expect(step.fieldName, equals('Numbers'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -175,12 +175,12 @@ void main() {
     });
 
     test('should create async validation step for Future map', () async {
-      final step = Future.value({'key': 'value'}).field('Config');
+      final step = Future.value({'key': 'value'}).trust('Config');
 
       expect(step, isA<AsyncValidationStep<Map<String, String>>>());
       expect(step.fieldName, equals('Config'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -189,12 +189,12 @@ void main() {
     });
 
     test('should create async validation step for Future null', () async {
-      final step = Future.value(null).field('Nullable');
+      final step = Future.value(null).trust('Nullable');
 
       expect(step, isA<AsyncValidationStep<Null>>());
       expect(step.fieldName, equals('Nullable'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -203,12 +203,12 @@ void main() {
     });
 
     test('should handle Future that throws error', () async {
-      final step = Future<String>.error('Test error').field('ErrorField');
+      final step = Future<String>.error('Test error').trust('ErrorField');
 
       expect(step, isA<AsyncValidationStep<String>>());
       expect(step.fieldName, equals('ErrorField'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isLeft(), isTrue);
       result.fold((error) {
         expect(error.fieldName, equals('ErrorField'));
@@ -220,12 +220,12 @@ void main() {
       final step = Future.delayed(
         Duration(milliseconds: 10),
         () => throw Exception('Test exception'),
-      ).field('ExceptionField');
+      ).trust('ExceptionField');
 
       expect(step, isA<AsyncValidationStep<Object>>());
       expect(step.fieldName, equals('ExceptionField'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isLeft(), isTrue);
       result.fold((error) {
         expect(error.fieldName, equals('ExceptionField'));
@@ -237,23 +237,19 @@ void main() {
   group('FieldExtensionRight', () {
     test('should create validation step from Right', () {
       final right = Right<String, String>('test@example.com');
-      final step = right.field('Email');
+      final step = right.trust('Email');
 
       expect(step, isA<SyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
     });
 
     test('should work with string validation on Right', () {
       final right = Right<String, String>('test@example.com');
-      final result = right
-          .field('Email')
-          .isNotEmpty()
-          .isEmail()
-          .validateEither();
+      final result = right.trust('Email').isNotEmpty().isEmail().verifyEither();
 
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
@@ -261,11 +257,7 @@ void main() {
 
     test('should fail validation on Right with invalid email', () {
       final right = Right<String, String>('invalid-email');
-      final result = right
-          .field('Email')
-          .isNotEmpty()
-          .isEmail()
-          .validateEither();
+      final result = right.trust('Email').isNotEmpty().isEmail().verifyEither();
 
       expect(result.isLeft(), isTrue);
       expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
@@ -274,7 +266,7 @@ void main() {
 
     test('should handle empty string in Right', () {
       final right = Right<String, String>('');
-      final result = right.field('Email').isNotEmpty().validateEither();
+      final result = right.trust('Email').isNotEmpty().verifyEither();
 
       expect(result.isLeft(), isTrue);
       expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
@@ -285,12 +277,12 @@ void main() {
   group('FieldExtensionLeft', () {
     test('should propagate left error from Left', () {
       final left = Left<String, String>('Invalid input');
-      final step = left.field('Email');
+      final step = left.trust('Email');
 
       expect(step, isA<SyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isLeft(), isTrue);
       expect(
         result.fold((l) => l.message, (r) => null),
@@ -303,12 +295,12 @@ void main() {
   group('FieldExtensionEither', () {
     test('should create validation step from Right Either', () {
       final either = Right<String, String>('test@example.com');
-      final step = either.field('Email');
+      final step = either.trust('Email');
 
       expect(step, isA<SyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isRight(), isTrue);
       result.fold(
         (error) => fail('Should not return error'),
@@ -318,12 +310,12 @@ void main() {
 
     test('should create validation step from Left Either', () {
       final either = Left<String, String>('Previous error');
-      final step = either.field('Email');
+      final step = either.trust('Email');
 
       expect(step, isA<SyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = step.validateEither();
+      final result = step.verifyEither();
       expect(result.isLeft(), isTrue);
       result.fold((error) {
         expect(error, isA<FieldInitializationError>());
@@ -335,10 +327,10 @@ void main() {
     test('should work with string validation on Right Either', () {
       final either = Right<String, String>('test@example.com');
       final result = either
-          .field('Email')
+          .trust('Email')
           .isNotEmpty()
           .isEmail()
-          .validateEither();
+          .verifyEither();
 
       expect(result.isRight(), isTrue);
       result.fold(
@@ -350,10 +342,10 @@ void main() {
     test('should fail validation on Right Either with invalid email', () {
       final either = Right<String, String>('invalid-email');
       final result = either
-          .field('Email')
+          .trust('Email')
           .isNotEmpty()
           .isEmail()
-          .validateEither();
+          .verifyEither();
 
       expect(result.isLeft(), isTrue);
       result.fold((error) {
@@ -364,7 +356,7 @@ void main() {
 
     test('should handle empty string in Right Either', () {
       final either = Right<String, String>('');
-      final result = either.field('Email').isNotEmpty().validateEither();
+      final result = either.trust('Email').isNotEmpty().verifyEither();
 
       expect(result.isLeft(), isTrue);
       result.fold((error) {
@@ -375,7 +367,7 @@ void main() {
 
     test('should propagate left error without additional validation', () {
       final either = Left<String, String>('Database connection failed');
-      final result = either.field('UserData').validateEither();
+      final result = either.trust('UserData').verifyEither();
 
       expect(result.isLeft(), isTrue);
       result.fold((error) {
@@ -387,7 +379,7 @@ void main() {
 
     test('should work with numeric validation on Right Either', () {
       final either = Right<String, int>(42);
-      final result = either.field('Age').min(18).max(100).validateEither();
+      final result = either.trust('Age').min(18).max(100).verifyEither();
 
       expect(result.isRight(), isTrue);
       result.fold(
@@ -398,7 +390,7 @@ void main() {
 
     test('should fail numeric validation on Right Either', () {
       final either = Right<String, int>(15);
-      final result = either.field('Age').min(18).validateEither();
+      final result = either.trust('Age').min(18).verifyEither();
 
       expect(result.isLeft(), isTrue);
       result.fold((error) {
@@ -409,7 +401,7 @@ void main() {
 
     test('should handle Either with different left type', () {
       final either = Left<Exception, String>(Exception('Network error'));
-      final result = either.field('Response').validateEither();
+      final result = either.trust('Response').verifyEither();
 
       expect(result.isLeft(), isTrue);
       result.fold((error) {
@@ -424,7 +416,7 @@ void main() {
         'name': 'John',
         'age': 30,
       });
-      final result = either.field('UserData').validateEither();
+      final result = either.trust('UserData').verifyEither();
 
       expect(result.isRight(), isTrue);
       result.fold(
@@ -440,10 +432,11 @@ void main() {
     test('should work with Either from computation', () {
       Either<String, int> parseAge(String input) {
         final parsed = int.tryParse(input);
+
         return parsed != null ? Right(parsed) : Left('Invalid age format');
       }
 
-      final validResult = parseAge('25').field('Age').min(18).validateEither();
+      final validResult = parseAge('25').trust('Age').min(18).verifyEither();
 
       expect(validResult.isRight(), isTrue);
       validResult.fold(
@@ -453,7 +446,7 @@ void main() {
 
       final invalidResult = parseAge(
         'not a number',
-      ).field('Age').validateEither();
+      ).trust('Age').verifyEither();
 
       expect(invalidResult.isLeft(), isTrue);
       invalidResult.fold((error) {
@@ -467,24 +460,24 @@ void main() {
   group('FieldExtensionTaskEither', () {
     test('should create validation step from Right TaskEither', () async {
       final taskEither = TaskEither.right('test@example.com');
-      final step = taskEither.field('Email');
+      final step = taskEither.trust('Email');
 
       expect(step, isA<AsyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
     });
 
     test('should propagate left error from TaskEither', () async {
       final taskEither = TaskEither<String, String>.left('Invalid input');
-      final step = taskEither.field('Email');
+      final step = taskEither.trust('Email');
 
       expect(step, isA<AsyncValidationStep<String>>());
       expect(step.fieldName, equals('Email'));
 
-      final result = await step.validateEither();
+      final result = await step.verifyEither();
       expect(result.isLeft(), isTrue);
       expect(
         result.fold((l) => l.message, (r) => null),
@@ -496,9 +489,9 @@ void main() {
     test('should chain validation methods on Right TaskEither', () async {
       final taskEither = TaskEither.right('test@example.com');
       final result = await taskEither
-          .field('Email')
+          .trust('Email')
           .then((step) => step.isNotEmpty().isEmail())
-          .validateEither();
+          .verifyEither();
 
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
@@ -509,9 +502,9 @@ void main() {
       () async {
         final taskEither = TaskEither.right('invalid-email');
         final result = await taskEither
-            .field('Email')
+            .trust('Email')
             .then((step) => step.isNotEmpty().isEmail())
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
@@ -522,9 +515,9 @@ void main() {
     test('should handle empty string in Right TaskEither', () async {
       final taskEither = TaskEither.right('');
       final result = await taskEither
-          .field('Email')
+          .trust('Email')
           .then((step) => step.isNotEmpty())
-          .validateEither();
+          .verifyEither();
 
       expect(result.isLeft(), isTrue);
       expect(result.fold((l) => l.fieldName, (r) => null), equals('Email'));
@@ -538,9 +531,9 @@ void main() {
       );
 
       final result = await taskEither
-          .field('Email')
+          .trust('Email')
           .then((step) => step.isNotEmpty().isEmail())
-          .validateEither();
+          .verifyEither();
 
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals('test@example.com'));
@@ -550,7 +543,7 @@ void main() {
   group('Integration tests', () {
     test('should work with numeric validation on Right', () {
       final right = Right<Exception, int>(42);
-      final result = right.field('Age').min(18).validateEither();
+      final result = right.trust('Age').min(18).verifyEither();
 
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals(42));
@@ -559,9 +552,9 @@ void main() {
     test('should work with numeric validation on TaskEither', () async {
       final taskEither = TaskEither.right(42);
       final result = await taskEither
-          .field('Age')
+          .trust('Age')
           .then((step) => step.min(18))
-          .validateEither();
+          .verifyEither();
 
       expect(result.isRight(), isTrue);
       expect(result.fold((l) => null, (r) => r), equals(42));

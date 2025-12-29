@@ -1,27 +1,35 @@
-/// A functional validation library for Dart with support for TaskEither and Either types.
+/// A fluent validation library for Dart with support for transformation and sync/async validators.
 ///
 /// This library provides a fluent API for validating data with functional programming
 /// principles, supporting both synchronous (Either) and asynchronous (TaskEither) validation.
 ///
 /// Example usage:
 /// ```dart
-/// import 'package:fpvalidate/fpvalidate.dart';
+/// import 'package:trust_but_verify/trust_but_verify.dart';
 ///
 /// // Single field validation
 /// final result = email
-///     .field('Email')
+///     .trust('Email')
 ///     .isNotEmpty()
 ///     .isEmail()
-///     .validate()
-///     .mapLeft((error) => CustomError(error.message));
+///     .verifyEither();
+///
+/// // Without field name (uses generic messages)
+/// final result = email
+///     .trust()
+///     .isNotEmpty()
+///     .isEmail()
+///     .verifyEither();
 ///
 /// // Multiple field validation
 /// final result = [
-///   email.field('Email').isNotEmpty().isEmail(),
-///   password.field('Password').isNotEmpty().minLength(8),
-///   age.field('Age').min(13).max(120),
-/// ].validate()
-/// .mapLeft((error) => CustomError(error.message));
+///   email.trust('Email').isNotEmpty().isEmail(),
+///   password.trust('Password').isNotEmpty().minLength(8),
+///   age.trust('Age').min(13).max(120),
+/// ].verifyEither();
+///
+/// // Custom error messages
+/// final result = step.verify((fieldName) => 'Please enter a valid $fieldName');
 /// ```
 library;
 
@@ -32,5 +40,3 @@ export 'src/i18n/validation_messages.dart';
 export 'src/i18n/translations/english_validation_messages.dart';
 export 'src/i18n/validation_messages_mixin.dart';
 export 'src/i18n/validation_i18n.dart';
-
-// TODO: Export any libraries intended for clients of this package.

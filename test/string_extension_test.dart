@@ -1,11 +1,11 @@
 import 'package:test/test.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('StringExtension', () {
     group('notEmpty', () {
       test('should succeed with non-empty string', () {
-        final result = 'test'.field('String').isNotEmpty().validateEither();
+        final result = 'test'.trust('String').isNotEmpty().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -14,20 +14,20 @@ void main() {
       });
 
       test('should fail with empty string', () {
-        final result = ''.field('String').isNotEmpty().validateEither();
+        final result = ''.trust('String').isNotEmpty().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
-          expect(error.message, equals('Field String is empty'));
+          expect(error.message, equals('String cannot be empty'));
         }, (value) => fail('Should return error'));
       });
 
       test('should fail with whitespace-only string by default', () {
-        final result = '   '.field('String').isNotEmpty().validateEither();
+        final result = '   '.trust('String').isNotEmpty().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
-          expect(error.message, equals('Field String is empty'));
+          expect(error.message, equals('String cannot be empty'));
         }, (value) => fail('Should return error'));
       });
 
@@ -35,9 +35,9 @@ void main() {
         'should succeed with whitespace-only string when allowWhitespace is true',
         () {
           final result = '   '
-              .field('String')
+              .trust('String')
               .isNotEmpty(allowWhitespace: true)
-              .validateEither();
+              .verifyEither();
           expect(result.isRight(), isTrue);
           result.fold(
             (error) => fail('Should not return error'),
@@ -47,7 +47,7 @@ void main() {
       );
 
       test('should succeed with string containing whitespace and content', () {
-        final result = '  test  '.field('String').isNotEmpty().validateEither();
+        final result = '  test  '.trust('String').isNotEmpty().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -58,7 +58,7 @@ void main() {
 
     group('toInt', () {
       test('should succeed with valid integer string', () {
-        final result = '123'.field('Number').toInt().validateEither();
+        final result = '123'.trust('Number').toInt().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
           expect(value, isA<int>());
@@ -67,7 +67,7 @@ void main() {
       });
 
       test('should succeed with negative integer string', () {
-        final result = '-123'.field('Number').toInt().validateEither();
+        final result = '-123'.trust('Number').toInt().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
           expect(value, isA<int>());
@@ -76,31 +76,31 @@ void main() {
       });
 
       test('should fail with non-integer string', () {
-        final result = 'abc'.field('Number').toInt().validateEither();
+        final result = 'abc'.trust('Number').toInt().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
           expect(
             error.message,
-            equals('Value abc for field Number is not a number'),
+            equals('"abc" is not a valid number for Number'),
           );
         }, (value) => fail('Should return error'));
       });
 
       test('should fail with decimal string', () {
-        final result = '123.45'.field('Number').toInt().validateEither();
+        final result = '123.45'.trust('Number').toInt().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Number'));
           expect(
             error.message,
-            equals('Value 123.45 for field Number is not a number'),
+            equals('"123.45" is not a valid number for Number'),
           );
         }, (value) => fail('Should return error'));
       });
 
       test('should transform type from String to int', () {
-        final result = '100'.field('Number').toInt().min(50).validateEither();
+        final result = '100'.trust('Number').toInt().min(50).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
           expect(value, isA<int>());
@@ -111,7 +111,7 @@ void main() {
 
     group('minLength', () {
       test('should succeed when string length equals min', () {
-        final result = 'test'.field('String').minLength(4).validateEither();
+        final result = 'test'.trust('String').minLength(4).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -120,7 +120,7 @@ void main() {
       });
 
       test('should succeed when string length is greater than min', () {
-        final result = 'testing'.field('String').minLength(4).validateEither();
+        final result = 'testing'.trust('String').minLength(4).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -129,7 +129,7 @@ void main() {
       });
 
       test('should fail when string length is less than min', () {
-        final result = 'abc'.field('String').minLength(4).validateEither();
+        final result = 'abc'.trust('String').minLength(4).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -141,7 +141,7 @@ void main() {
       });
 
       test('should work with zero min length', () {
-        final result = 'test'.field('String').minLength(0).validateEither();
+        final result = 'test'.trust('String').minLength(0).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -152,7 +152,7 @@ void main() {
 
     group('maxLength', () {
       test('should succeed when string length equals max', () {
-        final result = 'test'.field('String').maxLength(4).validateEither();
+        final result = 'test'.trust('String').maxLength(4).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -161,7 +161,7 @@ void main() {
       });
 
       test('should succeed when string length is less than max', () {
-        final result = 'abc'.field('String').maxLength(4).validateEither();
+        final result = 'abc'.trust('String').maxLength(4).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -170,7 +170,7 @@ void main() {
       });
 
       test('should fail when string length is greater than max', () {
-        final result = 'testing'.field('String').maxLength(4).validateEither();
+        final result = 'testing'.trust('String').maxLength(4).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -193,7 +193,7 @@ void main() {
         ];
 
         for (final email in validEmails) {
-          final result = email.field('Email').isEmail().validateEither();
+          final result = email.trust('Email').isEmail().verifyEither();
           expect(result.isRight(), isTrue, reason: '$email should be valid');
           result.fold(
             (error) => fail('$email should be valid'),
@@ -214,7 +214,7 @@ void main() {
         ];
 
         for (final email in invalidEmails) {
-          final result = email.field('Email').isEmail().validateEither();
+          final result = email.trust('Email').isEmail().verifyEither();
           expect(result.isLeft(), isTrue, reason: '$email should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('Email'));
@@ -240,7 +240,7 @@ void main() {
         ];
 
         for (final url in validUrls) {
-          final result = url.field('URL').isUrl().validateEither();
+          final result = url.trust('URL').isUrl().verifyEither();
           expect(result.isRight(), isTrue, reason: '$url should be valid');
           result.fold(
             (error) => fail('$url should be valid'),
@@ -259,7 +259,7 @@ void main() {
         ];
 
         for (final url in invalidUrls) {
-          final result = url.field('URL').isUrl().validateEither();
+          final result = url.trust('URL').isUrl().verifyEither();
           expect(result.isLeft(), isTrue, reason: '$url should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('URL'));
@@ -283,7 +283,7 @@ void main() {
         ];
 
         for (final phone in validPhones) {
-          final result = phone.field('Phone').isPhone().validateEither();
+          final result = phone.trust('Phone').isPhone().verifyEither();
           expect(result.isRight(), isTrue, reason: '$phone should be valid');
           result.fold(
             (error) => fail('$phone should be valid'),
@@ -302,7 +302,7 @@ void main() {
         ];
 
         for (final phone in invalidPhones) {
-          final result = phone.field('Phone').isPhone().validateEither();
+          final result = phone.trust('Phone').isPhone().verifyEither();
           expect(result.isLeft(), isTrue, reason: '$phone should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('Phone'));
@@ -315,12 +315,12 @@ void main() {
     group('isPattern', () {
       test('should succeed when string matches pattern', () {
         final result = 'abc123'
-            .field('String')
+            .trust('String')
             .isPattern(
               RegExp(r'^[a-z0-9]+$'),
               'lowercase letters and digits only',
             )
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -330,12 +330,12 @@ void main() {
 
       test('should fail when string does not match pattern', () {
         final result = 'ABC123'
-            .field('String')
+            .trust('String')
             .isPattern(
               RegExp(r'^[a-z0-9]+$'),
               'lowercase letters and digits only',
             )
-            .validateEither();
+            .verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -352,9 +352,9 @@ void main() {
     group('contains', () {
       test('should succeed when string contains substring', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .contains('World')
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -364,9 +364,9 @@ void main() {
 
       test('should fail when string does not contain substring', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .contains('Universe')
-            .validateEither();
+            .verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -376,9 +376,9 @@ void main() {
 
       test('should work with empty substring', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .contains('')
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -390,9 +390,9 @@ void main() {
     group('startsWith', () {
       test('should succeed when string starts with prefix', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .startsWith('Hello')
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -402,9 +402,9 @@ void main() {
 
       test('should fail when string does not start with prefix', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .startsWith('World')
-            .validateEither();
+            .verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -416,9 +416,9 @@ void main() {
     group('endsWith', () {
       test('should succeed when string ends with suffix', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .endsWith('World')
-            .validateEither();
+            .verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -428,9 +428,9 @@ void main() {
 
       test('should fail when string does not end with suffix', () {
         final result = 'Hello World'
-            .field('String')
+            .trust('String')
             .endsWith('Hello')
-            .validateEither();
+            .verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -441,7 +441,7 @@ void main() {
 
     group('alphanumeric', () {
       test('should succeed with alphanumeric string', () {
-        final result = 'abc123'.field('String').alphanumeric().validateEither();
+        final result = 'abc123'.trust('String').alphanumeric().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -451,9 +451,9 @@ void main() {
 
       test('should fail with non-alphanumeric string', () {
         final result = 'abc-123'
-            .field('String')
+            .trust('String')
             .alphanumeric()
-            .validateEither();
+            .verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -465,7 +465,7 @@ void main() {
       });
 
       test('should fail with empty string', () {
-        final result = ''.field('String').alphanumeric().validateEither();
+        final result = ''.trust('String').alphanumeric().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -479,7 +479,7 @@ void main() {
 
     group('lettersOnly', () {
       test('should succeed with letters-only string', () {
-        final result = 'abcdef'.field('String').lettersOnly().validateEither();
+        final result = 'abcdef'.trust('String').lettersOnly().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -488,7 +488,7 @@ void main() {
       });
 
       test('should fail with string containing non-letters', () {
-        final result = 'abc123'.field('String').lettersOnly().validateEither();
+        final result = 'abc123'.trust('String').lettersOnly().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -497,7 +497,7 @@ void main() {
       });
 
       test('should fail with empty string', () {
-        final result = ''.field('String').lettersOnly().validateEither();
+        final result = ''.trust('String').lettersOnly().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -508,7 +508,7 @@ void main() {
 
     group('digitsOnly', () {
       test('should succeed with digits-only string', () {
-        final result = '123456'.field('String').digitsOnly().validateEither();
+        final result = '123456'.trust('String').digitsOnly().verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -517,7 +517,7 @@ void main() {
       });
 
       test('should fail with string containing non-digits', () {
-        final result = '123abc'.field('String').digitsOnly().validateEither();
+        final result = '123abc'.trust('String').digitsOnly().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -526,7 +526,7 @@ void main() {
       });
 
       test('should fail with empty string', () {
-        final result = ''.field('String').digitsOnly().validateEither();
+        final result = ''.trust('String').digitsOnly().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -545,7 +545,7 @@ void main() {
         ];
 
         for (final uuid in validUuids) {
-          final result = uuid.field('UUID').isUuid().validateEither();
+          final result = uuid.trust('UUID').isUuid().verifyEither();
           expect(result.isRight(), isTrue, reason: '$uuid should be valid');
           result.fold(
             (error) => fail('$uuid should be valid'),
@@ -563,7 +563,7 @@ void main() {
         ];
 
         for (final uuid in invalidUuids) {
-          final result = uuid.field('UUID').isUuid().validateEither();
+          final result = uuid.trust('UUID').isUuid().verifyEither();
           expect(result.isLeft(), isTrue, reason: '$uuid should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('UUID'));
@@ -585,7 +585,7 @@ void main() {
         ];
 
         for (final card in validCards) {
-          final result = card.field('Card').isCreditCard().validateEither();
+          final result = card.trust('Card').isCreditCard().verifyEither();
           expect(result.isRight(), isTrue, reason: '$card should be valid');
           result.fold(
             (error) => fail('$card should be valid'),
@@ -604,7 +604,7 @@ void main() {
         ];
 
         for (final card in invalidCards) {
-          final result = card.field('Card').isCreditCard().validateEither();
+          final result = card.trust('Card').isCreditCard().verifyEither();
           expect(result.isLeft(), isTrue, reason: '$card should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('Card'));
@@ -629,9 +629,9 @@ void main() {
 
         for (final code in validCodes) {
           final result = code
-              .field('PostalCode')
+              .trust('PostalCode')
               .isPostalCode()
-              .validateEither();
+              .verifyEither();
           expect(result.isRight(), isTrue, reason: '$code should be valid');
           result.fold(
             (error) => fail('$code should be valid'),
@@ -651,9 +651,9 @@ void main() {
 
         for (final code in invalidCodes) {
           final result = code
-              .field('PostalCode')
+              .trust('PostalCode')
               .isPostalCode()
-              .validateEither();
+              .verifyEither();
           expect(result.isLeft(), isTrue, reason: '$code should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('PostalCode'));
@@ -677,7 +677,7 @@ void main() {
         ];
 
         for (final date in validDates) {
-          final result = date.field('Date').isIsoDate().validateEither();
+          final result = date.trust('Date').isIsoDate().verifyEither();
           expect(result.isRight(), isTrue, reason: '$date should be valid');
           result.fold(
             (error) => fail('$date should be valid'),
@@ -700,7 +700,7 @@ void main() {
         ];
 
         for (final date in invalidDates) {
-          final result = date.field('Date').isIsoDate().validateEither();
+          final result = date.trust('Date').isIsoDate().verifyEither();
           expect(result.isLeft(), isTrue, reason: '$date should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('Date'));
@@ -716,7 +716,7 @@ void main() {
       });
 
       test('should fail with non-leap year February 29', () {
-        final result = '2023-02-29'.field('Date').isIsoDate().validateEither();
+        final result = '2023-02-29'.trust('Date').isIsoDate().verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Date'));
@@ -738,7 +738,7 @@ void main() {
         ];
 
         for (final time in validTimes) {
-          final result = time.field('Time').isTime24Hour().validateEither();
+          final result = time.trust('Time').isTime24Hour().verifyEither();
           expect(result.isRight(), isTrue, reason: '$time should be valid');
           result.fold(
             (error) => fail('$time should be valid'),
@@ -762,9 +762,9 @@ void main() {
 
         for (final time in invalidTimes) {
           final result = time
-              .field('Time')
+              .trust('Time')
               .isTime24Hour(requireLeadingZero: true)
-              .validateEither();
+              .verifyEither();
           expect(result.isLeft(), isTrue, reason: '$time should be invalid');
           result.fold((error) {
             expect(error.fieldName, equals('Time'));
@@ -789,11 +789,11 @@ void main() {
     group('chaining', () {
       test('should work with multiple validators', () {
         final result = 'test@example.com'
-            .field('Email')
+            .trust('Email')
             .isNotEmpty()
             .isEmail()
             .minLength(10)
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -804,11 +804,11 @@ void main() {
 
       test('should fail on first validation failure', () {
         final result = 'test@example.com'
-            .field('Email')
+            .trust('Email')
             .isNotEmpty()
             .isEmail()
             .minLength(20) // This will fail
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -822,12 +822,12 @@ void main() {
 
       test('should work with type transformation', () {
         final result = '123'
-            .field('Number')
+            .trust('Number')
             .isNotEmpty()
             .toInt()
             .min(100)
             .max(200)
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold((error) => fail('Should not return error'), (value) {
@@ -839,11 +839,11 @@ void main() {
 
     group('isOneOf', () {
       test('should succeed when string is in allowed values list', () {
-        final result = 'active'.field('Status').isOneOf([
+        final result = 'active'.trust('Status').isOneOf([
           'active',
           'inactive',
           'pending',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -852,11 +852,11 @@ void main() {
       });
 
       test('should fail when string is not in allowed values list', () {
-        final result = 'invalid'.field('Status').isOneOf([
+        final result = 'invalid'.trust('Status').isOneOf([
           'active',
           'inactive',
           'pending',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Status'));
@@ -868,10 +868,10 @@ void main() {
       });
 
       test('should succeed with case-insensitive comparison', () {
-        final result = 'ACTIVE'.field('Status').isOneOf([
+        final result = 'ACTIVE'.trust('Status').isOneOf([
           'active',
           'inactive',
-        ], caseInsensitive: true).validateEither();
+        ], caseInsensitive: true).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -880,10 +880,10 @@ void main() {
       });
 
       test('should fail with case-sensitive comparison by default', () {
-        final result = 'ACTIVE'.field('Status').isOneOf([
+        final result = 'ACTIVE'.trust('Status').isOneOf([
           'active',
           'inactive',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Status'));
@@ -895,9 +895,9 @@ void main() {
       });
 
       test('should work with single allowed value', () {
-        final result = 'test'.field('String').isOneOf([
+        final result = 'test'.trust('String').isOneOf([
           'test',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -906,7 +906,7 @@ void main() {
       });
 
       test('should work with empty list (always fails)', () {
-        final result = 'test'.field('String').isOneOf([]).validateEither();
+        final result = 'test'.trust('String').isOneOf([]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -915,11 +915,11 @@ void main() {
       });
 
       test('should work with mixed case values in case-insensitive mode', () {
-        final result = 'MixedCase'.field('String').isOneOf([
+        final result = 'MixedCase'.trust('String').isOneOf([
           'mixedcase',
           'MIXEDCASE',
           'MixedCase',
-        ], caseInsensitive: true).validateEither();
+        ], caseInsensitive: true).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -930,11 +930,11 @@ void main() {
 
     group('isNoneOf', () {
       test('should succeed when string is not in forbidden values list', () {
-        final result = 'valid'.field('Username').isNoneOf([
+        final result = 'valid'.trust('Username').isNoneOf([
           'admin',
           'root',
           'system',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -943,11 +943,11 @@ void main() {
       });
 
       test('should fail when string is in forbidden values list', () {
-        final result = 'admin'.field('Username').isNoneOf([
+        final result = 'admin'.trust('Username').isNoneOf([
           'admin',
           'root',
           'system',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Username'));
@@ -959,10 +959,10 @@ void main() {
       });
 
       test('should succeed with case-insensitive comparison', () {
-        final result = 'VALID'.field('Username').isNoneOf([
+        final result = 'VALID'.trust('Username').isNoneOf([
           'admin',
           'root',
-        ], caseInsensitive: true).validateEither();
+        ], caseInsensitive: true).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -973,10 +973,10 @@ void main() {
       test(
         'should fail with case-insensitive comparison when value matches',
         () {
-          final result = 'ADMIN'.field('Username').isNoneOf([
+          final result = 'ADMIN'.trust('Username').isNoneOf([
             'admin',
             'root',
-          ], caseInsensitive: true).validateEither();
+          ], caseInsensitive: true).verifyEither();
           expect(result.isLeft(), isTrue);
           result.fold((error) {
             expect(error.fieldName, equals('Username'));
@@ -989,10 +989,10 @@ void main() {
       );
 
       test('should succeed with case-sensitive comparison by default', () {
-        final result = 'ADMIN'.field('Username').isNoneOf([
+        final result = 'ADMIN'.trust('Username').isNoneOf([
           'admin',
           'root',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -1001,9 +1001,9 @@ void main() {
       });
 
       test('should work with single forbidden value', () {
-        final result = 'test'.field('String').isNoneOf([
+        final result = 'test'.trust('String').isNoneOf([
           'forbidden',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -1012,7 +1012,7 @@ void main() {
       });
 
       test('should work with empty list (always succeeds)', () {
-        final result = 'test'.field('String').isNoneOf([]).validateEither();
+        final result = 'test'.trust('String').isNoneOf([]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -1021,11 +1021,11 @@ void main() {
       });
 
       test('should work with mixed case values in case-insensitive mode', () {
-        final result = 'ValidCase'.field('String').isNoneOf([
+        final result = 'ValidCase'.trust('String').isNoneOf([
           'validcase',
           'VALIDCASE',
           'ValidCase',
-        ], caseInsensitive: true).validateEither();
+        ], caseInsensitive: true).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
@@ -1039,10 +1039,10 @@ void main() {
       });
 
       test('should work with special characters in forbidden values', () {
-        final result = 'user@domain.com'.field('Email').isNoneOf([
+        final result = 'user@domain.com'.trust('Email').isNoneOf([
           'admin@domain.com',
           'root@domain.com',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -1051,10 +1051,10 @@ void main() {
       });
 
       test('should fail with special characters when value matches', () {
-        final result = 'admin@domain.com'.field('Email').isNoneOf([
+        final result = 'admin@domain.com'.trust('Email').isNoneOf([
           'admin@domain.com',
           'root@domain.com',
-        ]).validateEither();
+        ]).verifyEither();
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('Email'));

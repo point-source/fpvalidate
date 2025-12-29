@@ -11,39 +11,39 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-# fpvalidate
+# trust_but_verify
 
 A fluent, flexible, and typesafe validation library that supports async, casting, and [fpdart](https://pub.dev/packages/fpdart) types
 
 ## Features
 
 - **Fluent API**: Chain validation rules with a clean, readable syntax
-- **Functional Programming**: Built on [fpdart](https://pub.dev/packages/fpdart)'s Either and TaskEither for type-safe error handling
-- **Multiple Validation Modes**: Support for both synchronous and asynchronous validation
-- **Comprehensive Validators**: Built-in validators for strings, numbers, and nullable types
-- **Custom Validators**: Easy creation of custom validation logic
+
 - **Batch Validation**: Validate multiple fields at once
 - **Nullable Support**: Specialized validators for handling optional fields
 - **Type Casting & Transformation**: Convert between types while validating (String to int, nullable to non-nullable, etc.)
+- **Multiple Validation Modes**: Support for both synchronous and asynchronous validation
+- **Comprehensive Validators**: Built-in validators for strings, numbers, nullable types, and easy creation of custom validation logic
 - **Flutter Form Compatibility**: Built-in support for Flutter form validation with `asFormValidator()` method
 - **Error Handling**: Comprehensive error system with specific error types for different validation scenarios
-- **Direct Either/TaskEither Support**: Start validation chains directly from [fpdart](https://pub.dev/packages/fpdart)'s `Either` and `TaskEither` values
+- **Optional Field Names**: Use `.trust('Email')` with a name, or `.trust()` for generic messages
+- **Custom Error Messages**: Override error messages at verification time with lambdas
+- **Direct Either/TaskEither Support**: Start validation chains directly from [fpdart](https://pub.dev/packages/fpdart)'s `Either` and `TaskEither` values. Optionally return validation result as an Either/TaskEither
 - **Internationalization**: Support for custom validation messages with type-safe interfaces and default English fallbacks
 
 ## Getting Started
 
-Add fpvalidate to your `pubspec.yaml`:
+Add trust_but_verify to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fpvalidate: ^0.4.0
-  fpdart: ^1.1.1
+  trust_but_verify: ^1.0.0
 ```
 
 Import the library:
 
 ```dart
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 ```
 
 ## Usage
@@ -51,27 +51,41 @@ import 'package:fpvalidate/fpvalidate.dart';
 ### Basic Single Field Validation
 
 ```dart
-// Functional validation with Either
-final result = email
-    .field('Email')
-    .isNotEmpty()
-    .isEmail()
-    .validateEither()
-    .mapLeft((error) => 'Validation failed: ${error.message}');
-
 // Simple validation with exception handling
 try {
   final validatedEmail = email
-      .field('Email')
+      .trust('Email')
       .isNotEmpty()
       .isEmail()
-      .validate();
+      .verify();
   print('Valid email: $validatedEmail');
 } catch (e) {
   if (e is ValidationError) {
     print('Validation failed: ${e.message}');
   }
 }
+
+// Validation without field name (uses generic messages like "Value cannot be empty")
+final result = email
+    .trust()
+    .isNotEmpty()
+    .isEmail()
+    .verifyEither();
+
+// Custom error message at verification time
+final value = email
+    .trust('Email')
+    .isNotEmpty()
+    .isEmail()
+    .verify((fieldName) => 'Please enter a valid $fieldName');
+
+// Functional validation with Either (from fpdart package)
+final result = email
+    .trust('Email')
+    .isNotEmpty()
+    .isEmail()
+    .verifyEither()
+    .mapLeft((error) => 'Validation failed: ${error.message}');
 ```
 
 ### Flutter Form Validation
@@ -91,7 +105,7 @@ class _EmailFormState extends State<EmailForm> {
   // [asFormValidator] causes the validation to return a [String?] instead of a [Either<ValidationError, String>]
   // This is useful for Flutter forms since they expect a [String?] to display the error message or [null] to signal success.
   String? _validateEmail(String? value) => value
-        .field('Email')
+        .trust('Email')
         .isNotNull()
         .isNotEmpty()
         .isEmail()
@@ -120,10 +134,10 @@ class _EmailFormState extends State<EmailForm> {
 
 ```dart
 final validationResult = [
-  email.field('Email').isNotEmpty().isEmail(),
-  password.field('Password').isNotEmpty().minLength(8),
-  age.field('Age').min(13).max(120),
-].validateEither()
+  email.trust('Email').isNotEmpty().isEmail(),
+  password.trust('Password').isNotEmpty().minLength(8),
+  age.trust('Age').min(13).max(120),
+].verifyEither()
 .mapLeft((error) => 'Validation failed: ${error.message}');
 ```
 
@@ -132,7 +146,7 @@ final validationResult = [
 ```dart
 // Async validation with TaskEither
 final result = await email
-    .field('Email')
+    .trust('Email')
     .isNotEmpty()
     .isEmail()
     .toAsync()
@@ -144,16 +158,16 @@ final result = await email
       }
       return email;
     }, (fieldName) => '$fieldName already registered')
-    .validateTaskEither()
+    .verifyTaskEither()
     .run();
 
 // Async validation with Either
 final asyncResult = await email
-    .field('Email')
+    .trust('Email')
     .isNotEmpty()
     .isEmail()
     .toAsync()
-    .validateEither();
+    .verifyEither();
 ```
 
 ### Validation from Either/TaskEither
@@ -166,37 +180,37 @@ import 'package:fpdart/fpdart.dart';
 // Start validation from a Right value
 final right = Right<String, String>('test@example.com');
 final validated = right
-    .field('Email')
+    .trust('Email')
     .isNotEmpty()
     .isEmail()
-    .validateEither();
+    .verifyEither();
 
 // Start validation from a Left value (propagates the error)
 final left = Left<String, String>('Invalid input');
-final error = left.field('Email').validateEither();
+final error = left.trust('Email').verifyEither();
 // Result: Left(ValidationError('Email', 'Invalid input'))
 
 // Start validation from a TaskEither value
 final taskEither = TaskEither<String, String>.right('test@example.com');
 final asyncValidated = await taskEither
-    .field('Email')
+    .trust('Email')
     .bind((step) => step.isNotEmpty().isEmail())
-    .validateEither();
+    .verifyEither();
 
 // Use with numeric validation
 final ageRight = Right<String, int>(25);
 final ageValidated = ageRight
-    .field('Age')
+    .trust('Age')
     .min(18)
     .max(65)
-    .validateEither();
+    .verifyEither();
 
 // Use with async numeric validation
 final asyncAge = TaskEither<String, int>.right(30);
 final asyncAgeValidated = await asyncAge
-    .field('Age')
+    .trust('Age')
     .bind((step) => step.min(18).max(65))
-    .validateEither();
+    .verifyEither();
 ```
 
 ## Built-in Validators
@@ -204,7 +218,7 @@ final asyncAgeValidated = await asyncAge
 ### String Validators
 
 ```dart
-email.field('Email')
+email.trust('Email')
     .isNotEmpty()           // Ensures field is not empty
     .isNotEmpty(allowWhitespace: true)  // Allows whitespace-only strings
     .isEmail()            // Validates email format
@@ -228,7 +242,7 @@ email.field('Email')
     .isOneOf(['ACTIVE', 'INACTIVE'], caseInsensitive: true) // Case-insensitive comparison
     .isNoneOf(['admin', 'root', 'system']) // Must not be one of specified values
     .isNoneOf(['ADMIN', 'ROOT'], caseInsensitive: true) // Case-insensitive comparison
-    .validate();
+    .verify();
 ```
 
 These validators provide a fluent, chainable API and automatically use the field name in error messages for better user experience.
@@ -236,7 +250,7 @@ These validators provide a fluent, chainable API and automatically use the field
 ### Numeric Validators
 
 ```dart
-age.field('Age')
+age.trust('Age')
     .min(0)               // Minimum value
     .max(120)             // Maximum value
     .inRange(13, 65)      // Value within range
@@ -250,15 +264,15 @@ age.field('Age')
     .isWithinPercentage(target, 5.0) // Within 5% of target value
     .isOneOf([1, 2, 3, 4, 5]) // Must be one of specified values
     .isNoneOf([80, 443, 8080]) // Must not be one of specified values
-    .validate();
+    .verify();
 ```
 
 ### Nullable Validators
 
 ```dart
-optionalField.field('Optional Field')
+optionalField.trust('Optional Field')
     .isNotNull()
-    .validate();
+    .verify();
 ```
 
 ### Type Casting and Transformation Validators
@@ -268,39 +282,39 @@ Some validators not only validate but also transform the value type, enabling di
 ```dart
 // String to Integer transformation
 final result = '123'
-    .field('Number String')
+    .trust('Number String')
     .toInt()              // Converts String to int, enables numeric validators
     .min(100)             // Now we can use numeric validators
     .max(200)
     .isEven()
-    .validateEither();
+    .verifyEither();
 
 // Nullable to Non-nullable transformation
 final result = (someNullableString as String?)
-    .field('Optional String')
+    .trust('Optional String')
     .isNotNull()          // Converts String? to String, enables string validators
     .isNotEmpty()           // Now we can use string validators
     .isEmail()
-    .validateEither();
+    .verifyEither();
 
 // Type validation with isType<T>()
 // NOTE: isType<T>() works on Object? or more specific types.
 // It does NOT work directly on dynamic types due to Dart limitations.
 // If you have a dynamic value, cast it to Object? first.
 final result = (someDynamicValue as Object?)
-    .field('Dynamic Field')
+    .trust('Dynamic Field')
     .isType<int>()        // Validates type is int and returns SyncValidationStep<int>
     .min(10)              // Now we can use numeric validators
-    .validateEither();
+    .verifyEither();
 
 // Custom transformation with tryMap
 final result = '2023-12-25'
-    .field('Date String')
+    .trust('Date String')
     .tryMap(
       (value) => DateTime.parse(value),  // Converts String to DateTime
       (fieldName) => '$fieldName must be a valid date',
     )
-    .validateEither();
+    .verifyEither();
 ```
 
 These transformation validators are powerful because they allow you to:
@@ -318,27 +332,27 @@ These transformation validators are powerful because they allow you to:
 ```dart
 // Custom validation with ensure()
 final result = 'hello world'
-    .field('Custom String')
+    .trust('Custom String')
     .ensure(
       (value) => value.contains('world'),
       (fieldName) => '$fieldName must contain "world"',
     )
-    .validateEither();
+    .verifyEither();
 
 // Custom transformation with tryMap()
 final result = '123'
-    .field('Number String')
+    .trust('Number String')
     .tryMap(
       (value) => int.tryParse(value) ?? throw Exception('Invalid number'),
       (fieldName) => '$fieldName must be a valid number',
     )
-    .validateEither();
+    .verifyEither();
 
 // Type conversion with toInt()
 final result = '123'
-    .field('Number String')
+    .trust('Number String')
     .toInt()
-    .validateEither();
+    .verifyEither();
 ```
 
 ### Using the bind() Method
@@ -348,7 +362,7 @@ The `bind()` method allows you to chain validation steps by passing the current 
 ```dart
 // Complex validation with bind()
 final result = 'user@example.com'
-    .field('Email')
+    .trust('Email')
     .bind((email) {
       // Check if email is from allowed domains
       final allowedDomains = ['example.com', 'company.org'];
@@ -365,11 +379,11 @@ final result = 'user@example.com'
 
       return Right(email);
     })
-    .validateEither();
+    .verifyEither();
 
 // Conditional validation with bind()
 final result = age
-    .field('Age')
+    .trust('Age')
     .bind((value) {
       if (value < 18) {
         return Left(ValidationError('Age', 'Must be at least 18 years old'));
@@ -386,7 +400,7 @@ final result = age
 
       return Right(value);
     })
-    .validateEither();
+    .verifyEither();
 ```
 
 ### Creating Custom Extensions
@@ -449,19 +463,19 @@ extension CustomNumExtension<T extends num> on SyncValidationStep<T> {
 
 // Usage of custom extensions
 final passwordResult = 'MyP@ssw0rd'
-    .field('Password')
+    .trust('Password')
     .isStrongPassword()
-    .validateEither();
+    .verifyEither();
 
 final ageResult = 25
-    .field('Age')
+    .trust('Age')
     .isEmploymentAge()
-    .validateEither();
+    .verifyEither();
 ```
 
 ### Error Handling
 
-fpvalidate provides a comprehensive error handling system with specific error types for different validation scenarios. This allows for better debugging and more precise error handling in your applications.
+trust_but_verify provides a comprehensive error handling system with specific error types for different validation scenarios. This allows for better debugging and more precise error handling in your applications.
 
 ### Error Types
 
@@ -473,12 +487,14 @@ The library uses a hierarchical error system:
 - **`NullableValidationError`**: Specific errors for nullable field validation
 - **Core validation errors**: `FieldInitializationError`, `AsyncFieldInitializationError`, `TryMapValidationError`, `CheckValidationError`, `BindValidationError`
 
+All error classes support `copyWith({String? message})` for customizing error messages.
+
 ### Basic Error Handling
 
 ```dart
 // Get error message or null (useful for Flutter forms)
 final error = email
-    .field('Email')
+    .trust('Email')
     .isNotEmpty()
     .isEmail()
     .errorOrNull();
@@ -494,10 +510,10 @@ if (error != null) {
 ```dart
   // Handle specific error types and optionally change the error message
   final result = 'test@example.com'
-      .field('Email')
+      .trust('Email')
       .isNotEmpty()
       .isEmail()
-      .validateEither()
+      .verifyEither()
       .fold(
         (error) => switch (error) {
           EmptyStringValidationError _ => 'Email field is empty',
@@ -518,12 +534,12 @@ All validation errors include optional stack traces for better debugging:
 ```dart
 try {
   final result = email
-      .field('Email')
+      .trust('Email')
       .tryMap(
         (value) => throw Exception('Custom error'),
         (fieldName) => '$fieldName transformation failed',
       )
-      .validate();
+      .verify();
 } catch (e) {
   if (e is TryMapValidationError) {
     print('Error: ${e.message}');
@@ -553,11 +569,11 @@ class UserRegistrationForm {
 
   Either<ValidationError, UserRegistrationForm> validate() {
     return [
-      email.field('Email').isNotEmpty().isEmail(),
-      password.field('Password').isNotEmpty().minLength(8),
-      age.field('Age').min(13).max(120),
-      if (phone != null) phone!.field('Phone').isPhone(),
-    ].validateEither().map((_) => this);
+      email.trust('Email').isNotEmpty().isEmail(),
+      password.trust('Password').isNotEmpty().minLength(8),
+      age.trust('Age').min(13).max(120),
+      if (phone != null) phone!.trust('Phone').isPhone(),
+    ].verifyEither().map((_) => this);
   }
 }
 ```
@@ -568,7 +584,7 @@ class UserRegistrationForm {
 Future<Either<ValidationError, User>> validateUserResponse(Map<String, dynamic> json) async {
   return await json['email']
       .toString()
-      .field('Email')
+      .trust('Email')
       .isNotEmpty()
       .isEmail()
       .toAsync()
@@ -580,7 +596,7 @@ Future<Either<ValidationError, User>> validateUserResponse(Map<String, dynamic> 
         }
         return User(email: email);
       }, (fieldName) => '$fieldName not found')
-      .validateTaskEither()
+      .verifyTaskEither()
       .run();
 }
 ```
@@ -601,7 +617,7 @@ class _LoginFormState extends State<LoginForm> {
   String? _validateEmail(String? value) {
     if (value == null) return null;
     return value
-        .field('Email')
+        .trust('Email')
         .isNotEmpty()
         .isEmail()
         .asFormValidator();
@@ -610,7 +626,7 @@ class _LoginFormState extends State<LoginForm> {
   String? _validatePassword(String? value) {
     if (value == null) return null;
     return value
-        .field('Password')
+        .trust('Password')
         .isNotEmpty()
         .minLength(8)
         .asFormValidator();
@@ -649,24 +665,28 @@ The library provides descriptive error messages that include the field name and 
 - `"Age must be between 13 and 120"` (InvalidRangeValidationError)
 - `"Phone must be a valid phone number"` (InvalidPhoneValidationError)
 
+When no field name is provided (using `.trust()`), generic messages are used:
+- `"Value cannot be empty"`
+- `"Value must be a valid email address"`
+
 ## Internationalization
 
-fpvalidate supports custom validation messages through a type-safe internationalization system. You can override specific messages or provide complete custom implementations while maintaining default English fallbacks.
+trust_but_verify supports custom validation messages through a type-safe internationalization system. You can override specific messages or provide complete custom implementations while maintaining default English fallbacks.
 
 ### Basic Usage
 
 ```dart
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 // Configure custom messages globally
 ValidationStep.configureMessages(CustomValidationMessages());
 
 // All validation operations will now use your custom messages
 final result = email
-    .field('Email')
+    .trust('Email')
     .isNotEmpty()
     .isEmail()
-    .validateEither();
+    .verifyEither();
 ```
 
 ### Partial Override with Mixin
@@ -694,7 +714,7 @@ ValidationStep.configureMessages(CustomValidationMessages());
 Implement all messages for a complete translation:
 
 ```dart
-// Implement the ValidationMessages interface to provide your own completetranslations
+// Implement the ValidationMessages interface to provide your own complete translations
 class SpanishValidationMessages implements ValidationMessages {
   @override
   String emptyField(String fieldName) => 'El campo $fieldName está vacío';
@@ -733,6 +753,19 @@ The internationalization system is fully type-safe:
 ### Example Implementation
 
 See `example/i18n_example.dart` for a complete working example of the internationalization system.
+
+## Migration from fpvalidate
+
+If you're upgrading from the previous `fpvalidate` package, here are the API changes:
+
+| Old API (fpvalidate) | New API (trust_but_verify) |
+|----------------------|---------------------------|
+| `import 'package:fpvalidate/fpvalidate.dart'` | `import 'package:trust_but_verify/trust_but_verify.dart'` |
+| `.field('Name')` | `.trust('Name')` or `.trust()` |
+| `.validate()` | `.verify()` or `.verify((fieldName) => 'Custom message')` |
+| `.validateEither()` | `.verifyEither()` |
+| `.validateTaskEither()` | `.verifyTaskEither()` |
+| `.validateAsync()` | `.verifyAsync()` |
 
 ## Contributing
 

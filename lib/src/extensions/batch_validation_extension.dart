@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 /// Extension that provides batch validation capabilities for lists of validation steps.
 ///
@@ -10,33 +10,33 @@ import 'package:fpvalidate/fpvalidate.dart';
 /// Example:
 /// ```dart
 /// final result = [
-///   email.field('Email').isNotEmpty().isEmail(),
-///   password.field('Password').isNotEmpty().minLength(8),
-///   age.field('Age').min(13).max(120),
-/// ].validateEither();
+///   email.trust('Email').isNotEmpty().isEmail(),
+///   password.trust('Password').isNotEmpty().minLength(8),
+///   age.trust('Age').min(13).max(120),
+/// ].verifyEither();
 /// ```
 extension BatchValidationExtension<T> on List<ValidationStep<T>> {
-  /// Validates all validation steps asynchronously and returns a list of validated values.
+  /// Validates all validation steps asynchronously and returns a list of verified values.
   ///
   /// This method handles both synchronous and asynchronous validation steps.
   /// Synchronous steps are wrapped in a Future, while asynchronous steps are
   /// executed as-is. All validations run concurrently.
   ///
-  /// Returns a [Future<List<T>>] containing all validated values if successful,
+  /// Returns a [Future<List<T>>] containing all verified values if successful,
   /// or throws the first [ValidationError] encountered.
   ///
   /// Example:
   /// ```dart
   /// final values = await [
-  ///   email.field('Email').isNotEmpty().isEmail(),
-  ///   password.field('Password').isNotEmpty().minLength(8),
-  /// ].validateAsync();
+  ///   email.trust('Email').isNotEmpty().isEmail(),
+  ///   password.trust('Password').isNotEmpty().minLength(8),
+  /// ].verifyAsync();
   /// ```
-  Future<List<T>> validateAsync() => Future.wait(
+  Future<List<T>> verifyAsync() => Future.wait(
     map(
       (step) => switch (step) {
-        SyncValidationStep<T>() => Future.value(step.validate()),
-        AsyncValidationStep<T>() => step.validate().then((value) => value),
+        SyncValidationStep<T>() => Future.value(step.verify()),
+        AsyncValidationStep<T>() => step.verify().then((value) => value),
       },
     ),
   );
@@ -49,19 +49,19 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   ///
   /// Returns a [TaskEither<ValidationError, List<T>>] where:
   /// - [Left] contains the first [ValidationError] encountered
-  /// - [Right] contains a list of all validated values
+  /// - [Right] contains a list of all verified values
   ///
   /// Example:
   /// ```dart
   /// final result = await [
-  ///   email.field('Email').isNotEmpty().isEmail(),
-  ///   password.field('Password').isNotEmpty().minLength(8),
-  /// ].validateTaskEither().run();
+  ///   email.trust('Email').isNotEmpty().isEmail(),
+  ///   password.trust('Password').isNotEmpty().minLength(8),
+  /// ].verifyTaskEither().run();
   /// ```
-  TaskEither<ValidationError, List<T>> validateTaskEither() => map(
+  TaskEither<ValidationError, List<T>> verifyTaskEither() => map(
     (step) => switch (step) {
-      SyncValidationStep<T>() => step.validateEither().toTaskEither(),
-      AsyncValidationStep<T>() => step.validateTaskEither(),
+      SyncValidationStep<T>() => step.verifyEither().toTaskEither(),
+      AsyncValidationStep<T>() => step.verifyTaskEither(),
     },
   ).sequenceTaskEither();
 }
@@ -74,45 +74,45 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
 /// Example:
 /// ```dart
 /// final result = [
-///   email.field('Email').isNotEmpty().isEmail(),
-///   password.field('Password').isNotEmpty().minLength(8),
-/// ].validateEither();
+///   email.trust('Email').isNotEmpty().isEmail(),
+///   password.trust('Password').isNotEmpty().minLength(8),
+/// ].verifyEither();
 /// ```
 extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
-  /// Validates all synchronous validation steps and returns a list of validated values.
+  /// Verifies all synchronous validation steps and returns a list of verified values.
   ///
   /// This method executes all validations synchronously and returns the results
   /// immediately. If any validation fails, a [ValidationError] is thrown.
   ///
-  /// Returns a [List<T>] containing all validated values if successful.
+  /// Returns a [List<T>] containing all verified values if successful.
   ///
   /// Example:
   /// ```dart
   /// final values = [
-  ///   email.field('Email').isNotEmpty().isEmail(),
-  ///   password.field('Password').isNotEmpty().minLength(8),
-  /// ].validate();
+  ///   email.trust('Email').isNotEmpty().isEmail(),
+  ///   password.trust('Password').isNotEmpty().minLength(8),
+  /// ].verify();
   /// ```
-  List<T> validate() => map((step) => step.validate()).toList();
+  List<T> verify() => map((step) => step.verify()).toList();
 
-  /// Validates all synchronous validation steps and returns an [Either] containing the results.
+  /// Verifies all synchronous validation steps and returns an [Either] containing the results.
   ///
   /// This method executes all validations synchronously and returns the results
   /// wrapped in an [Either] for functional error handling.
   ///
   /// Returns an [Either<ValidationError, List<T>>] where:
   /// - [Left] contains the first [ValidationError] encountered
-  /// - [Right] contains a list of all validated values
+  /// - [Right] contains a list of all verified values
   ///
   /// Example:
   /// ```dart
   /// final result = [
-  ///   email.field('Email').isNotEmpty().isEmail(),
-  ///   password.field('Password').isNotEmpty().minLength(8),
-  /// ].validateEither();
+  ///   email.trust('Email').isNotEmpty().isEmail(),
+  ///   password.trust('Password').isNotEmpty().minLength(8),
+  /// ].verifyEither();
   /// ```
-  Either<ValidationError, List<T>> validateEither() =>
-      map((step) => step.validateEither()).sequenceEither();
+  Either<ValidationError, List<T>> verifyEither() =>
+      map((step) => step.verifyEither()).sequenceEither();
 }
 
 /// Extension that provides batch validation capabilities for lists of asynchronous validation steps.
@@ -123,44 +123,43 @@ extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
 /// Example:
 /// ```dart
 /// final result = await [
-///   email.field('Email').toAsync().isNotEmpty().isEmail(),
-///   password.field('Password').toAsync().isNotEmpty().minLength(8),
-/// ].validateTaskEither().run();
+///   email.trust('Email').toAsync().isNotEmpty().isEmail(),
+///   password.trust('Password').toAsync().isNotEmpty().minLength(8),
+/// ].verifyTaskEither().run();
 /// ```
 extension BatchAsyncValidationExtension<T> on List<AsyncValidationStep<T>> {
-  /// Validates all asynchronous validation steps and returns a list of validated values.
+  /// Verifies all asynchronous validation steps and returns a list of verified values.
   ///
   /// This method executes all validations asynchronously and returns the results
   /// when all validations complete. If any validation fails, a [ValidationError] is thrown.
   ///
-  /// Returns a [Future<List<T>>] containing all validated values if successful.
+  /// Returns a [Future<List<T>>] containing all verified values if successful.
   ///
   /// Example:
   /// ```dart
   /// final values = await [
-  ///   email.field('Email').toAsync().isNotEmpty().isEmail(),
-  ///   password.field('Password').toAsync().isNotEmpty().minLength(8),
-  /// ].validateAsync();
+  ///   email.trust('Email').toAsync().isNotEmpty().isEmail(),
+  ///   password.trust('Password').toAsync().isNotEmpty().minLength(8),
+  /// ].verifyAsync();
   /// ```
-  Future<List<T>> validateAsync() =>
-      BatchValidationExtension(this).validateAsync();
+  Future<List<T>> verifyAsync() => BatchValidationExtension(this).verifyAsync();
 
-  /// Validates all asynchronous validation steps and returns a [TaskEither] containing the results.
+  /// Verifies all asynchronous validation steps and returns a [TaskEither] containing the results.
   ///
   /// This method executes all validations asynchronously and returns the results
   /// wrapped in a [TaskEither] for functional error handling.
   ///
   /// Returns a [TaskEither<ValidationError, List<T>>] where:
   /// - [Left] contains the first [ValidationError] encountered
-  /// - [Right] contains a list of all validated values
+  /// - [Right] contains a list of all verified values
   ///
   /// Example:
   /// ```dart
   /// final result = await [
-  ///   email.field('Email').toAsync().isNotEmpty().isEmail(),
-  ///   password.field('Password').toAsync().isNotEmpty().minLength(8),
-  /// ].validateTaskEither().run();
+  ///   email.trust('Email').toAsync().isNotEmpty().isEmail(),
+  ///   password.trust('Password').toAsync().isNotEmpty().minLength(8),
+  /// ].verifyTaskEither().run();
   /// ```
-  TaskEither<ValidationError, List<T>> validateTaskEither() =>
-      BatchValidationExtension(this).validateTaskEither();
+  TaskEither<ValidationError, List<T>> verifyTaskEither() =>
+      BatchValidationExtension(this).verifyTaskEither();
 }

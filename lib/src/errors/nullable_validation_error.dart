@@ -14,4 +14,8 @@ class NullValueValidationError extends NullableValidationError {
     super.message, [
     super.stackTrace,
   ]);
+
+  @override
+  NullValueValidationError copyWith({String? message}) =>
+      .new(fieldName, message ?? this.message, stackTrace);
 }

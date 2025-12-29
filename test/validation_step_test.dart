@@ -1,18 +1,18 @@
 import 'package:test/test.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:fpvalidate/fpvalidate.dart';
+import 'package:trust_but_verify/trust_but_verify.dart';
 
 void main() {
   group('SyncValidationStep', () {
     group('tryMap', () {
       test('should transform value successfully', () {
-        final step = '123'.field('Number');
+        final step = '123'.trust('Number');
         final result = step
             .tryMap(
               (value) => int.parse(value),
               (fieldName) => '$fieldName must be a number',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -22,13 +22,13 @@ void main() {
       });
 
       test('should return error when transformation fails', () {
-        final step = 'abc'.field('Number');
+        final step = 'abc'.trust('Number');
         final result = step
             .tryMap(
               (value) => int.parse(value),
               (fieldName) => '$fieldName must be a number',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -40,13 +40,13 @@ void main() {
 
     group('check', () {
       test('should succeed when condition is true', () {
-        final step = 'test@example.com'.field('Email');
+        final step = 'test@example.com'.trust('Email');
         final result = step
             .ensure(
               (value) => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -56,13 +56,13 @@ void main() {
       });
 
       test('should fail when condition is false', () {
-        final step = 'invalid-email'.field('Email');
+        final step = 'invalid-email'.trust('Email');
         final result = step
             .ensure(
               (value) => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -72,13 +72,13 @@ void main() {
       });
 
       test('should handle exceptions in check function', () {
-        final step = 'test'.field('String');
+        final step = 'test'.trust('String');
         final result = step
             .ensure(
               (value) => throw Exception('Test exception'),
               (fieldName) => '$fieldName is invalid',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -90,10 +90,10 @@ void main() {
 
     group('bind', () {
       test('should bind to another validation step', () {
-        final step = '123'.field('Number');
+        final step = '123'.trust('Number');
         final result = step
             .bind((value) => Right(int.parse(value)))
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -103,12 +103,12 @@ void main() {
       });
 
       test('should propagate error from bound step', () {
-        final step = 'abc'.field('Number');
+        final step = 'abc'.trust('Number');
         final result = step
             .bind(
               (value) => Left(BindValidationError('Number', 'Invalid number')),
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -120,12 +120,12 @@ void main() {
 
     group('toAsync', () {
       test('should convert to async validation step', () async {
-        final step = 'test'.field('String');
+        final step = 'test'.trust('String');
         final asyncStep = step.toAsync();
 
         expect(asyncStep, isA<AsyncValidationStep<String>>());
 
-        final result = await asyncStep.validateEither();
+        final result = await asyncStep.verifyEither();
         expect(result.isRight(), isTrue);
         result.fold(
           (error) => fail('Should not return error'),
@@ -136,23 +136,23 @@ void main() {
 
     group('validate', () {
       test('should return value when successful', () {
-        final step = 'test'.field('String');
-        final result = step.validate();
+        final step = 'test'.trust('String');
+        final result = step.verify();
 
         expect(result, equals('test'));
       });
 
       test('should throw ValidationError when failed', () {
-        final step = ''.field('String').isNotEmpty();
+        final step = ''.trust('String').isNotEmpty();
 
-        expect(() => step.validate(), throwsA(isA<ValidationError>()));
+        expect(() => step.verify(), throwsA(isA<ValidationError>()));
       });
     });
 
     group('validateEither', () {
       test('should return Right when successful', () {
-        final step = 'test'.field('String');
-        final result = step.validateEither();
+        final step = 'test'.trust('String');
+        final result = step.verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -162,46 +162,46 @@ void main() {
       });
 
       test('should return Left when failed', () {
-        final step = ''.field('String').isNotEmpty();
-        final result = step.validateEither();
+        final step = ''.trust('String').isNotEmpty();
+        final result = step.verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
           expect(error.fieldName, equals('String'));
-          expect(error.message, equals('Field String is empty'));
+          expect(error.message, equals('String cannot be empty'));
         }, (value) => fail('Should return error'));
       });
     });
 
     group('errorOrNull', () {
       test('should return null when successful', () {
-        final step = 'test'.field('String');
+        final step = 'test'.trust('String');
         final result = step.errorOrNull();
 
         expect(result, isNull);
       });
 
       test('should return error message when failed', () {
-        final step = ''.field('String').isNotEmpty();
+        final step = ''.trust('String').isNotEmpty();
         final result = step.errorOrNull();
 
-        expect(result, equals('Field String is empty'));
+        expect(result, equals('String cannot be empty'));
       });
     });
 
     group('asFormValidator', () {
       test('should return null when successful', () {
-        final step = 'test'.field('String');
+        final step = 'test'.trust('String');
         final result = step.asFormValidator();
 
         expect(result, isNull);
       });
 
       test('should return error message when failed', () {
-        final step = ''.field('String').isNotEmpty();
+        final step = ''.trust('String').isNotEmpty();
         final result = step.asFormValidator();
 
-        expect(result, equals('Field String is empty'));
+        expect(result, equals('String cannot be empty'));
       });
     });
   });
@@ -209,13 +209,13 @@ void main() {
   group('AsyncValidationStep', () {
     group('tryMap', () {
       test('should transform value successfully with async function', () async {
-        final step = Future.value('123').field('Number');
+        final step = Future.value('123').trust('Number');
         final result = await step
             .tryMap(
               (value) async => int.parse(value),
               (fieldName) => '$fieldName must be a number',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -225,13 +225,13 @@ void main() {
       });
 
       test('should transform value successfully with sync function', () async {
-        final step = Future.value('123').field('Number');
+        final step = Future.value('123').trust('Number');
         final result = await step
             .tryMap(
               (value) => int.parse(value),
               (fieldName) => '$fieldName must be a number',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -243,13 +243,13 @@ void main() {
       test(
         'should return error when transformation fails with async function',
         () async {
-          final step = Future.value('abc').field('Number');
+          final step = Future.value('abc').trust('Number');
           final result = await step
               .tryMap(
                 (value) async => int.parse(value),
                 (fieldName) => '$fieldName must be a number',
               )
-              .validateEither();
+              .verifyEither();
 
           expect(result.isLeft(), isTrue);
           result.fold((error) {
@@ -262,13 +262,13 @@ void main() {
       test(
         'should return error when transformation fails with sync function',
         () async {
-          final step = Future.value('abc').field('Number');
+          final step = Future.value('abc').trust('Number');
           final result = await step
               .tryMap(
                 (value) => int.parse(value),
                 (fieldName) => '$fieldName must be a number',
               )
-              .validateEither();
+              .verifyEither();
 
           expect(result.isLeft(), isTrue);
           result.fold((error) {
@@ -281,13 +281,13 @@ void main() {
       test(
         'should handle exceptions in sync transformation function',
         () async {
-          final step = Future.value('test').field('String');
+          final step = Future.value('test').trust('String');
           final result = await step
               .tryMap(
                 (value) => throw Exception('Test exception'),
                 (fieldName) => '$fieldName is invalid',
               )
-              .validateEither();
+              .verifyEither();
 
           expect(result.isLeft(), isTrue);
           result.fold((error) {
@@ -302,13 +302,13 @@ void main() {
       test(
         'should succeed when condition is true with async function',
         () async {
-          final step = Future.value('test@example.com').field('Email');
+          final step = Future.value('test@example.com').trust('Email');
           final result = await step
               .ensure(
                 (value) async => value.contains('@'),
                 (fieldName) => '$fieldName must contain @',
               )
-              .validateEither();
+              .verifyEither();
 
           expect(result.isRight(), isTrue);
           result.fold(
@@ -321,13 +321,13 @@ void main() {
       test(
         'should succeed when condition is true with sync function',
         () async {
-          final step = Future.value('test@example.com').field('Email');
+          final step = Future.value('test@example.com').trust('Email');
           final result = await step
               .ensure(
                 (value) => value.contains('@'),
                 (fieldName) => '$fieldName must contain @',
               )
-              .validateEither();
+              .verifyEither();
 
           expect(result.isRight(), isTrue);
           result.fold(
@@ -338,13 +338,13 @@ void main() {
       );
 
       test('should fail when condition is false with async function', () async {
-        final step = Future.value('invalid-email').field('Email');
+        final step = Future.value('invalid-email').trust('Email');
         final result = await step
             .ensure(
               (value) async => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -354,13 +354,13 @@ void main() {
       });
 
       test('should fail when condition is false with sync function', () async {
-        final step = Future.value('invalid-email').field('Email');
+        final step = Future.value('invalid-email').trust('Email');
         final result = await step
             .ensure(
               (value) => value.contains('@'),
               (fieldName) => '$fieldName must contain @',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -370,13 +370,13 @@ void main() {
       });
 
       test('should handle exceptions in sync check function', () async {
-        final step = Future.value('test').field('String');
+        final step = Future.value('test').trust('String');
         final result = await step
             .ensure(
               (value) => throw Exception('Test exception'),
               (fieldName) => '$fieldName is invalid',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -386,14 +386,14 @@ void main() {
       });
 
       test('should handle complex validation logic with sync function', () async {
-        final step = Future.value('password123').field('Password');
+        final step = Future.value('password123').trust('Password');
         final result = await step
             .ensure(
               (value) => value.length >= 8 && value.contains(RegExp(r'\d')),
               (fieldName) =>
                   '$fieldName must be at least 8 characters and contain a number',
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -405,7 +405,7 @@ void main() {
 
     group('then', () {
       test('should chain with sync validation step', () async {
-        final step = Future.value('123').field('Number');
+        final step = Future.value('123').trust('Number');
         final result = await step
             .then(
               (syncStep) => syncStep.tryMap(
@@ -413,7 +413,7 @@ void main() {
                 (fieldName) => '$fieldName must be a number',
               ),
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -425,10 +425,10 @@ void main() {
 
     group('bind', () {
       test('should bind to sync validation step', () async {
-        final step = Future.value('123').field('Number');
+        final step = Future.value('123').trust('Number');
         final result = await step
             .bind((value) => Right(int.parse(value)))
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -440,7 +440,7 @@ void main() {
 
     group('bindAsync', () {
       test('should bind to async validation step', () async {
-        final step = Future.value('123').field('Number');
+        final step = Future.value('123').trust('Number');
         final result = await step
             .bindAsync(
               (value) => TaskEither.tryCatch(
@@ -449,7 +449,7 @@ void main() {
                     BindValidationError('Number', 'Invalid number', stackTrace),
               ),
             )
-            .validateEither();
+            .verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -461,28 +461,28 @@ void main() {
 
     group('validate', () {
       test('should return value when successful', () async {
-        final step = Future.value('test').field('String');
-        final result = await step.validate();
+        final step = Future.value('test').trust('String');
+        final result = await step.verify();
 
         expect(result, equals('test'));
       });
 
       test('should throw ValidationError when failed', () {
         final step = Future.value('')
-            .field('String')
+            .trust('String')
             .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
             );
 
-        expect(() => step.validate(), throwsA(isA<ValidationError>()));
+        expect(() => step.verify(), throwsA(isA<ValidationError>()));
       });
     });
 
     group('validateEither', () {
       test('should return Right when successful', () async {
-        final step = Future.value('test').field('String');
-        final result = await step.validateEither();
+        final step = Future.value('test').trust('String');
+        final result = await step.verifyEither();
 
         expect(result.isRight(), isTrue);
         result.fold(
@@ -493,12 +493,12 @@ void main() {
 
       test('should return Left when failed', () async {
         final step = Future.value('')
-            .field('String')
+            .trust('String')
             .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
             );
-        final result = await step.validateEither();
+        final result = await step.verifyEither();
 
         expect(result.isLeft(), isTrue);
         result.fold((error) {
@@ -510,8 +510,8 @@ void main() {
 
     group('validateTaskEither', () {
       test('should return TaskEither', () async {
-        final step = Future.value('test').field('String');
-        final taskEither = step.validateTaskEither();
+        final step = Future.value('test').trust('String');
+        final taskEither = step.verifyTaskEither();
 
         expect(taskEither, isA<TaskEither<ValidationError, String>>());
 
@@ -526,7 +526,7 @@ void main() {
 
     group('errorOrNull', () {
       test('should return null when successful', () async {
-        final step = Future.value('test').field('String');
+        final step = Future.value('test').trust('String');
         final result = await step.errorOrNull();
 
         expect(result, isNull);
@@ -534,7 +534,7 @@ void main() {
 
       test('should return error message when failed', () async {
         final step = Future.value('')
-            .field('String')
+            .trust('String')
             .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',
@@ -547,7 +547,7 @@ void main() {
 
     group('asFormValidator', () {
       test('should return null when successful', () async {
-        final step = Future.value('test').field('String');
+        final step = Future.value('test').trust('String');
         final result = await step.asFormValidator();
 
         expect(result, isNull);
@@ -555,7 +555,7 @@ void main() {
 
       test('should return error message when failed', () async {
         final step = Future.value('')
-            .field('String')
+            .trust('String')
             .ensure(
               (value) async => value.isNotEmpty,
               (fieldName) => 'Field $fieldName is empty',

@@ -8,10 +8,10 @@ part of '../validation_step.dart';
 /// Example:
 /// ```dart
 /// final result = (someNullableString as String?)
-///     .field('Optional String')
+///     .trust('Optional String')
 ///     .isNotNull()
 ///     .isNotEmpty()
-///     .validateEither();
+///     .verifyEither();
 /// ```
 extension NullableExtension<T> on SyncValidationStep<T?> {
   /// Validates that the value is not null and converts it to a non-nullable type.
@@ -30,11 +30,11 @@ extension NullableExtension<T> on SyncValidationStep<T?> {
   /// Example:
   /// ```dart
   /// final result = (optionalEmail as String?)
-  ///     .field('Optional Email')
+  ///     .trust('Optional Email')
   ///     .isNotNull()          // Converts String? to String
   ///     .isNotEmpty()           // Now we can use string validators
   ///     .isEmail()
-  ///     .validateEither();
+  ///     .verifyEither();
   /// ```
   SyncValidationStep<T> isNotNull() => bind(
     (value) => value == null
