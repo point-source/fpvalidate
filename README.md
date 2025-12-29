@@ -80,12 +80,15 @@ final value = email
     .verify((fieldName) => 'Please enter a valid $fieldName');
 
 // Functional validation with Either (from fpdart package)
-final result = email
+final status = email
     .trust('Email')
     .isNotEmpty()
     .isEmail()
     .verifyEither()
-    .mapLeft((error) => 'Validation failed: ${error.message}');
+    .fold(
+      (error) => 'Validation failed: ${error.message}',
+      (validEmail) => 'Valid email: $validEmail',
+    );
 ```
 
 ### Flutter Form Validation
@@ -146,20 +149,12 @@ try {
     print('Validation failed: ${e.message}');
   }
 }
-
-// Or collect result as Either for functional error handling
-final validationResult = [
-  email.trust('Email').isNotEmpty().isEmail(),
-  password.trust('Password').isNotEmpty().minLength(8),
-  age.trust('Age').min(13).max(120),
-].verifyEither()
-.mapLeft((error) => 'Validation failed: ${error.message}');
 ```
 
 ### Asynchronous Validation
 
 ```dart
-// Async validation with TaskEither
+// Async validation with API call
 final result = await email
     .trust('Email')
     .isNotEmpty()
@@ -173,58 +168,53 @@ final result = await email
       }
       return email;
     }, (fieldName) => '$fieldName already registered')
-    .verifyTaskEither()
-    .run();
-
-// Async validation with verify()
-final asyncResult = await email
-    .trust('Email')
-    .isNotEmpty()
-    .isEmail()
-    .toAsync()
     .verify();
 ```
 
-### Validation from Either/TaskEither
+### Support for fpdart Functional Types
 
-You can now start validation chains directly from `Right`, `Left`, and `TaskEither` values:
+While `trust_but_verify` is designed to be a general-purpose validation library for any Dart project, it provides first-class support for users of the [fpdart](https://pub.dev/packages/fpdart) functional programming library.
+
+#### Flexible Verification
+
+Every validation chain can be ended in different ways depending on your preferred error-handling style. This allows the library to fit seamlessly into both standard imperative Dart and pure functional architectures.
+
+| Method | Result Type | Benefit |
+|--------|-------------|---------|
+| `.verify()` | `T` | Standard Dart. Throws `ValidationError` on failure. |
+| `.verifyEither()` | `Either<ValidationError, T>` | Pure functional. Returns `Left` on failure, `Right` on success. |
+| `.verifyTaskEither()` | `TaskEither<ValidationError, T>` | Async functional. Returns a `TaskEither` for further chaining. |
 
 ```dart
 import 'package:fpdart/fpdart.dart';
 
-// Start validation from a Right value
-final right = Right<String, String>('test@example.com');
-final validated = right
+// 1. Standard Dart (Throws on failure)
+final email = 'test@example.com'.trust('Email').isEmail().verify();
+
+// 2. Functional style with Either (Returns Left/Right)
+final result = 'test@example.com'.trust('Email').isEmail().verifyEither();
+
+// 3. Async functional style with TaskEither
+final task = 'test@example.com'.trust('Email').isEmail().toAsync().verifyTaskEither();
+```
+
+#### Starting Chains from Functional Types
+
+You can start validation chains directly from `Either` or `TaskEither` values, which is useful for integrating validation into existing functional flows.
+
+```dart
+// Start validation from an existing Either
+final Either<String, String> input = Right('test@example.com');
+final validated = input
     .trust('Email')
     .isNotEmpty()
     .isEmail()
     .verifyEither();
 
-// Start validation from a Left value (propagates the error)
-final left = Left<String, String>('Invalid input');
-final error = left.trust('Email').verifyEither();
-// Result: Left(ValidationError('Email', 'Invalid input'))
-
-// Start validation from a TaskEither value
-final taskEither = TaskEither<String, String>.right('test@example.com');
-final asyncValidated = await taskEither
+// Start validation from a TaskEither (propagates upstream failures)
+final taskInput = TaskEither<String, String>.right('test@example.com');
+final asyncValidated = await taskInput
     .trust('Email')
-    .bind((step) => step.isNotEmpty().isEmail())
-    .verifyEither();
-
-// Use with numeric validation
-final ageRight = Right<String, int>(25);
-final ageValidated = ageRight
-    .trust('Age')
-    .min(18)
-    .max(65)
-    .verifyEither();
-
-// Use with async numeric validation
-final asyncAge = TaskEither<String, int>.right(30);
-final asyncAgeValidated = await asyncAge
-    .trust('Age')
-    .bind((step) => step.min(18).max(65))
     .verifyEither();
 ```
 
