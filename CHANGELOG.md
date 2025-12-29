@@ -1,3 +1,7 @@
+## 0.6.1
+
+- **FIX**: Fixed issue with custom messages not being available to batch validation methods
+
 ## 0.6.0
 
 - **BREAKING**: Renamed package from `fpvalidate` to `trust_but_verify`

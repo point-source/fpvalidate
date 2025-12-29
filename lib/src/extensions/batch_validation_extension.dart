@@ -13,7 +13,7 @@ import 'package:trust_but_verify/trust_but_verify.dart';
 ///   email.trust('Email').isNotEmpty().isEmail(),
 ///   password.trust('Password').isNotEmpty().minLength(8),
 ///   age.trust('Age').min(13).max(120),
-/// ].verify();
+/// ].verifyAsync();
 /// ```
 extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   /// Validates all validation steps asynchronously and returns a list of verified values.
@@ -32,11 +32,14 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   ///   password.trust('Password').isNotEmpty().minLength(8),
   /// ].verifyAsync();
   /// ```
-  Future<List<T>> verifyAsync() => Future.wait(
+  Future<List<T>> verifyAsync([
+    String Function(String fieldName)? customMessage,
+  ]) => Future.wait(
     map(
       (step) => switch (step) {
-        SyncValidationStep<T>() => Future.value(step.verify()),
-        AsyncValidationStep<T>() => step.verify().then((value) => value),
+        SyncValidationStep<T>() => Future.value(step.verify(customMessage)),
+        AsyncValidationStep<T>() =>
+          step.verify(customMessage).then((value) => value),
       },
     ),
   );
@@ -58,10 +61,13 @@ extension BatchValidationExtension<T> on List<ValidationStep<T>> {
   ///   password.trust('Password').isNotEmpty().minLength(8),
   /// ].verifyTaskEither().run();
   /// ```
-  TaskEither<ValidationError, List<T>> verifyTaskEither() => map(
+  TaskEither<ValidationError, List<T>> verifyTaskEither([
+    String Function(String fieldName)? customMessage,
+  ]) => map(
     (step) => switch (step) {
-      SyncValidationStep<T>() => step.verifyEither().toTaskEither(),
-      AsyncValidationStep<T>() => step.verifyTaskEither(),
+      SyncValidationStep<T>() =>
+        step.verifyEither(customMessage).toTaskEither(),
+      AsyncValidationStep<T>() => step.verifyTaskEither(customMessage),
     },
   ).sequenceTaskEither();
 }
@@ -93,7 +99,8 @@ extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
   ///   password.trust('Password').isNotEmpty().minLength(8),
   /// ].verify();
   /// ```
-  List<T> verify() => map((step) => step.verify()).toList();
+  List<T> verify([String Function(String fieldName)? customMessage]) =>
+      map((step) => step.verify(customMessage)).toList();
 
   /// Verifies all synchronous validation steps and returns an [Either] containing the results.
   ///
@@ -111,8 +118,9 @@ extension BatchSyncValidationExtension<T> on List<SyncValidationStep<T>> {
   ///   password.trust('Password').isNotEmpty().minLength(8),
   /// ].verifyEither();
   /// ```
-  Either<ValidationError, List<T>> verifyEither() =>
-      map((step) => step.verifyEither()).sequenceEither();
+  Either<ValidationError, List<T>> verifyEither([
+    String Function(String fieldName)? customMessage,
+  ]) => map((step) => step.verifyEither(customMessage)).sequenceEither();
 }
 
 /// Extension that provides batch validation capabilities for lists of asynchronous validation steps.
@@ -142,16 +150,13 @@ extension BatchAsyncValidationExtension<T> on List<AsyncValidationStep<T>> {
   ///   password.trust('Password').toAsync().isNotEmpty().minLength(8),
   /// ].verifyAsync();
   /// ```
-  Future<List<T>> verifyAsync() => BatchValidationExtension(this).verifyAsync();
+  Future<List<T>> verifyAsync([
+    String Function(String fieldName)? customMessage,
+  ]) => BatchValidationExtension(this).verifyAsync(customMessage);
 
   /// Verifies all asynchronous validation steps and returns a [TaskEither] containing the results.
   ///
-  /// This method executes all validations asynchronously and returns the results
-  /// wrapped in a [TaskEither] for functional error handling.
-  ///
-  /// Returns a [TaskEither<ValidationError, List<T>>] where:
-  /// - [Left] contains the first [ValidationError] encountered
-  /// - [Right] contains a list of all verified values
+  /// [customMessage] is an optional function to override the error message.
   ///
   /// Example:
   /// ```dart
@@ -160,6 +165,7 @@ extension BatchAsyncValidationExtension<T> on List<AsyncValidationStep<T>> {
   ///   password.trust('Password').toAsync().isNotEmpty().minLength(8),
   /// ].verifyTaskEither().run();
   /// ```
-  TaskEither<ValidationError, List<T>> verifyTaskEither() =>
-      BatchValidationExtension(this).verifyTaskEither();
+  TaskEither<ValidationError, List<T>> verifyTaskEither([
+    String Function(String fieldName)? customMessage,
+  ]) => BatchValidationExtension(this).verifyTaskEither(customMessage);
 }
