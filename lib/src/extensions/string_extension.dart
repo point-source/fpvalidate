@@ -26,7 +26,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// [allowWhitespace] determines whether strings containing only whitespace are
   /// considered valid. Defaults to false.
   ///
-  /// Returns a [ValidationError] if the string is empty or contains only whitespace
+  /// Returns a [EmptyStringValidationError] if the string is empty or contains only whitespace
   /// (when [allowWhitespace] is false).
   ///
   /// Example:
@@ -51,7 +51,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Converts the string to an integer and returns a new validation step.
   ///
   /// This method attempts to parse the string as an integer using [int.tryParse].
-  /// If parsing fails, it returns a [ValidationError]. If successful, it returns
+  /// If parsing fails, it returns a [InvalidNumberFormatValidationError]. If successful, it returns
   /// a new [SyncValidationStep<int>] that can be chained with numeric validators.
   ///
   /// This is a type transformation validator that changes the validator type from
@@ -80,7 +80,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string has a minimum length of [length].
   ///
-  /// Returns a [ValidationError] if the string is shorter than [length].
+  /// Returns a [InvalidLengthValidationError] if the string is shorter than [length].
   ///
   /// Example:
   /// ```dart
@@ -97,7 +97,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string has a maximum length of [length].
   ///
-  /// Returns a [ValidationError] if the string is longer than [length].
+  /// Returns a [InvalidLengthValidationError] if the string is longer than [length].
   ///
   /// Example:
   /// ```dart
@@ -122,7 +122,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// the email address.
   ///
   /// Uses [email_validator](https://pub.dev/packages/email_validator) to validate email format.
-  /// Returns a [ValidationError] if the string is not a valid email address.
+  /// Returns a [InvalidEmailValidationError] if the string is not a valid email address.
   ///
   /// Example:
   /// ```dart
@@ -147,7 +147,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Validates that the string is a valid URL.
   ///
   /// Uses a comprehensive regex pattern to validate URL format.
-  /// Returns a [ValidationError] if the string is not a valid URL.
+  /// Returns a [InvalidUrlValidationError] if the string is not a valid URL.
   ///
   /// Example:
   /// ```dart
@@ -165,7 +165,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Validates that the string is a valid phone number.
   ///
   /// Uses a regex pattern to validate common phone number formats.
-  /// Returns a [ValidationError] if the string is not a valid phone number.
+  /// Returns a [InvalidPhoneValidationError] if the string is not a valid phone number.
   ///
   /// Example:
   /// ```dart
@@ -192,7 +192,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// [regex] is the regular expression pattern to match against.
   /// [description] is a human-readable description of the pattern for error messages.
   ///
-  /// Returns a [ValidationError] if the string doesn't match the pattern.
+  /// Returns a [InvalidPatternValidationError] if the string doesn't match the pattern.
   ///
   /// Example:
   /// ```dart
@@ -213,7 +213,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string contains the specified [substring].
   ///
-  /// Returns a [ValidationError] if the string doesn't contain [substring].
+  /// Returns a [MissingSubstringValidationError] if the string doesn't contain [substring].
   ///
   /// Example:
   /// ```dart
@@ -230,7 +230,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string starts with the specified [prefix].
   ///
-  /// Returns a [ValidationError] if the string doesn't start with [prefix].
+  /// Returns a [InvalidPrefixValidationError] if the string doesn't start with [prefix].
   ///
   /// Example:
   /// ```dart
@@ -247,7 +247,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string ends with the specified [suffix].
   ///
-  /// Returns a [ValidationError] if the string doesn't end with [suffix].
+  /// Returns a [InvalidSuffixValidationError] if the string doesn't end with [suffix].
   ///
   /// Example:
   /// ```dart
@@ -264,7 +264,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string contains only alphanumeric characters (letters and digits).
   ///
-  /// Returns a [ValidationError] if the string contains any non-alphanumeric characters.
+  /// Returns a [InvalidAlphanumericValidationError] if the string contains any non-alphanumeric characters.
   ///
   /// Example:
   /// ```dart
@@ -281,7 +281,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string contains only letters (a-z, A-Z).
   ///
-  /// Returns a [ValidationError] if the string contains any non-letter characters.
+  /// Returns a [InvalidLettersOnlyValidationError] if the string contains any non-letter characters.
   ///
   /// Example:
   /// ```dart
@@ -298,7 +298,7 @@ extension StringExtension on SyncValidationStep<String> {
 
   /// Validates that the string contains only digits (0-9).
   ///
-  /// Returns a [ValidationError] if the string contains any non-digit characters.
+  /// Returns a [InvalidDigitsOnlyValidationError] if the string contains any non-digit characters.
   ///
   /// Example:
   /// ```dart
@@ -318,7 +318,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Uses a regex pattern to validate UUID format (e.g., 550e8400-e29b-41d4-a716-446655440000).
   /// Case-insensitive validation.
   ///
-  /// Returns a [ValidationError] if the string is not a valid UUID.
+  /// Returns a [InvalidUuidValidationError] if the string is not a valid UUID.
   ///
   /// Example:
   /// ```dart
@@ -338,7 +338,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Uses a regex pattern to validate common credit card number formats.
   /// Automatically removes whitespace before validation.
   ///
-  /// Returns a [ValidationError] if the string is not a valid credit card number.
+  /// Returns a [InvalidCreditCardValidationError] if the string is not a valid credit card number.
   ///
   /// Example:
   /// ```dart
@@ -388,7 +388,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Validates that the string is a valid postal code.
   ///
   /// Uses a regex pattern to validate common postal code formats.
-  /// Returns a [ValidationError] if the string is not a valid postal code.
+  /// Returns a [InvalidPostalCodeValidationError] if the string is not a valid postal code.
   ///
   /// Example:
   /// ```dart
@@ -406,7 +406,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// Validates that the string is a valid ISO date in YYYY-MM-DD format.
   ///
   /// This method validates both the format and the actual date validity.
-  /// Returns a [ValidationError] if the string is not a valid ISO date.
+  /// Returns a [InvalidIsoDateValidationError] if the string is not a valid ISO date.
   ///
   /// Example:
   /// ```dart
@@ -442,7 +442,7 @@ extension StringExtension on SyncValidationStep<String> {
   ///
   /// Uses a regex pattern to validate 24-hour time format (00:00 to 23:59).
   /// [requireLeadingZero] determines whether hours and minutes must have leading zeros.
-  /// Returns a [ValidationError] if the string is not a valid 24-hour time.
+  /// Returns a [InvalidTime24HourValidationError] if the string is not a valid 24-hour time.
   ///
   /// Example:
   /// ```dart
@@ -478,7 +478,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// [caseInsensitive] determines whether the comparison should be case-insensitive.
   /// Defaults to false (case-sensitive).
   ///
-  /// Returns a [ValidationError] if the string is not in the allowed values list.
+  /// Returns a [InvalidAllowedValueValidationError] if the string is not in the allowed values list.
   ///
   /// Example:
   /// ```dart
@@ -522,7 +522,7 @@ extension StringExtension on SyncValidationStep<String> {
   /// [caseInsensitive] determines whether the comparison should be case-insensitive.
   /// Defaults to false (case-sensitive).
   ///
-  /// Returns a [ValidationError] if the string is in the forbidden values list.
+  /// Returns a [InvalidForbiddenValueValidationError] if the string is in the forbidden values list.
   ///
   /// Example:
   /// ```dart
@@ -560,7 +560,7 @@ extension NullableStringExtension on SyncValidationStep<String?> {
   /// [allowWhitespace] determines whether strings containing only whitespace are
   /// considered valid. Defaults to false.
   ///
-  /// Returns a [ValidationError] if the string is empty or contains only whitespace
+  /// Returns a [EmptyStringValidationError] if the string is empty or contains only whitespace
   /// (when [allowWhitespace] is false).
   ///
   /// Example:

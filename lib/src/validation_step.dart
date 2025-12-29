@@ -102,7 +102,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
 
   /// Attempts to transform the value using the provided function.
   ///
-  /// If the transformation function throws an error, it returns a [ValidationError]
+  /// If the transformation function throws an error, it returns a [TryMapValidationError]
   /// with the message provided by [onFail].
   ///
   /// [f] is the transformation function that takes the current value and returns a new value.
@@ -124,7 +124,7 @@ class SyncValidationStep<T> extends ValidationStep<T> {
 
   /// Ensures that the value satisfies the condition.
   ///
-  /// If the condition is not satisfied, return a [ValidationError]
+  /// If the condition is not satisfied, return a [CheckValidationError]
   /// containing the error message returned by the [onFalse] function.
   SyncValidationStep<T> ensure(
     bool Function(T) f,
@@ -279,7 +279,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
 
   /// Attempts to transform the value using the provided asynchronous function.
   ///
-  /// If the transformation function throws an error, it returns a [ValidationError]
+  /// If the transformation function throws an error, it returns a [TryMapValidationError]
   /// with the message provided by [onFail].
   ///
   /// [f] is the asynchronous transformation function that takes the current value and returns a [Future].
@@ -301,7 +301,7 @@ class AsyncValidationStep<T> extends ValidationStep<T> {
 
   /// Ensures that the value satisfies the given condition.
   ///
-  /// If the condition returns false, it returns a [ValidationError] with the message
+  /// If the condition returns false, it returns a [CheckValidationError] with the message
   /// provided by [onFalse].
   ///
   /// [f] is the validation function that takes the current value and returns a boolean.

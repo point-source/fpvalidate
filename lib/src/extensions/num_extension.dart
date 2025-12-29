@@ -18,7 +18,7 @@ part of '../validation_step.dart';
 extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Validates that the value is greater than or equal to [min].
   ///
-  /// Returns a [ValidationError] if the value is less than [min].
+  /// Returns a [InvalidMinValueValidationError] if the value is less than [min].
   ///
   /// Example:
   /// ```dart
@@ -35,7 +35,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is less than or equal to [max].
   ///
-  /// Returns a [ValidationError] if the value is greater than [max].
+  /// Returns a [InvalidMaxValueValidationError] if the value is greater than [max].
   ///
   /// Example:
   /// ```dart
@@ -52,7 +52,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is even (divisible by 2).
   ///
-  /// Returns a [ValidationError] if the value is odd.
+  /// Returns a [InvalidEvenNumberValidationError] if the value is odd.
   ///
   /// Example:
   /// ```dart
@@ -69,7 +69,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is odd (not divisible by 2).
   ///
-  /// Returns a [ValidationError] if the value is even.
+  /// Returns a [InvalidOddNumberValidationError] if the value is even.
   ///
   /// Example:
   /// ```dart
@@ -86,7 +86,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is positive (greater than 0).
   ///
-  /// Returns a [ValidationError] if the value is zero or negative.
+  /// Returns a [InvalidPositiveNumberValidationError] if the value is zero or negative.
   ///
   /// Example:
   /// ```dart
@@ -103,7 +103,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is non-negative (greater than or equal to 0).
   ///
-  /// Returns a [ValidationError] if the value is negative.
+  /// Returns a [InvalidNonNegativeNumberValidationError] if the value is negative.
   ///
   /// Example:
   /// ```dart
@@ -120,7 +120,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is negative (less than 0).
   ///
-  /// Returns a [ValidationError] if the value is zero or positive.
+  /// Returns a [InvalidNegativeNumberValidationError] if the value is zero or positive.
   ///
   /// Example:
   /// ```dart
@@ -137,7 +137,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
 
   /// Validates that the value is non-positive (less than or equal to 0).
   ///
-  /// Returns a [ValidationError] if the value is positive.
+  /// Returns a [InvalidNonPositiveNumberValidationError] if the value is positive.
   ///
   /// Example:
   /// ```dart
@@ -161,7 +161,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// This is a type transformation validator that changes the validator type from
   /// [SyncValidationStep<T>] to [SyncValidationStep<int>].
   ///
-  /// Returns a [SyncValidationStep<int>] if the value is an integer.
+  /// Returns a [InvalidIntegerValidationError] if the value is not an integer.
   ///
   /// Example:
   /// ```dart
@@ -191,7 +191,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// A power of 2 is a number that can be written as 2^n where n is a non-negative integer.
   /// Examples: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, etc.
   ///
-  /// Returns a [ValidationError] if the value is not a power of 2.
+  /// Returns a [InvalidPowerOfTwoValidationError] if the value is not a power of 2.
   ///
   /// Example:
   /// ```dart
@@ -237,7 +237,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// Port numbers are used in networking to identify specific processes or services.
   /// Valid port numbers range from 1 to 65535.
   ///
-  /// Returns a [ValidationError] if the value is not a valid port number.
+  /// Returns a [InvalidPortNumberValidationError] if the value is not a valid port number.
   ///
   /// Example:
   /// ```dart
@@ -260,7 +260,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// [target] is the reference value to compare against.
   /// [percentage] is the tolerance percentage (e.g., 5.0 for 5%).
   ///
-  /// Returns a [ValidationError] if the value is outside the tolerance range.
+  /// Returns a [InvalidPercentageRangeValidationError] if the value is outside the tolerance range.
   ///
   /// Example:
   /// ```dart
@@ -292,7 +292,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   /// This method checks if the value is greater than or equal to [min] and
   /// less than or equal to [max].
   ///
-  /// Returns a [ValidationError] if the value is outside the range.
+  /// Returns a [InvalidRangeValidationError] if the value is outside the range.
   ///
   /// Example:
   /// ```dart
@@ -313,7 +313,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// [allowedValues] is a list of numbers that are considered valid.
   ///
-  /// Returns a [ValidationError] if the value is not in the allowed values list.
+  /// Returns a [InvalidAllowedNumericValueValidationError] if the value is not in the allowed values list.
   ///
   /// Example:
   /// ```dart
@@ -345,7 +345,7 @@ extension NumExtension<T extends num> on SyncValidationStep<T> {
   ///
   /// [forbiddenValues] is a list of numbers that are considered invalid.
   ///
-  /// Returns a [ValidationError] if the value is in the forbidden values list.
+  /// Returns a [InvalidForbiddenNumericValueValidationError] if the value is in the forbidden values list.
   ///
   /// Example:
   /// ```dart

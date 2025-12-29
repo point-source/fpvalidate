@@ -17,7 +17,7 @@ extension NullableExtension<T> on SyncValidationStep<T?> {
   /// Validates that the value is not null and converts it to a non-nullable type.
   ///
   /// This method checks if the current value is null. If it is null, it returns
-  /// a [ValidationError]. If it is not null, it returns a new [SyncValidationStep]
+  /// a [NullValueValidationError]. If it is not null, it returns a new [SyncValidationStep]
   /// with the non-nullable value, enabling further validation with non-nullable
   /// validators.
   ///
