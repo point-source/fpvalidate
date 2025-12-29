@@ -13,7 +13,7 @@ and the Flutter guide for
 
 # trust_but_verify
 
-A fluent, flexible, and typesafe validation library that supports async, casting, and [fpdart](https://pub.dev/packages/fpdart) types
+A fluent, flexible, and typesafe validation library that supports async validators, type casting & transformations, custom error messages,and (optionally) [fpdart](https://pub.dev/packages/fpdart) types
 
 ## Features
 
@@ -549,9 +549,9 @@ try {
 }
 ```
 
-## Examples
+## Additional Examples
 
-### Form Validation
+### Form Data Object Validation (with fpdart Either type)
 
 ```dart
 class UserRegistrationForm {
@@ -578,7 +578,7 @@ class UserRegistrationForm {
 }
 ```
 
-### API Response Validation
+### API Response Validation (with fpdart Either type)
 
 ```dart
 Future<Either<ValidationError, User>> validateUserResponse(Map<String, dynamic> json) async {
@@ -601,60 +601,6 @@ Future<Either<ValidationError, User>> validateUserResponse(Map<String, dynamic> 
 }
 ```
 
-### Flutter Form Integration
-
-```dart
-class LoginForm extends StatefulWidget {
-  @override
-  _LoginFormState createState() => _LoginFormState();
-}
-
-class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  String? _validateEmail(String? value) {
-    if (value == null) return null;
-    return value
-        .trust('Email')
-        .isNotEmpty()
-        .isEmail()
-        .asFormValidator();
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null) return null;
-    return value
-        .trust('Password')
-        .isNotEmpty()
-        .minLength(8)
-        .asFormValidator();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _emailController,
-            validator: _validateEmail,
-            decoration: InputDecoration(labelText: 'Email'),
-          ),
-          TextFormField(
-            controller: _passwordController,
-            validator: _validatePassword,
-            decoration: InputDecoration(labelText: 'Password'),
-            obscureText: true,
-          ),
-        ],
-      ),
-    );
-  }
-}
-```
 
 ## Error Messages
 
